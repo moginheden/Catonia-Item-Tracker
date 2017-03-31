@@ -264,8 +264,17 @@ namespace Catonia_Item_Tracker
                 lvItemHistory.ResumeLayout();
             }
 
+            //if no item selected, update overall history
+            if (lvItems.SelectedItems.Count == 0)
+            {
+                lvItemHistory.SuspendLayout();
+                lvItemHistory.Items.Clear();
+                generateHistory(liqGold.item.id);
+                lvItemHistory.ResumeLayout();
+            }
+
             //if it's in the list of items, update that
-            foreach(ListViewItem lvi in lvItems.Items)
+            foreach (ListViewItem lvi in lvItems.Items)
             {
                 if(lvi.Tag == liqGold)
                 {
