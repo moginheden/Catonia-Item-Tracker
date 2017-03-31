@@ -51,6 +51,7 @@
     <Compile Include="FrmMain.Designer.cs">
       <DependentUpon>FrmMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="HistoryRecord.cs" />
     <Compile Include="Inventory.cs" />
     <Compile Include="LootItem.cs" />
     <Compile Include="LootItemQty.cs" />

@@ -44,6 +44,8 @@ namespace Catonia_Item_Tracker
         /// <param name="newItemList">The new list of items to use</param>
         private void updateLvItems(IEnumerable<LootItemQty> newItemList)
         {
+            lvItems.SuspendLayout();
+
             itemList = newItemList;
 
             lvItems.Items.Clear();
@@ -55,6 +57,11 @@ namespace Catonia_Item_Tracker
                 row.Tag = liq;
                 lvItems.Items.Add(row);
             }
+
+            lvItems.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvItems.Columns[0].Width = -2;
+
+            lvItems.ResumeLayout();
         }
 
         /// <summary>
@@ -109,19 +116,28 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void lvItems_SelectedIndexChanged(object sender, EventArgs e)
         {
+            lvCreationPaths.SuspendLayout();
+            lvItemHistory.SuspendLayout();
+
             lvCreationPaths.Items.Clear();
             lvItemHistory.Items.Clear();
             if (lvItems.SelectedItems.Count == 0)
             {
-                generateHistory("1=1");
+                generateHistory();
+                nudOwned.Value = 0;
+                txtDescription.Text = "";
             }
             else
             {
                 LootItemQty liq = (LootItemQty)lvItems.SelectedItems[0].Tag;
                 nudOwned.Value = liq.qty;
+                txtDescription.Text = liq.item.description;
                 updateCreationPaths(liq.item);
-                generateHistory("itemID = " + liq.item.id);
+                generateHistory(liq.item.id);
             }
+
+            lvCreationPaths.ResumeLayout();
+            lvItemHistory.ResumeLayout();
         }
 
         /// <summary>
@@ -130,43 +146,185 @@ namespace Catonia_Item_Tracker
         /// <param name="item"></param>
         private void updateCreationPaths(LootItem item)
         {
-            /// TODO: build this, need to update the number of columns, or maybe convert the lvCreationPaths control to a tree
-            throw new NotImplementedException();
+            /// TODO: look into multi-step recipies, maybe convert the lvCreationPaths control to a tree
+
+            //remove extra ingredient columns
+            for (int i = lvCreationPaths.Columns.Count-1; i > 3; i--)
+            {
+                lvCreationPaths.Columns.RemoveAt(i);
+            }
+            
+            //loop through each recipie that matches this item
+            IEnumerable<Recipie> recipieLines = Program.recipies.Where(x => x.result == item);
+            foreach(Recipie r in recipieLines)
+            {
+                ListViewItem row = new ListViewItem();
+                row.SubItems.Add(r.profession);
+                row.SubItems.Add(r.crafterLevel);
+                row.SubItems.Add(r.resultQty.ToString());
+
+                //add columns for each ingredient
+                for (int i=0; i < r.ingredients.Count; i++)
+                {
+                    LootItemQty ingredient = r.ingredients[i];
+                    if (lvCreationPaths.Columns.Count < ((i*2)+3))
+                    {
+                        lvCreationPaths.Columns.Add("Ingredient " + i);
+                        lvCreationPaths.Columns.Add("# Needed");
+                    }
+
+                    row.SubItems.Add(ingredient.item.name);
+                    row.SubItems.Add(ingredient.qty.ToString());
+                }
+
+                lvCreationPaths.Items.Add(row);
+            }
+            foreach(ColumnHeader col in lvCreationPaths.Columns)
+            {
+                col.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                col.Width = -2;
+            }
         }
 
         /// <summary>
         /// populates the history panel in the lower right based on the given where clause for the current inventory set
         /// </summary>
-        /// <param name="where">the where clause to limit the history to</param>
-        private void generateHistory(string where)
+        /// <param name="itemToSearch">the id of the item to limit the history to, (use the default of -1 for all)</param>
+        private void generateHistory(int itemToSearch = -1)
         {
-            using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
+            IEnumerable<HistoryRecord> rows;
+            if(itemToSearch == -1)
             {
-                dataConnection.Open();
+                rows = inventory.history.AsEnumerable();
+            }
+            else
+            {
+                rows = inventory.history.Where(x => x.liq.item.id == itemToSearch);
+            }
 
-                string sql = @"SELECT *
-                               FROM history
-                               WHERE " + where + @"
-                                 AND inventory = " + inventory.location.Replace("'", "''") + @"
-                               ORDER BY modificationDate desc";
-                using (SqlCommand comm = new SqlCommand(sql, dataConnection))
+            foreach(HistoryRecord hr in rows)
+            {
+                ListViewItem row = new ListViewItem(hr.dateTime.ToString("MMMM dd, yyyy h:mm tt"));
+                row.SubItems.Add(hr.qtyChanged.ToString());
+                row.SubItems.Add(hr.liq.item.name);
+                row.SubItems.Add(hr.note);
+
+                row.Tag = hr;
+
+                lvItemHistory.Items.Add(row);
+            }
+
+            lvItemHistory.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvItemHistory.Columns[0].Width = -2;
+            lvItemHistory.Columns[2].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvItemHistory.Columns[2].Width = -2;
+            lvItemHistory.Columns[3].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvItemHistory.Columns[3].Width = -2;
+        }
+
+        private void btnMake_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Event handler for the add gold button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnAddGold_Click(object sender, EventArgs e)
+        {
+            //Don't do anything it it's a quantity of 0
+            if (nudAddGold.Value == 0M)
+            {
+                return;
+            }
+
+            liqGold.qty += (int)nudAddGold.Value;
+
+            nudGold.Value = liqGold.qty;
+
+            HistoryRecord hr = new HistoryRecord();
+            hr.liq = liqGold;
+            hr.qtyChanged = (int)nudAddGold.Value;
+
+            inventory.history.Insert(0, hr);
+
+            //reset the field to avoid double adds
+            nudAddGold.Value = 0M;
+
+            //if it's the current item update other related fields
+            if ((lvItems.SelectedItems.Count > 0) && (lvItems.SelectedItems[0].Tag == liqGold))
+            {
+                nudOwned.Value = liqGold.qty;
+
+                lvItemHistory.SuspendLayout();
+                lvItemHistory.Items.Clear();
+                generateHistory(liqGold.item.id);
+                lvItemHistory.ResumeLayout();
+            }
+
+            //if it's in the list of items, update that
+            foreach(ListViewItem lvi in lvItems.Items)
+            {
+                if(lvi.Tag == liqGold)
                 {
-                    using(SqlDataReader reader = comm.ExecuteReader())
-                    {
-                        while(reader.Read())
-                        {
-                            LootItemQty liq = inventory.findLoot((int)reader["itemID"]);
-                            ListViewItem row = new ListViewItem();
-                            row.SubItems["dateTime"].Text = ((DateTime)reader["modificationDate"]).ToString("MMMM dd, yyyy");
-                            row.SubItems["numAdded"].Text = ((int)reader["qty"]).ToString();
-                            row.SubItems["item"].Text = liq.item.name;
-                            row.SubItems["note"].Text = (string)reader["note"];
+                    lvItems.SuspendLayout();
+                    lvi.SubItems[1].Text = liqGold.qty.ToString();
+                    lvItems.ResumeLayout();
+                }
+            }
+        }
 
-                            row.Tag = liq;
+        /// <summary>
+        /// event handler for the add items button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnAddItems_Click(object sender, EventArgs e)
+        {
+            //Don't do anything it it's a quantity of 0, or if there is no item selected
+            if ((nudAddItems.Value == 0M) || (lvItems.SelectedItems.Count == 0))
+            {
+                return;
+            }
 
-                            lvItems.Items.Add(row);
-                        }
-                    }
+            LootItemQty liq = (LootItemQty)lvItems.SelectedItems[0].Tag;
+
+            liq.qty += (int)nudAddItems.Value;
+
+            HistoryRecord hr = new HistoryRecord();
+            hr.liq = liq;
+            hr.qtyChanged = (int)nudAddItems.Value;
+
+            inventory.history.Insert(0, hr);
+
+            //reset the field to avoid double adds
+            nudAddItems.Value = 0M;
+
+            //update # owned
+            nudOwned.Value = liq.qty;
+
+            //if it's the gold item, update other related fields
+            if (liq == liqGold)
+            {
+                nudGold.Value = liqGold.qty;
+            }
+
+            //update history window
+            lvItemHistory.SuspendLayout();
+            lvItemHistory.Items.Clear();
+            generateHistory(liqGold.item.id);
+            lvItemHistory.ResumeLayout();
+
+            //update the list of items
+            foreach (ListViewItem lvi in lvItems.Items)
+            {
+                if (lvi.Tag == liq)
+                {
+                    lvItems.SuspendLayout();
+                    lvi.SubItems[1].Text = liq.qty.ToString();
+                    lvItems.ResumeLayout();
                 }
             }
         }

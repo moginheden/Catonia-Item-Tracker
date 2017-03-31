@@ -14,6 +14,8 @@ namespace Catonia_Item_Tracker
         /// </summary>
         public List<LootItemQty> loot = null;
 
+        public List<HistoryRecord> history = null;
+
         /// <summary>
         /// the name of this location as stored in the database
         /// </summary>
@@ -31,6 +33,7 @@ namespace Catonia_Item_Tracker
             this.location = loc;
 
             loot = new List<LootItemQty>();
+            history = new List<HistoryRecord>();
 
             using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
             {
@@ -54,6 +57,28 @@ namespace Catonia_Item_Tracker
                             liq.qty = (int)reader["qty"];
 
                             loot.Add(liq);
+                        }
+                    }
+                }
+
+                //load history
+                string selectHistory = @"SELECT *
+								         FROM history
+                                         WHERE location = '" + loc.Replace("'", "''") + @"'
+								         ORDER BY modificationDate desc";
+                using (SqlCommand comm = new SqlCommand(selectHistory, dataConnection))
+                {
+                    using (SqlDataReader reader = comm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            HistoryRecord hr = new HistoryRecord();
+                            hr.dateTime = (DateTime)reader["modificationDate"];
+                            hr.liq = findLoot((int)reader["id"]);
+                            hr.note = (string)reader["note"];
+                            hr.qtyChanged = (int)reader["qty"];
+                            
+                            history.Add(hr);
                         }
                     }
                 }

@@ -45,6 +45,9 @@
             this.nudAddGold = new System.Windows.Forms.NumericUpDown();
             this.gbGold = new System.Windows.Forms.GroupBox();
             this.gbItemManagment = new System.Windows.Forms.GroupBox();
+            this.gbNew = new System.Windows.Forms.GroupBox();
+            this.btnRecipe = new System.Windows.Forms.Button();
+            this.btnNewItem = new System.Windows.Forms.Button();
             this.btnTransfer = new System.Windows.Forms.Button();
             this.nudAddItems = new System.Windows.Forms.NumericUpDown();
             this.btnAddItems = new System.Windows.Forms.Button();
@@ -58,15 +61,19 @@
             this.note = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblCreationPaths = new System.Windows.Forms.Label();
             this.lvCreationPaths = new System.Windows.Forms.ListView();
+            this.profession = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.crafterLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numMade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.rbOnHand = new System.Windows.Forms.RadioButton();
             this.rbLeftBehind = new System.Windows.Forms.RadioButton();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.txtDescription = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddGold)).BeginInit();
             this.gbGold.SuspendLayout();
             this.gbItemManagment.SuspendLayout();
+            this.gbNew.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddItems)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -98,39 +105,43 @@
             this.valueTotal,
             this.professions,
             this.usable});
+            this.lvItems.FullRowSelect = true;
             this.lvItems.Location = new System.Drawing.Point(12, 54);
             this.lvItems.Name = "lvItems";
-            this.lvItems.Size = new System.Drawing.Size(344, 555);
+            this.lvItems.Size = new System.Drawing.Size(344, 444);
             this.lvItems.TabIndex = 3;
             this.lvItems.UseCompatibleStateImageBehavior = false;
+            this.lvItems.View = System.Windows.Forms.View.Details;
             this.lvItems.SelectedIndexChanged += new System.EventHandler(this.lvItems_SelectedIndexChanged);
             // 
             // itemName
             // 
             this.itemName.Text = "Item Name";
+            this.itemName.Width = 104;
             // 
             // numOwned
             // 
-            this.numOwned.Text = "# Owned";
-            this.numOwned.Width = 30;
+            this.numOwned.Text = "#";
+            this.numOwned.Width = 45;
             // 
             // value
             // 
-            this.value.Text = "Value Each";
-            this.value.Width = 30;
+            this.value.Text = "Value";
+            this.value.Width = 39;
             // 
             // valueTotal
             // 
-            this.valueTotal.Text = "Value Total";
-            this.valueTotal.Width = 30;
+            this.valueTotal.Text = "Total";
+            this.valueTotal.Width = 38;
             // 
             // professions
             // 
             this.professions.Text = "Professions";
+            this.professions.Width = 67;
             // 
             // usable
             // 
-            this.usable.Text = "Directly Usable";
+            this.usable.Text = "Usable";
             // 
             // nudOwned
             // 
@@ -144,6 +155,7 @@
             this.nudOwned.Name = "nudOwned";
             this.nudOwned.Size = new System.Drawing.Size(219, 53);
             this.nudOwned.TabIndex = 4;
+            this.nudOwned.ThousandsSeparator = true;
             // 
             // lblNumOwned
             // 
@@ -188,6 +200,7 @@
             this.btnAddGold.TabIndex = 8;
             this.btnAddGold.Text = "Add Gold";
             this.btnAddGold.UseVisualStyleBackColor = true;
+            this.btnAddGold.Click += new System.EventHandler(this.btnAddGold_Click);
             // 
             // nudAddGold
             // 
@@ -223,15 +236,16 @@
             // 
             // gbItemManagment
             // 
+            this.gbItemManagment.Controls.Add(this.gbNew);
             this.gbItemManagment.Controls.Add(this.btnTransfer);
             this.gbItemManagment.Controls.Add(this.nudAddItems);
             this.gbItemManagment.Controls.Add(this.btnAddItems);
             this.gbItemManagment.Controls.Add(this.btnMake);
+            this.gbItemManagment.Controls.Add(this.lvCreationPaths);
             this.gbItemManagment.Controls.Add(this.btnUndo);
             this.gbItemManagment.Controls.Add(this.lblItemHistory);
             this.gbItemManagment.Controls.Add(this.lvItemHistory);
             this.gbItemManagment.Controls.Add(this.lblCreationPaths);
-            this.gbItemManagment.Controls.Add(this.lvCreationPaths);
             this.gbItemManagment.Controls.Add(this.nudOwned);
             this.gbItemManagment.Controls.Add(this.lblNumOwned);
             this.gbItemManagment.Location = new System.Drawing.Point(362, 162);
@@ -240,6 +254,37 @@
             this.gbItemManagment.TabIndex = 11;
             this.gbItemManagment.TabStop = false;
             this.gbItemManagment.Text = "Item";
+            // 
+            // gbNew
+            // 
+            this.gbNew.Controls.Add(this.btnRecipe);
+            this.gbNew.Controls.Add(this.btnNewItem);
+            this.gbNew.Location = new System.Drawing.Point(159, 386);
+            this.gbNew.Name = "gbNew";
+            this.gbNew.Size = new System.Drawing.Size(219, 61);
+            this.gbNew.TabIndex = 14;
+            this.gbNew.TabStop = false;
+            this.gbNew.Text = "New Types";
+            // 
+            // btnRecipe
+            // 
+            this.btnRecipe.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRecipe.Location = new System.Drawing.Point(6, 14);
+            this.btnRecipe.Name = "btnRecipe";
+            this.btnRecipe.Size = new System.Drawing.Size(116, 41);
+            this.btnRecipe.TabIndex = 14;
+            this.btnRecipe.Text = "Recipe";
+            this.btnRecipe.UseVisualStyleBackColor = true;
+            // 
+            // btnNewItem
+            // 
+            this.btnNewItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnNewItem.Location = new System.Drawing.Point(136, 14);
+            this.btnNewItem.Name = "btnNewItem";
+            this.btnNewItem.Size = new System.Drawing.Size(77, 41);
+            this.btnNewItem.TabIndex = 13;
+            this.btnNewItem.Text = "Item";
+            this.btnNewItem.UseVisualStyleBackColor = true;
             // 
             // btnTransfer
             // 
@@ -280,16 +325,19 @@
             this.btnAddItems.TabIndex = 10;
             this.btnAddItems.Text = "Add";
             this.btnAddItems.UseVisualStyleBackColor = true;
+            this.btnAddItems.Click += new System.EventHandler(this.btnAddItems_Click);
             // 
             // btnMake
             // 
-            this.btnMake.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnMake.Location = new System.Drawing.Point(275, 400);
+            this.btnMake.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnMake.Location = new System.Drawing.Point(315, 228);
+            this.btnMake.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.btnMake.Name = "btnMake";
-            this.btnMake.Size = new System.Drawing.Size(103, 41);
+            this.btnMake.Size = new System.Drawing.Size(63, 28);
             this.btnMake.TabIndex = 11;
             this.btnMake.Text = "Make";
             this.btnMake.UseVisualStyleBackColor = true;
+            this.btnMake.Click += new System.EventHandler(this.btnMake_Click);
             // 
             // btnUndo
             // 
@@ -322,10 +370,12 @@
             this.lvItemHistory.Size = new System.Drawing.Size(372, 119);
             this.lvItemHistory.TabIndex = 8;
             this.lvItemHistory.UseCompatibleStateImageBehavior = false;
+            this.lvItemHistory.View = System.Windows.Forms.View.Details;
             // 
             // dateTime
             // 
             this.dateTime.Text = "Date/Time";
+            this.dateTime.Width = 150;
             // 
             // numAdded
             // 
@@ -333,13 +383,13 @@
             // 
             // item
             // 
-            this.item.DisplayIndex = 3;
             this.item.Text = "Item";
+            this.item.Width = 98;
             // 
             // note
             // 
-            this.note.DisplayIndex = 2;
             this.note.Text = "Note";
+            this.note.Width = 175;
             // 
             // lblCreationPaths
             // 
@@ -353,12 +403,23 @@
             // lvCreationPaths
             // 
             this.lvCreationPaths.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.profession,
+            this.crafterLevel,
             this.numMade});
             this.lvCreationPaths.Location = new System.Drawing.Point(9, 155);
             this.lvCreationPaths.Name = "lvCreationPaths";
             this.lvCreationPaths.Size = new System.Drawing.Size(369, 70);
             this.lvCreationPaths.TabIndex = 6;
             this.lvCreationPaths.UseCompatibleStateImageBehavior = false;
+            this.lvCreationPaths.View = System.Windows.Forms.View.Details;
+            // 
+            // profession
+            // 
+            this.profession.Text = "Profession";
+            // 
+            // crafterLevel
+            // 
+            this.crafterLevel.Text = "Crafter Level";
             // 
             // numMade
             // 
@@ -397,15 +458,26 @@
             this.panel1.Size = new System.Drawing.Size(250, 26);
             this.panel1.TabIndex = 14;
             // 
+            // txtDescription
+            // 
+            this.txtDescription.BackColor = System.Drawing.SystemColors.Window;
+            this.txtDescription.Location = new System.Drawing.Point(12, 505);
+            this.txtDescription.Multiline = true;
+            this.txtDescription.Name = "txtDescription";
+            this.txtDescription.ReadOnly = true;
+            this.txtDescription.Size = new System.Drawing.Size(344, 104);
+            this.txtDescription.TabIndex = 15;
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(758, 621);
+            this.Controls.Add(this.txtDescription);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.gbItemManagment);
-            this.Controls.Add(this.gbGold);
             this.Controls.Add(this.lvItems);
+            this.Controls.Add(this.gbGold);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.txtSearch);
             this.Name = "FrmMain";
@@ -417,6 +489,7 @@
             this.gbGold.PerformLayout();
             this.gbItemManagment.ResumeLayout(false);
             this.gbItemManagment.PerformLayout();
+            this.gbNew.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudAddItems)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
@@ -461,5 +534,11 @@
         private System.Windows.Forms.RadioButton rbLeftBehind;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnTransfer;
+        private System.Windows.Forms.GroupBox gbNew;
+        private System.Windows.Forms.Button btnRecipe;
+        private System.Windows.Forms.Button btnNewItem;
+        private System.Windows.Forms.ColumnHeader profession;
+        private System.Windows.Forms.ColumnHeader crafterLevel;
+        private System.Windows.Forms.TextBox txtDescription;
     }
 }
