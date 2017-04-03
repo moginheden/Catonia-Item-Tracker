@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Catonia_Item_Tracker
@@ -12,9 +14,22 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// the list of items in this inventory stash
         /// </summary>
-        public List<LootItemQty> loot = null;
+        public List<ItemQty> loot = null;
 
-        public List<HistoryRecord> history = null;
+        /// <summary>
+        /// The list of history records representing all changes to this item
+        /// </summary>
+        private Stack<HistoryRecord> history = null;
+
+        /// <summary>
+        /// List of HistoryRecords representing changes that need to be saved to the database
+        /// </summary>
+        private ConcurrentQueue<HistoryRecord> sqlTasks = null;
+
+        /// <summary>
+        /// the thread that updates the database in the background without stalling the UI
+        /// </summary>
+        private Thread workerThread = null;
 
         /// <summary>
         /// the name of this location as stored in the database
@@ -32,8 +47,15 @@ namespace Catonia_Item_Tracker
         {
             this.location = loc;
 
-            loot = new List<LootItemQty>();
-            history = new List<HistoryRecord>();
+            loot = new List<ItemQty>();
+            history = new Stack<HistoryRecord>();
+
+            foreach (Item i in Program.items)
+            {
+                ItemQty iq = new ItemQty();
+                iq.item = i;
+                loot.Add(iq);
+            }
 
             using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
             {
@@ -50,13 +72,8 @@ namespace Catonia_Item_Tracker
                     {
                         while (reader.Read())
                         {
-                            LootItem li = Program.findLootByID((int)reader["id"]);
-
-                            LootItemQty liq = new LootItemQty();
-                            liq.item = li;
-                            liq.qty = (int)reader["qty"];
-
-                            loot.Add(liq);
+                            ItemQty iq = findLoot((int)reader["id"]);
+                            iq.qty = (int)reader["qty"];
                         }
                     }
                 }
@@ -65,7 +82,7 @@ namespace Catonia_Item_Tracker
                 string selectHistory = @"SELECT *
 								         FROM history
                                          WHERE location = '" + loc.Replace("'", "''") + @"'
-								         ORDER BY modificationDate desc";
+								         ORDER BY modificationDate";
                 using (SqlCommand comm = new SqlCommand(selectHistory, dataConnection))
                 {
                     using (SqlDataReader reader = comm.ExecuteReader())
@@ -73,14 +90,155 @@ namespace Catonia_Item_Tracker
                         while (reader.Read())
                         {
                             HistoryRecord hr = new HistoryRecord();
-                            hr.dateTime = (DateTime)reader["modificationDate"];
-                            hr.liq = findLoot((int)reader["id"]);
+                            hr.dateTime = ((DateTime)reader["modificationDate"]).ToLocalTime();
+                            hr.iq = findLoot((int)reader["itemID"]);
                             hr.note = (string)reader["note"];
                             hr.qtyChanged = (int)reader["qty"];
                             
-                            history.Add(hr);
+                            history.Push(hr);
                         }
                     }
+                }
+            }
+
+            sqlTasks = new ConcurrentQueue<HistoryRecord>();
+            workerThread = new Thread(new ThreadStart(workerThreadLoop));
+            workerThread.Start();
+        }
+
+        /// <summary>
+        /// Proccessing loop for the worker thread, only exists once it finds a HistoryRecord with an Item ID of -1
+        /// </summary>
+        private void workerThreadLoop()
+        {
+            string unsaved = " Unsaved Changes";
+
+            while (true)
+            {
+                Thread.Sleep(1000);
+
+                using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
+                {
+                    dataConnection.Open();
+
+                    //update database with this client's changes
+                    HistoryRecord hr = null;
+                    while(this.sqlTasks.TryDequeue(out hr))
+                    {
+                        //if the program is closing, finish up
+                        if (hr.iq.item.id == -1)
+                        {
+                            return;
+                        }
+
+                        string sql = @"INSERT INTO history
+                                                   (itemID,
+                                                    modificationDate,
+                                                    location,
+                                                    qty,
+                                                    note)
+                                       VALUES ('" + hr.iq.item.id + @"',
+                                               '" + hr.dateTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff") + @"',
+                                               '" + this.location + @"',
+                                               '" + hr.qtyChanged + @"',
+                                               '" + hr.note + @"')";
+                        using (SqlCommand comm = new SqlCommand(sql, dataConnection))
+                        {
+                            try
+                            {
+                                comm.ExecuteNonQuery();
+                            }
+                            catch(SqlException ex)
+                            {
+                                if (ex.Message.StartsWith("Violation of PRIMARY KEY"))
+                                {
+                                    sql = @"UPDATE history
+                                        SET qty = '" + hr.qtyChanged + @"',
+                                            note = '" + hr.note + @"'
+                                        WHERE itemID = '" + hr.iq.item.id + @"'
+                                          AND modificationDate = '" + hr.dateTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff") + @"'
+                                          AND location = '" + this.location + @"'";
+                                    using (SqlCommand commUpdate = new SqlCommand(sql, dataConnection))
+                                    {
+                                        commUpdate.ExecuteNonQuery();
+                                    }
+                                }
+                                else
+                                {
+                                    throw;
+                                }
+                            }
+                        }
+
+                        sql = @"UPDATE lootByLocation
+                                SET qty = '" + hr.iq.qty + @"'
+                                WHERE id = '" + hr.iq.item.id + @"'
+                                  AND location = '" + this.location + @"'";
+                        using (SqlCommand comm = new SqlCommand(sql, dataConnection))
+                        {
+                            comm.ExecuteNonQuery();
+                        }
+                    }
+
+
+                    //Look for updates from other clients
+                    DateTime checkDate = DateTime.Now.AddSeconds(-10).ToUniversalTime();
+                    string findUpdatesSQL = @"SELECT *
+                                              FROM history
+                                              WHERE modificationDate > '" + checkDate.ToString("yyyy-MM-dd HH:mm:ss.fff") + @"'
+                                                AND location = '" + this.location + @"'";
+                    using (SqlCommand comm = new SqlCommand(findUpdatesSQL, dataConnection))
+                    {
+                        using (SqlDataReader reader = comm.ExecuteReader())
+                        {
+                            while(reader.Read())
+                            {
+                                //look for a HistoryRecord that matches, but allow a 10 millisecond variance due to SQL truncating dates
+                                HistoryRecord hrToUpdate = history.SingleOrDefault(x =>
+                                    (x.iq.item.id == (int)reader["itemID"])
+                                    && (100000 > Math.Abs((x.dateTime - ((DateTime)reader["modificationDate"]).ToLocalTime()).Ticks)));
+                                if (hrToUpdate == null)
+                                {
+                                    hrToUpdate = new HistoryRecord()
+                                    {
+                                        dateTime = ((DateTime)reader["modificationDate"]).ToLocalTime(),
+                                        iq = findLoot((int)reader["itemID"]),
+                                        qtyChanged = (int)reader["qty"],
+                                        note = (string)reader["note"]
+                                    };
+                                    hrToUpdate.iq.qty += hrToUpdate.qtyChanged;
+
+                                    this.history.Push(hrToUpdate);
+
+                                    if(Program.mainForm.inventory == this)
+                                    {
+                                        Program.mainForm.updateItem(hrToUpdate.iq);
+                                    }
+                                }
+                                else if((hrToUpdate.qtyChanged != (int)reader["qty"]) 
+                                        || (hrToUpdate.note != (string)reader["note"]))
+                                {
+                                    hrToUpdate.note = (string)reader["note"];
+                                    hrToUpdate.iq.qty -= hrToUpdate.qtyChanged;
+                                    hrToUpdate.qtyChanged = (int)reader["qty"];
+                                    hrToUpdate.iq.qty += hrToUpdate.qtyChanged;
+
+                                    if (Program.mainForm.inventory == this)
+                                    {
+                                        Program.mainForm.updateItem(hrToUpdate.iq);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ((Program.mainForm.Text.EndsWith(unsaved)) && (Program.mainForm.Visible))
+                {
+                    Program.mainForm.Invoke(new Action(() =>
+                    {
+                        Program.mainForm.Text = Program.mainForm.Text.Substring(0, Program.mainForm.Text.Length - unsaved.Length);
+                    }));
                 }
             }
         }
@@ -90,9 +248,8 @@ namespace Catonia_Item_Tracker
         /// </summary>
         /// <param name="lootID">the DB id of the loot item</param>
         /// <exception cref="IndexOutOfRangeException">If the id isn't found</exception>
-        public LootItemQty findLoot(int lootID)
+        public ItemQty findLoot(int lootID)
         {
-            /// TODO: switch this to binary search
             int lootIndex = lootID;
             while (loot[lootIndex].item.id > lootID)
             {
@@ -109,6 +266,72 @@ namespace Catonia_Item_Tracker
             }
 
             return loot[lootIndex];
+        }
+
+        /// <summary>
+        /// returns an enumerator to view the history of items in this inventory
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<HistoryRecord> getHistory()
+        {
+            return history.GetEnumerator();
+        }
+
+        /// <summary>
+        /// adds a new history line
+        /// </summary>
+        /// <param name="hr"></param>
+        public void addHistory(HistoryRecord hr)
+        {
+            history.Push(hr);
+
+            updateHistory(hr);
+        }
+
+        /// <summary>
+        /// updates an existing history item
+        /// </summary>
+        /// <param name="hr"></param>
+        public void updateHistory(HistoryRecord hr)
+        {
+            string unsaved = " Unsaved Changes";
+            if (!Program.mainForm.Text.EndsWith(unsaved))
+            {
+                Program.mainForm.Text += unsaved;
+            }
+
+            //enqueue a copy of the HistoryRecord and it's subitem to avoid cross-threading issues
+            ItemQty iqToEnqueue = new ItemQty()
+            {
+                item = hr.iq.item,
+                qty = hr.iq.qty
+            };
+            HistoryRecord hrToEnqueue = new HistoryRecord()
+            {
+                dateTime = hr.dateTime,
+                iq = iqToEnqueue,
+                note = hr.note,
+                qtyChanged = hr.qtyChanged
+            };
+            this.sqlTasks.Enqueue(hr);
+        }
+
+        /// <summary>
+        /// Views the latest history record. Make sure to call updateHistory() if you make changes to the returned record
+        /// </summary>
+        /// <returns>The HistoryRecord that was most recently modified</returns>
+        public HistoryRecord latestHistory()
+        {
+            if(history.Count ==0)
+            {
+                return null;
+            }
+            return history.Peek();
+        }
+
+        public void undo()
+        {
+            /// TODO: update DB
         }
     }
 }

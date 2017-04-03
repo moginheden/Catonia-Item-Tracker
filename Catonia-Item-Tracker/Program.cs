@@ -17,7 +17,7 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// the list of items in the game
         /// </summary>
-        public static List<LootItem> items = null;
+        public static List<Item> items = null;
 
         /// <summary>
         /// The list of items we have on hand
@@ -35,24 +35,41 @@ namespace Catonia_Item_Tracker
         public static List<Recipie> recipies = null;
 
         /// <summary>
+        /// link to the main form window
+        /// </summary>
+        public static FrmMain mainForm = null;
+
+        /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
         {
-            loadAllFromDB();
+            try
+            {
+                loadAllFromDB();
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FrmMain());
-        }
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                mainForm = new FrmMain();
+                Application.Run(mainForm);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                
+            }
+            HistoryRecord hrCloser = new HistoryRecord() { iq = new ItemQty() { item = new Item() { id = -1 } } };
+            onHand.addHistory(hrCloser);
+            leftBehind.addHistory(hrCloser);
+         }
 
         /// <summary>
         /// Loads all the items and recipies from the database
         /// </summary>
         private static void loadAllFromDB()
         {
-            items = new List<LootItem>();
+            items = new List<Item>();
             recipies = new List<Recipie>();
 
             using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
@@ -69,13 +86,13 @@ namespace Catonia_Item_Tracker
                     {
                         while (reader.Read())
                         {
-                            LootItem li = new LootItem();
-                            li.id = (int)reader["id"];
-                            li.name = (string)reader["name"];
-                            li.cost = (int)reader["cost"];
-                            li.description = (string)reader["description"];
+                            Item item = new Item();
+                            item.id = (int)reader["id"];
+                            item.name = (string)reader["name"];
+                            item.cost = (int)reader["cost"];
+                            item.description = (string)reader["description"];
                             
-                            items.Add(li);
+                            items.Add(item);
                         }
                     }
                 }
@@ -102,14 +119,14 @@ namespace Catonia_Item_Tracker
                                 {
                                     while (readerIngredients.Read())
                                     {
-                                        LootItemQty liq = new LootItemQty();
-                                        liq.item = findLootByID((int)reader["ingredient"]);
-                                        liq.qty = (int)reader["qty"];
-                                        r.ingredients.Add(liq);
+                                        ItemQty iq = new ItemQty();
+                                        iq.item = findLootByID((int)reader["ingredient"]);
+                                        iq.qty = (int)reader["qty"];
+                                        r.ingredients.Add(iq);
                                     }
                                 }
                             }
-                            LootItem result = findLootByID((int)reader["result"]);
+                            Item result = findLootByID((int)reader["result"]);
                             r.resultQty = (int)reader["resultQty"];
                             r.profession = (string)reader["profession"];
                             r.crafterLevel = (string)reader["crafterLevel"];
@@ -129,7 +146,7 @@ namespace Catonia_Item_Tracker
         /// </summary>
         /// <param name="lootID">the DB id of the loot item</param>
         /// <exception cref="IndexOutOfRangeException">If the id isn't found</exception>
-        public static LootItem findLootByID(int lootID)
+        public static Item findLootByID(int lootID)
         {
             int lootIndex = lootID;
             while (items[lootIndex].id > lootID)

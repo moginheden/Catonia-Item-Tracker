@@ -6,14 +6,24 @@ using System.Threading.Tasks;
 
 namespace Catonia_Item_Tracker
 {
-    public class LootItemQty
+    public class ItemQty
     {
-        public LootItem item = null;
+        public Item item = null;
         public int qty = 0;
 
         public override bool Equals(object a)
         {
-            return this.item.id.Equals(((LootItemQty)a).item.id);
+            return this.item.id.Equals(((ItemQty)a).item.id);
+        }
+
+        public static bool operator ==(ItemQty i1, ItemQty i2)
+        {
+            return i1.Equals(i2);
+        }
+
+        public static bool operator !=(ItemQty i1, ItemQty i2)
+        {
+            return !i1.Equals(i2);
         }
 
         public override int GetHashCode()

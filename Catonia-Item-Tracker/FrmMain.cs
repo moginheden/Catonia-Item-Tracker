@@ -16,14 +16,17 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// reference to the loot item "Gold" for use in the numeric up/down field
         /// </summary>
-        private LootItemQty liqGold = Program.onHand.loot.First(x => x.item.name.Equals("Gold"));
+        private ItemQty iqGold = Program.onHand.loot.First(x => x.item.name.Equals("Gold"));
 
         /// <summary>
         /// current list of items shown in the left listview
         /// </summary>
-        internal IEnumerable<LootItemQty> itemList = null;
+        internal IEnumerable<ItemQty> itemList = null;
 
-        private Inventory inventory = Program.onHand;
+        /// <summary>
+        /// The inventory list this form is currently using
+        /// </summary>
+        internal Inventory inventory = Program.onHand;
 
         /// <summary>
         /// entry point
@@ -32,8 +35,30 @@ namespace Catonia_Item_Tracker
         {
             InitializeComponent();
 
-            nudGold.Value = liqGold.qty;
+            using (new TriggerLock())
+            {
+                nudGold.Value = iqGold.qty;
+            }
 
+            //setup column size for item list
+            lvItems.Columns[0].Width = -2;
+
+            //setup column size for recipie listviews
+            lvRecipiesMakingItem.Columns[0].Width = -2;
+            lvRecipiesMakingItem.Columns[1].Width = -2;
+            lvRecipiesMakingItem.Columns[2].Width = -2;
+
+            lvRecipiesUsingItem.Columns[0].Width = -2;
+            lvRecipiesUsingItem.Columns[1].Width = -2;
+            lvRecipiesUsingItem.Columns[2].Width = -2;
+
+            //set previous history list
+            lvItemHistory.SuspendLayout();
+            lvItemHistory.Items.Clear();
+            generateHistory();
+            lvItemHistory.ResumeLayout();
+            
+            //set initial item list
             updateLvItems(inventory.loot);
         }
 
@@ -42,19 +67,19 @@ namespace Catonia_Item_Tracker
         /// </summary>
         /// <remarks>does not clear filters or sorts</remarks>
         /// <param name="newItemList">The new list of items to use</param>
-        private void updateLvItems(IEnumerable<LootItemQty> newItemList)
+        private void updateLvItems(IEnumerable<ItemQty> newItemList)
         {
             lvItems.SuspendLayout();
 
             itemList = newItemList;
 
             lvItems.Items.Clear();
-            foreach (LootItemQty liq in newItemList)
+            foreach (ItemQty iq in newItemList)
             {
-                ListViewItem row = new ListViewItem(new string[] { liq.item.name,
-                                                                   liq.qty.ToString(),
-                                                                   liq.item.cost.ToString() });
-                row.Tag = liq;
+                ListViewItem row = new ListViewItem(new string[] { iq.item.name,
+                                                                   iq.qty.ToString(),
+                                                                   iq.item.cost.ToString() });
+                row.Tag = iq;
                 lvItems.Items.Add(row);
             }
 
@@ -89,15 +114,15 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
-        /// event handler for the search bar typing a single character
+        /// event handler for the "search discriptions" checkbox being changed
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void txtSearch_KeyUp(object sender, KeyEventArgs e)
+        private void cbSearchDiscriptions_CheckedChanged(object sender, EventArgs e)
         {
             txtSearch_TextChanged(sender, e);
         }
-
+        
         /// <summary>
         /// event handler for the search bar having a new value, (doesn't auto-run till you leave the field)
         /// </summary>
@@ -105,8 +130,16 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
-            /// TODO: check if this is run twice due to keyup then this being called
-            updateLvItems(inventory.loot.Where(x => x.item.name.Contains(txtSearch.Text)));
+            string search = txtSearch.Text.ToLower();
+            if(cbSearchDescriptions.Checked)
+            {
+                updateLvItems(inventory.loot.Where(x => (x.item.name.ToLower().Contains(search)
+                                                        || x.item.description.ToLower().Contains(search))));
+            }
+            else
+            {
+                updateLvItems(inventory.loot.Where(x => x.item.name.ToLower().Contains(search)));
+            }
         }
 
         /// <summary>
@@ -116,27 +149,34 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void lvItems_SelectedIndexChanged(object sender, EventArgs e)
         {
-            lvCreationPaths.SuspendLayout();
+            /// TODO: check why this isn't called when the search eliminates the current item
+            lvRecipiesMakingItem.SuspendLayout();
             lvItemHistory.SuspendLayout();
 
-            lvCreationPaths.Items.Clear();
+            lvRecipiesMakingItem.Items.Clear();
             lvItemHistory.Items.Clear();
             if (lvItems.SelectedItems.Count == 0)
             {
                 generateHistory();
-                nudOwned.Value = 0;
+                using (new TriggerLock())
+                {
+                    nudOwned.Value = 0;
+                }
                 txtDescription.Text = "";
             }
             else
             {
-                LootItemQty liq = (LootItemQty)lvItems.SelectedItems[0].Tag;
-                nudOwned.Value = liq.qty;
-                txtDescription.Text = liq.item.description;
-                updateCreationPaths(liq.item);
-                generateHistory(liq.item.id);
+                ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
+                using (new TriggerLock())
+                {
+                    nudOwned.Value = iq.qty;
+                }
+                txtDescription.Text = iq.item.description;
+                updateCreationPaths(iq.item);
+                generateHistory(iq.item.id);
             }
 
-            lvCreationPaths.ResumeLayout();
+            lvRecipiesMakingItem.ResumeLayout();
             lvItemHistory.ResumeLayout();
         }
 
@@ -144,14 +184,15 @@ namespace Catonia_Item_Tracker
         /// populates the item creation paths in the middle of the right side
         /// </summary>
         /// <param name="item"></param>
-        private void updateCreationPaths(LootItem item)
+        private void updateCreationPaths(Item item)
         {
-            /// TODO: look into multi-step recipies, maybe convert the lvCreationPaths control to a tree
+            /// TODO: look into multi-step recipies, maybe convert the list views to control to trees
+            /// TODO: implement items using this recipie listview
 
             //remove extra ingredient columns
-            for (int i = lvCreationPaths.Columns.Count-1; i > 3; i--)
+            for (int i = lvRecipiesMakingItem.Columns.Count-1; i > 3; i--)
             {
-                lvCreationPaths.Columns.RemoveAt(i);
+                lvRecipiesMakingItem.Columns.RemoveAt(i);
             }
             
             //loop through each recipie that matches this item
@@ -166,20 +207,20 @@ namespace Catonia_Item_Tracker
                 //add columns for each ingredient
                 for (int i=0; i < r.ingredients.Count; i++)
                 {
-                    LootItemQty ingredient = r.ingredients[i];
-                    if (lvCreationPaths.Columns.Count < ((i*2)+3))
+                    ItemQty ingredient = r.ingredients[i];
+                    if (lvRecipiesMakingItem.Columns.Count < ((i*2)+3))
                     {
-                        lvCreationPaths.Columns.Add("Ingredient " + i);
-                        lvCreationPaths.Columns.Add("# Needed");
+                        lvRecipiesMakingItem.Columns.Add("Ingredient " + i);
+                        lvRecipiesMakingItem.Columns.Add("# Needed");
                     }
 
                     row.SubItems.Add(ingredient.item.name);
                     row.SubItems.Add(ingredient.qty.ToString());
                 }
 
-                lvCreationPaths.Items.Add(row);
+                lvRecipiesMakingItem.Items.Add(row);
             }
-            foreach(ColumnHeader col in lvCreationPaths.Columns)
+            foreach(ColumnHeader col in lvRecipiesMakingItem.Columns)
             {
                 col.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
                 col.Width = -2;
@@ -192,39 +233,67 @@ namespace Catonia_Item_Tracker
         /// <param name="itemToSearch">the id of the item to limit the history to, (use the default of -1 for all)</param>
         private void generateHistory(int itemToSearch = -1)
         {
-            IEnumerable<HistoryRecord> rows;
-            if(itemToSearch == -1)
+            IEnumerator<HistoryRecord> rows = inventory.getHistory();
+
+            while (rows.MoveNext())
             {
-                rows = inventory.history.AsEnumerable();
+                HistoryRecord hr = rows.Current;
+
+                if ((itemToSearch == -1) || (hr.iq.item.id == itemToSearch))
+                {
+                    ListViewItem row = new ListViewItem(hr.dateTime.ToString("MMMM dd, yyyy h:mm tt"));
+                    row.SubItems.Add(hr.qtyChanged.ToString());
+                    row.SubItems.Add(hr.iq.item.name);
+                    row.SubItems.Add(hr.note);
+
+                    row.Tag = hr;
+
+                    lvItemHistory.Items.Add(row);
+                }
             }
-            else
-            {
-                rows = inventory.history.Where(x => x.liq.item.id == itemToSearch);
-            }
-
-            foreach(HistoryRecord hr in rows)
-            {
-                ListViewItem row = new ListViewItem(hr.dateTime.ToString("MMMM dd, yyyy h:mm tt"));
-                row.SubItems.Add(hr.qtyChanged.ToString());
-                row.SubItems.Add(hr.liq.item.name);
-                row.SubItems.Add(hr.note);
-
-                row.Tag = hr;
-
-                lvItemHistory.Items.Add(row);
-            }
-
-            lvItemHistory.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvItemHistory.Columns[0].Width = -2;
-            lvItemHistory.Columns[2].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvItemHistory.Columns[2].Width = -2;
-            lvItemHistory.Columns[3].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvItemHistory.Columns[3].Width = -2;
         }
 
         private void btnMake_Click(object sender, EventArgs e)
         {
 
+        }
+
+        /// <summary>
+        /// event handler for the tota amount of gold being changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void nudGold_ValueChanged(object sender, EventArgs e)
+        {
+            if (TriggerLock.IsLocked)
+            {
+                return;
+            }
+
+            //create or update the history record
+            int difference = (int)nudGold.Value - iqGold.qty;
+
+            HistoryRecord hr = inventory.latestHistory();
+            if ((hr != null)
+                && (hr.iq == iqGold)
+                && (hr.dateTime > DateTime.Now.AddSeconds(-10)))
+            {
+                hr.qtyChanged += difference;
+                inventory.updateHistory(hr);
+            }
+            else
+            {
+                hr = new HistoryRecord();
+                hr.iq = iqGold;
+                hr.qtyChanged = difference;
+                inventory.addHistory(hr);
+            }
+
+            //update the inventory
+            iqGold.qty = (int)nudGold.Value;
+
+            //update other ui fields
+            updateItem(iqGold);
         }
 
         /// <summary>
@@ -240,49 +309,65 @@ namespace Catonia_Item_Tracker
                 return;
             }
 
-            liqGold.qty += (int)nudAddGold.Value;
-
-            nudGold.Value = liqGold.qty;
+            iqGold.qty += (int)nudAddGold.Value;
 
             HistoryRecord hr = new HistoryRecord();
-            hr.liq = liqGold;
+            hr.iq = iqGold;
             hr.qtyChanged = (int)nudAddGold.Value;
 
-            inventory.history.Insert(0, hr);
+            inventory.addHistory(hr);
 
             //reset the field to avoid double adds
             nudAddGold.Value = 0M;
 
-            //if it's the current item update other related fields
-            if ((lvItems.SelectedItems.Count > 0) && (lvItems.SelectedItems[0].Tag == liqGold))
-            {
-                nudOwned.Value = liqGold.qty;
+            updateItem(iqGold);
+        }
 
-                lvItemHistory.SuspendLayout();
-                lvItemHistory.Items.Clear();
-                generateHistory(liqGold.item.id);
-                lvItemHistory.ResumeLayout();
+        /// <summary>
+        /// event handler for the tota amount of gold being changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void nudOwned_ValueChanged(object sender, EventArgs e)
+        {
+            /// TODO: look into scrolling this field then hitting up button sometimes un-doing the scroll
+            /// TODO: look into 2nd window not always capturing a change soon after another one
+            if (TriggerLock.IsLocked)
+            {
+                return;
             }
 
-            //if no item selected, update overall history
+            //Don't do anything if there is no item selected
             if (lvItems.SelectedItems.Count == 0)
             {
-                lvItemHistory.SuspendLayout();
-                lvItemHistory.Items.Clear();
-                generateHistory(liqGold.item.id);
-                lvItemHistory.ResumeLayout();
+                nudOwned.Value = 0M;
+                return;
             }
 
-            //if it's in the list of items, update that
-            foreach (ListViewItem lvi in lvItems.Items)
+            ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
+
+            //create or update the history record
+            HistoryRecord hr = inventory.latestHistory();
+            int difference = (int)nudOwned.Value - iq.qty;
+
+            if ((hr != null)
+                && (hr.iq == iq)
+                && (hr.dateTime > DateTime.Now.AddSeconds(-10)))
             {
-                if(lvi.Tag == liqGold)
-                {
-                    lvItems.SuspendLayout();
-                    lvi.SubItems[1].Text = liqGold.qty.ToString();
-                    lvItems.ResumeLayout();
-                }
+                hr.qtyChanged += difference;
             }
+            else
+            {
+                hr = new HistoryRecord();
+                hr.iq = iq;
+                hr.qtyChanged = difference;
+                inventory.addHistory(hr);
+            }
+
+            //update the inventory
+            iq.qty = (int)nudOwned.Value;
+
+            updateItem(iq);
         }
 
         /// <summary>
@@ -292,50 +377,100 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void btnAddItems_Click(object sender, EventArgs e)
         {
-            //Don't do anything it it's a quantity of 0, or if there is no item selected
+            //Don't do anything if it's a quantity of 0, or if there is no item selected
             if ((nudAddItems.Value == 0M) || (lvItems.SelectedItems.Count == 0))
             {
                 return;
             }
 
-            LootItemQty liq = (LootItemQty)lvItems.SelectedItems[0].Tag;
+            ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
 
-            liq.qty += (int)nudAddItems.Value;
+            iq.qty += (int)nudAddItems.Value;
 
             HistoryRecord hr = new HistoryRecord();
-            hr.liq = liq;
+            hr.iq = iq;
             hr.qtyChanged = (int)nudAddItems.Value;
 
-            inventory.history.Insert(0, hr);
+            inventory.addHistory(hr);
 
             //reset the field to avoid double adds
             nudAddItems.Value = 0M;
 
-            //update # owned
-            nudOwned.Value = liq.qty;
+            updateItem(iq);
+        }
 
-            //if it's the gold item, update other related fields
-            if (liq == liqGold)
+        /// <summary>
+        /// Updates the gui fields related to a given ItemQty, (all the cases where it's quantity is used, and history)
+        /// </summary>
+        /// <param name="iq"></param>
+        internal void updateItem(ItemQty iq)
+        {
+            if (this.InvokeRequired)
             {
-                nudGold.Value = liqGold.qty;
+                this.Invoke(new Action(() => updateItem(iq)));  // do stuff on UI thread, not here
+                return;
+            }
+            
+            //if it's the gold item, update it's numeric up down field
+            if (iq == iqGold)
+            {
+                using (new TriggerLock())
+                {
+                    nudGold.Value = iqGold.qty;
+                }
             }
 
-            //update history window
-            lvItemHistory.SuspendLayout();
-            lvItemHistory.Items.Clear();
-            generateHistory(liqGold.item.id);
-            lvItemHistory.ResumeLayout();
+            //if it's the current item update other related fields
+            if ((lvItems.SelectedItems.Count > 0) && ((ItemQty)lvItems.SelectedItems[0].Tag == iq))
+            {
+                using (new TriggerLock())
+                {
+                    nudOwned.Value = iq.qty;
+                }
 
-            //update the list of items
+                lvItemHistory.SuspendLayout();
+                lvItemHistory.Items.Clear();
+                generateHistory(iq.item.id);
+                lvItemHistory.ResumeLayout();
+            }
+
+            //if no item selected, update overall history
+            if (lvItems.SelectedItems.Count == 0)
+            {
+                lvItemHistory.SuspendLayout();
+                lvItemHistory.Items.Clear();
+                generateHistory();
+                lvItemHistory.ResumeLayout();
+            }
+
+            //if it's in the list of items, update that
             foreach (ListViewItem lvi in lvItems.Items)
             {
-                if (lvi.Tag == liq)
+                if ((ItemQty)lvi.Tag == iq)
                 {
                     lvItems.SuspendLayout();
-                    lvi.SubItems[1].Text = liq.qty.ToString();
+                    lvi.SubItems[1].Text = iqGold.qty.ToString();
                     lvItems.ResumeLayout();
                 }
             }
+        }
+
+        /// <summary>
+        /// event handler for dealing with the selected recipie being changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void lvRecipies_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ListView lv = (ListView)sender;
+
+            ListView otherLv = lvRecipiesMakingItem;
+            if(lv == lvRecipiesMakingItem)
+            {
+                otherLv = lvRecipiesUsingItem;
+            }
+
+            otherLv.SelectedIndices.Clear();
         }
     }
 }

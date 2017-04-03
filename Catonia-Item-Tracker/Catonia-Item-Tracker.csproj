@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataBaseUpdateThread.cs" />
     <Compile Include="FrmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -53,11 +54,12 @@
     </Compile>
     <Compile Include="HistoryRecord.cs" />
     <Compile Include="Inventory.cs" />
-    <Compile Include="LootItem.cs" />
-    <Compile Include="LootItemQty.cs" />
+    <Compile Include="Item.cs" />
+    <Compile Include="ItemQty.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Recipie.cs" />
+    <Compile Include="TriggerLock.cs" />
     <EmbeddedResource Include="FrmMain.resx">
       <DependentUpon>FrmMain.cs</DependentUpon>
     </EmbeddedResource>

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Catonia_Item_Tracker
 {
-    public class LootItem
+    public class Item
     {
         public int id = -1;
         public string name = null;
@@ -15,7 +15,17 @@ namespace Catonia_Item_Tracker
 
         public override bool Equals(object a)
         {
-            return this.id.Equals(((LootItem)a).id);
+            return this.id.Equals(((Item)a).id);
+        }
+
+        public static bool operator ==(Item i1, Item i2)
+        {
+            return i1.Equals(i2);
+        }
+
+        public static bool operator !=(Item i1, Item i2)
+        {
+            return !i1.Equals(i2);
         }
 
         public override int GetHashCode()
