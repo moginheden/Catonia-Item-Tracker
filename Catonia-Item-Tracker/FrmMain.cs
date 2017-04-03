@@ -330,7 +330,6 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void nudOwned_ValueChanged(object sender, EventArgs e)
         {
-            /// TODO: look into scrolling this field then hitting up button sometimes un-doing the scroll
             /// TODO: look into 2nd window not always capturing a change soon after another one
             if (TriggerLock.IsLocked)
             {
@@ -355,6 +354,7 @@ namespace Catonia_Item_Tracker
                 && (hr.dateTime > DateTime.Now.AddSeconds(-10)))
             {
                 hr.qtyChanged += difference;
+                inventory.updateHistory(hr);
             }
             else
             {
