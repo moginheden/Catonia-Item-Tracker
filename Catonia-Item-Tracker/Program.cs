@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -9,10 +13,13 @@ namespace Catonia_Item_Tracker
 {
     static class Program
     {
+        private const string sqlServer = "858d5789-ed56-4b0c-9364-a73301643bf4.sqlserver.sequelizer.com";
+        private const string database = "db858d5789ed564b0c9364a73301643bf4";
+
         /// <summary>
         /// The connection string to the SQL server
         /// </summary>
-        public const string connectionString = "Server=858d5789-ed56-4b0c-9364-a73301643bf4.sqlserver.sequelizer.com;Database=db858d5789ed564b0c9364a73301643bf4;User ID=pidrrcbeptdchsdu;Password=gZYWgihc2QRCFSbS3Vggaby376XduRrLsnD2UsmAkfX8vGMZTwmDMbXfA6XitePj;";
+        public const string connectionString = "Server=" + sqlServer + ";Database=" + database + ";User ID=pidrrcbeptdchsdu;Password=gZYWgihc2QRCFSbS3Vggaby376XduRrLsnD2UsmAkfX8vGMZTwmDMbXfA6XitePj;";
 
         /// <summary>
         /// the list of items in the game
@@ -40,6 +47,11 @@ namespace Catonia_Item_Tracker
         public static FrmMain mainForm = null;
 
         /// <summary>
+        /// ID to diferentiate this instance from others in SQL's history table
+        /// </summary>
+        public static string clientID = Environment.MachineName;
+
+        /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
@@ -60,9 +72,15 @@ namespace Catonia_Item_Tracker
                 
             }
             HistoryRecord hrCloser = new HistoryRecord() { iq = new ItemQty() { item = new Item() { id = -1 } } };
-            onHand.addHistory(hrCloser);
-            leftBehind.addHistory(hrCloser);
-         }
+            if(onHand != null)
+            {
+                onHand.addHistory(hrCloser);
+            }
+            if(leftBehind != null)
+            {
+                leftBehind.addHistory(hrCloser);
+            }
+        }
 
         /// <summary>
         /// Loads all the items and recipies from the database
@@ -91,7 +109,8 @@ namespace Catonia_Item_Tracker
                             item.name = (string)reader["name"];
                             item.cost = (int)reader["cost"];
                             item.description = (string)reader["description"];
-                            
+                            item.usable = (bool)reader["usable"];
+
                             items.Add(item);
                         }
                     }
@@ -149,16 +168,20 @@ namespace Catonia_Item_Tracker
         public static Item findLootByID(int lootID)
         {
             int lootIndex = lootID;
-            while (items[lootIndex].id > lootID)
+            if (lootIndex > (items.Count - 1))
+            {
+                lootIndex = items.Count - 1;
+            }
+            while ((lootIndex > -1) && (items[lootIndex].id > lootID))
             {
                 lootIndex--;
             }
-            while (items[lootIndex].id < lootID)
+            while ((lootIndex < items.Count) && (items[lootIndex].id < lootID))
             {
                 lootIndex++;
             }
 
-            if (items[lootIndex].id != lootID)
+            if ((lootIndex <= -1) || (lootIndex >= items.Count) || (items[lootIndex].id != lootID))
             {
                 throw new IndexOutOfRangeException("ID: " + lootID + " not found in loot list");
             }

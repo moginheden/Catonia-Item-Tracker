@@ -121,6 +121,9 @@ namespace Catonia_Item_Tracker
                 {
                     dataConnection.Open();
 
+
+                    
+
                     //update database with this client's changes
                     HistoryRecord hr = null;
                     while(this.sqlTasks.TryDequeue(out hr))
@@ -136,12 +139,16 @@ namespace Catonia_Item_Tracker
                                                     modificationDate,
                                                     location,
                                                     qty,
-                                                    note)
+                                                    note,
+                                                    undone,
+                                                    clientName)
                                        VALUES ('" + hr.iq.item.id + @"',
                                                '" + hr.dateTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff") + @"',
                                                '" + this.location + @"',
                                                '" + hr.qtyChanged + @"',
-                                               '" + hr.note + @"')";
+                                               '" + hr.note + @"',
+                                               '0',
+                                               '" + Program.clientID + @"')";
                         using (SqlCommand comm = new SqlCommand(sql, dataConnection))
                         {
                             try
@@ -154,7 +161,8 @@ namespace Catonia_Item_Tracker
                                 {
                                     sql = @"UPDATE history
                                         SET qty = '" + hr.qtyChanged + @"',
-                                            note = '" + hr.note + @"'
+                                            note = '" + hr.note + @"',
+                                            clientName = '" + Program.clientID + @"'
                                         WHERE itemID = '" + hr.iq.item.id + @"'
                                           AND modificationDate = '" + hr.dateTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff") + @"'
                                           AND location = '" + this.location + @"'";
@@ -176,23 +184,40 @@ namespace Catonia_Item_Tracker
                                   AND location = '" + this.location + @"'";
                         using (SqlCommand comm = new SqlCommand(sql, dataConnection))
                         {
-                            comm.ExecuteNonQuery();
+                            //run the update, if no rows are changed, then do an insert
+                            if (comm.ExecuteNonQuery() == 0)
+                            {
+                                sql = @"INSERT INTO lootByLocation
+                                                    (id, 
+                                                     location, 
+                                                     qty)
+                                        VALUES ('" + hr.iq.item.id + @"',
+                                                '" + this.location + @"',
+                                                '" + hr.iq.qty + @"')";
+                                using (SqlCommand insertComm = new SqlCommand(sql, dataConnection))
+                                {
+                                    insertComm.ExecuteNonQuery();
+                                }
+                            }
                         }
                     }
 
 
                     //Look for updates from other clients
-                    DateTime checkDate = DateTime.Now.AddSeconds(-10).ToUniversalTime();
+                    DateTime checkDate = DateTime.Now.AddSeconds(-60*5).ToUniversalTime();
                     string findUpdatesSQL = @"SELECT *
                                               FROM history
                                               WHERE modificationDate > '" + checkDate.ToString("yyyy-MM-dd HH:mm:ss.fff") + @"'
-                                                AND location = '" + this.location + @"'";
+                                                AND location = '" + this.location + @"'
+                                                AND clientName != '" + Program.clientID + @"'";
                     using (SqlCommand comm = new SqlCommand(findUpdatesSQL, dataConnection))
                     {
                         using (SqlDataReader reader = comm.ExecuteReader())
                         {
                             while(reader.Read())
                             {
+                                /// TODO: check into quick changes using up/down arrows being overwritten by old values
+                                
                                 //look for a HistoryRecord that matches, but allow a 10 millisecond variance due to SQL truncating dates
                                 HistoryRecord hrToUpdate = history.SingleOrDefault(x =>
                                     (x.iq.item.id == (int)reader["itemID"])
@@ -212,7 +237,7 @@ namespace Catonia_Item_Tracker
 
                                     if(Program.mainForm.inventory == this)
                                     {
-                                        Program.mainForm.updateItem(hrToUpdate.iq);
+                                        Program.mainForm.updateItemQty(hrToUpdate.iq);
                                     }
                                 }
                                 else if((hrToUpdate.qtyChanged != (int)reader["qty"]) 
@@ -225,7 +250,7 @@ namespace Catonia_Item_Tracker
 
                                     if (Program.mainForm.inventory == this)
                                     {
-                                        Program.mainForm.updateItem(hrToUpdate.iq);
+                                        Program.mainForm.updateItemQty(hrToUpdate.iq);
                                     }
                                 }
                             }
@@ -233,12 +258,11 @@ namespace Catonia_Item_Tracker
                     }
                 }
 
-                if ((Program.mainForm.Text.EndsWith(unsaved)) && (Program.mainForm.Visible))
+                if ((Program.mainForm != null)
+                    && (Program.mainForm.Visible) 
+                    && (Program.mainForm.Text.EndsWith(unsaved)))
                 {
-                    Program.mainForm.Invoke(new Action(() =>
-                    {
-                        Program.mainForm.Text = Program.mainForm.Text.Substring(0, Program.mainForm.Text.Length - unsaved.Length);
-                    }));
+                    Program.mainForm.ResetText();
                 }
             }
         }
@@ -251,16 +275,20 @@ namespace Catonia_Item_Tracker
         public ItemQty findLoot(int lootID)
         {
             int lootIndex = lootID;
-            while (loot[lootIndex].item.id > lootID)
+            if(lootIndex > (loot.Count-1))
+            {
+                lootIndex = loot.Count - 1;
+            }
+            while ((lootIndex > -1) && (loot[lootIndex].item.id > lootID))
             {
                 lootIndex--;
             }
-            while (loot[lootIndex].item.id < lootID)
+            while ((lootIndex < loot.Count) && (loot[lootIndex].item.id < lootID))
             {
                 lootIndex++;
             }
 
-            if (loot[lootIndex].item.id != lootID)
+            if ((lootIndex <= -1) || (lootIndex >= loot.Count) || (loot[lootIndex].item.id != lootID))
             {
                 throw new IndexOutOfRangeException("ID: " + lootID + " not found in loot list");
             }

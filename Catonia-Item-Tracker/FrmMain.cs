@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,20 +14,66 @@ namespace Catonia_Item_Tracker
 {
     public partial class FrmMain : Form
     {
+        public const string defaultTitle = "Catonia Item Tracker v0.3";
+
+        /// <summary>
+        /// class to sort the item list with the 0 qty at the bottom, then by clicked column
+        /// </summary>
+        class lvItemComparer : IComparer
+        {
+            private int col;
+            private System.Windows.Forms.SortOrder order;
+            public lvItemComparer()
+            {
+                col = 0;
+                order = System.Windows.Forms.SortOrder.Ascending;
+            }
+            public lvItemComparer(int column, System.Windows.Forms.SortOrder order)
+            {
+                col = column;
+                this.order = order;
+            }
+            public int Compare(object x, object y)
+            {
+                int returnVal = -1;
+
+                if ((col == 1) || (col == 2) || (col == 3))
+                {
+                    returnVal = int.Parse(((ListViewItem)x).SubItems[col].Text).CompareTo(int.Parse(((ListViewItem)y).SubItems[col].Text));
+                }
+                else
+                {
+                    returnVal = String.Compare(((ListViewItem)x).SubItems[col].Text, ((ListViewItem)y).SubItems[col].Text);
+                }
+
+                if (order == System.Windows.Forms.SortOrder.Descending)
+                {
+                    returnVal *= -1;
+                }
+
+                if ((((ListViewItem)x).SubItems[1].Text != "0") && (((ListViewItem)y).SubItems[1].Text == "0"))
+                {
+                    return -1;
+                }
+                else if ((((ListViewItem)x).SubItems[1].Text == "0") && (((ListViewItem)y).SubItems[1].Text != "0"))
+                {
+                    return 1;
+                }
+
+                return returnVal;
+            }
+        }
+
         /// <summary>
         /// reference to the loot item "Gold" for use in the numeric up/down field
         /// </summary>
-        private ItemQty iqGold = Program.onHand.loot.First(x => x.item.name.Equals("Gold"));
-
-        /// <summary>
-        /// current list of items shown in the left listview
-        /// </summary>
-        internal IEnumerable<ItemQty> itemList = null;
+        private ItemQty iqGold = Program.onHand.loot.First(x => x.item.name.Equals("Gold Coins"));
 
         /// <summary>
         /// The inventory list this form is currently using
         /// </summary>
         internal Inventory inventory = Program.onHand;
+        private int sortColumn;
 
         /// <summary>
         /// entry point
@@ -34,6 +81,8 @@ namespace Catonia_Item_Tracker
         public FrmMain()
         {
             InitializeComponent();
+
+            ResetText();
 
             using (new TriggerLock())
             {
@@ -57,9 +106,127 @@ namespace Catonia_Item_Tracker
             lvItemHistory.Items.Clear();
             generateHistory();
             lvItemHistory.ResumeLayout();
-            
+
             //set initial item list
+            sortColumn = 0;
+            lvItems.Sorting = System.Windows.Forms.SortOrder.Ascending;
             updateLvItems(inventory.loot);
+        }
+
+        /// <summary>
+        /// resets the title of this form to it's default value
+        /// </summary>
+        public override void ResetText()
+        {
+            if(this.InvokeRequired)
+            {
+                Program.mainForm.Invoke(new Action(() =>
+                {
+                    ResetText();
+                }));
+            }
+
+            Text = defaultTitle;
+        }
+
+        /// <summary>
+        /// updates the form to reflect a changed item
+        /// </summary>
+        /// <param name="item">The item that was updated</param>
+        internal void updateItem(Item item)
+        {
+            ItemQty iq = inventory.findLoot(item.id);
+
+            //update main item list
+            lvItems.SuspendLayout();
+
+            //try to update an existing row
+            bool found = false;
+            foreach (ListViewItem row in lvItems.Items)
+            {
+                if (((ItemQty)row.Tag).item.id == item.id)
+                {
+                    //update row
+                    row.SubItems[0].Text = item.name;
+                    row.SubItems[1].Text = iq.qty.ToString();
+                    row.SubItems[2].Text = item.cost.ToString();
+                    row.SubItems[3].Text = (item.cost * iq.qty).ToString();
+                    row.SubItems[4].Text = getProfessionsForItem(item);
+                    row.SubItems[5].Text = item.usable.ToString();
+                    found = true;
+
+                    //select new item
+                    lvItems.SelectedItems.Clear();
+                    row.Selected = true;
+                    row.Focused = true;
+                }
+            }
+
+            //if no row is found, add a new one at the bottom
+            if(!found)
+            {
+                //create noew row
+                ListViewItem row = new ListViewItem(new string[] { item.name,
+                                                                   iq.qty.ToString(),
+                                                                   item.cost.ToString(),
+                                                                   (item.cost * iq.qty).ToString(),
+                                                                   getProfessionsForItem(item),
+                                                                   item.usable.ToString() });
+                row.Tag = iq;
+                        
+                //add to list
+                lvItems.Items.Add(row);
+
+                //select new item
+                lvItems.SelectedItems.Clear();
+                row.Selected = true;
+                row.Focused = true;
+            }
+
+            //resize name column
+            lvItems.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvItems.Columns[0].Width = -2;
+
+            //re-sort
+            lvItems.Sort();
+
+            lvItems.ResumeLayout();
+
+            //update description and recipies if it's the active item
+            if((lvItems.SelectedItems.Count > 0) && (item.id == ((ItemQty)lvItems.SelectedItems[0].Tag).item.id))
+            {
+                txtDescription.Text = item.description;
+
+                lvRecipiesMakingItem.SuspendLayout();
+                lvRecipiesUsingItem.SuspendLayout();
+                lvRecipiesMakingItem.Items.Clear();
+                lvRecipiesUsingItem.Items.Clear();
+                updateCreationPaths(item);
+                lvRecipiesMakingItem.ResumeLayout();
+                lvRecipiesUsingItem.ResumeLayout();
+            }
+        }
+
+        /// <summary>
+        /// returns a string showing what prefessions use the given item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        private string getProfessionsForItem(Item item)
+        {
+            string returnVal = "";
+            ItemQty compare = new ItemQty() { item = item };
+            foreach(Recipie r in Program.recipies)
+            {
+                //if the recipie produces or uses the item, and the profession is not listed yet, add it
+                if(((r.result == item) || (r.ingredients.Contains(compare)))
+                   && (!returnVal.Contains(r.profession)))
+                {
+                    returnVal += r.profession + " ";
+                }
+            }
+
+            return returnVal;
         }
 
         /// <summary>
@@ -70,21 +237,27 @@ namespace Catonia_Item_Tracker
         private void updateLvItems(IEnumerable<ItemQty> newItemList)
         {
             lvItems.SuspendLayout();
-
-            itemList = newItemList;
-
+            
             lvItems.Items.Clear();
-            foreach (ItemQty iq in newItemList)
+            foreach (ItemQty iq in newItemList.OrderBy(o => (o.qty == 0)).ThenBy(o => o.item.name))
             {
                 ListViewItem row = new ListViewItem(new string[] { iq.item.name,
                                                                    iq.qty.ToString(),
-                                                                   iq.item.cost.ToString() });
+                                                                   iq.item.cost.ToString(),
+                                                                   (iq.item.cost * iq.qty).ToString(),
+                                                                   getProfessionsForItem(iq.item),
+                                                                   iq.item.usable.ToString()});
                 row.Tag = iq;
                 lvItems.Items.Add(row);
             }
 
+            //auto-size the name column
             lvItems.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
             lvItems.Columns[0].Width = -2;
+
+            //sort itemList
+            lvItems.ListViewItemSorter = new lvItemComparer(sortColumn, lvItems.Sorting);
+            lvItems.Sort();
 
             lvItems.ResumeLayout();
         }
@@ -114,11 +287,11 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
-        /// event handler for the "search discriptions" checkbox being changed
+        /// event handler for the "search descriptions" checkbox being changed
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void cbSearchDiscriptions_CheckedChanged(object sender, EventArgs e)
+        private void cbSearchDescriptions_CheckedChanged(object sender, EventArgs e)
         {
             txtSearch_TextChanged(sender, e);
         }
@@ -130,15 +303,15 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
-            string search = txtSearch.Text.ToLower();
+            string search = txtSearch.Text.ToLower().Replace('-', ' ');
             if(cbSearchDescriptions.Checked)
             {
-                updateLvItems(inventory.loot.Where(x => (x.item.name.ToLower().Contains(search)
-                                                        || x.item.description.ToLower().Contains(search))));
+                updateLvItems(inventory.loot.Where(x => (x.item.name.ToLower().Replace('-', ' ').Contains(search)
+                                                        || x.item.description.ToLower().Replace('-', ' ').Contains(search))));
             }
             else
             {
-                updateLvItems(inventory.loot.Where(x => x.item.name.ToLower().Contains(search)));
+                updateLvItems(inventory.loot.Where(x => x.item.name.ToLower().Replace('-', ' ').Contains(search)));
             }
         }
 
@@ -151,9 +324,11 @@ namespace Catonia_Item_Tracker
         {
             /// TODO: check why this isn't called when the search eliminates the current item
             lvRecipiesMakingItem.SuspendLayout();
+            lvRecipiesUsingItem.SuspendLayout();
             lvItemHistory.SuspendLayout();
 
             lvRecipiesMakingItem.Items.Clear();
+            lvRecipiesUsingItem.Items.Clear();
             lvItemHistory.Items.Clear();
             if (lvItems.SelectedItems.Count == 0)
             {
@@ -177,6 +352,7 @@ namespace Catonia_Item_Tracker
             }
 
             lvRecipiesMakingItem.ResumeLayout();
+            lvRecipiesUsingItem.ResumeLayout();
             lvItemHistory.ResumeLayout();
         }
 
@@ -187,40 +363,80 @@ namespace Catonia_Item_Tracker
         private void updateCreationPaths(Item item)
         {
             /// TODO: look into multi-step recipies, maybe convert the list views to control to trees
-            /// TODO: implement items using this recipie listview
 
+            //make a fake ItemQty to compare the ingredients to.  Since we overrode the equals on ItemQty to only check items qty is irrelivant.
+            ItemQty comparison = new ItemQty() { item = item, qty = 0 };
+            
             //remove extra ingredient columns
-            for (int i = lvRecipiesMakingItem.Columns.Count-1; i > 3; i--)
+            for (int i = lvRecipiesMakingItem.Columns.Count - 1; i > 3; i--)
             {
                 lvRecipiesMakingItem.Columns.RemoveAt(i);
             }
-            
-            //loop through each recipie that matches this item
-            IEnumerable<Recipie> recipieLines = Program.recipies.Where(x => x.result == item);
-            foreach(Recipie r in recipieLines)
-            {
-                ListViewItem row = new ListViewItem();
-                row.SubItems.Add(r.profession);
-                row.SubItems.Add(r.crafterLevel);
-                row.SubItems.Add(r.resultQty.ToString());
 
-                //add columns for each ingredient
-                for (int i=0; i < r.ingredients.Count; i++)
+            for (int i = lvRecipiesUsingItem.Columns.Count - 1; i > 3; i--)
+            {
+                lvRecipiesUsingItem.Columns.RemoveAt(i);
+            }
+
+            //loop through each recipie
+            foreach (Recipie r in Program.recipies)
+            {
+                //if it can make this item
+                if (r.result == item)
                 {
-                    ItemQty ingredient = r.ingredients[i];
-                    if (lvRecipiesMakingItem.Columns.Count < ((i*2)+3))
+                    ListViewItem row = new ListViewItem();
+                    row.SubItems.Add(r.profession);
+                    row.SubItems.Add(r.crafterLevel);
+                    row.SubItems.Add(r.resultQty.ToString());
+
+                    //add columns for each ingredient
+                    for (int i = 0; i < r.ingredients.Count; i++)
                     {
-                        lvRecipiesMakingItem.Columns.Add("Ingredient " + i);
-                        lvRecipiesMakingItem.Columns.Add("# Needed");
+                        ItemQty ingredient = r.ingredients[i];
+                        if (lvRecipiesMakingItem.Columns.Count < ((i * 2) + 3))
+                        {
+                            lvRecipiesMakingItem.Columns.Add("Ingredient " + i);
+                            lvRecipiesMakingItem.Columns.Add("# Needed");
+                        }
+
+                        row.SubItems.Add(ingredient.item.name);
+                        row.SubItems.Add(ingredient.qty.ToString());
                     }
 
-                    row.SubItems.Add(ingredient.item.name);
-                    row.SubItems.Add(ingredient.qty.ToString());
+                    lvRecipiesMakingItem.Items.Add(row);
                 }
 
-                lvRecipiesMakingItem.Items.Add(row);
+                //if it uses this item
+                if (r.ingredients.Contains(comparison))
+                {
+                    ListViewItem row = new ListViewItem();
+                    row.SubItems.Add(r.profession);
+                    row.SubItems.Add(r.crafterLevel);
+                    row.SubItems.Add(r.resultQty.ToString());
+
+                    //add columns for each ingredient
+                    for (int i = 0; i < r.ingredients.Count; i++)
+                    {
+                        ItemQty ingredient = r.ingredients[i];
+                        if (lvRecipiesUsingItem.Columns.Count < ((i * 2) + 3))
+                        {
+                            lvRecipiesUsingItem.Columns.Add("Ingredient " + i);
+                            lvRecipiesUsingItem.Columns.Add("# Needed");
+                        }
+
+                        row.SubItems.Add(ingredient.item.name);
+                        row.SubItems.Add(ingredient.qty.ToString());
+                    }
+
+                    lvRecipiesUsingItem.Items.Add(row);
+                }
             }
             foreach(ColumnHeader col in lvRecipiesMakingItem.Columns)
+            {
+                col.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                col.Width = -2;
+            }
+            foreach (ColumnHeader col in lvRecipiesUsingItem.Columns)
             {
                 col.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
                 col.Width = -2;
@@ -233,6 +449,7 @@ namespace Catonia_Item_Tracker
         /// <param name="itemToSearch">the id of the item to limit the history to, (use the default of -1 for all)</param>
         private void generateHistory(int itemToSearch = -1)
         {
+            /// TODO: limit this generation to only updating the top couple of rows instead of re-generating everything every time
             IEnumerator<HistoryRecord> rows = inventory.getHistory();
 
             while (rows.MoveNext())
@@ -293,7 +510,7 @@ namespace Catonia_Item_Tracker
             iqGold.qty = (int)nudGold.Value;
 
             //update other ui fields
-            updateItem(iqGold);
+            updateItemQty(iqGold);
         }
 
         /// <summary>
@@ -320,7 +537,7 @@ namespace Catonia_Item_Tracker
             //reset the field to avoid double adds
             nudAddGold.Value = 0M;
 
-            updateItem(iqGold);
+            updateItemQty(iqGold);
         }
 
         /// <summary>
@@ -367,7 +584,7 @@ namespace Catonia_Item_Tracker
             //update the inventory
             iq.qty = (int)nudOwned.Value;
 
-            updateItem(iq);
+            updateItemQty(iq);
         }
 
         /// <summary>
@@ -396,18 +613,18 @@ namespace Catonia_Item_Tracker
             //reset the field to avoid double adds
             nudAddItems.Value = 0M;
 
-            updateItem(iq);
+            updateItemQty(iq);
         }
 
         /// <summary>
         /// Updates the gui fields related to a given ItemQty, (all the cases where it's quantity is used, and history)
         /// </summary>
         /// <param name="iq"></param>
-        internal void updateItem(ItemQty iq)
+        internal void updateItemQty(ItemQty iq)
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action(() => updateItem(iq)));  // do stuff on UI thread, not here
+                this.Invoke(new Action(() => updateItemQty(iq)));  // do stuff on UI thread, not here
                 return;
             }
             
@@ -449,7 +666,9 @@ namespace Catonia_Item_Tracker
                 if ((ItemQty)lvi.Tag == iq)
                 {
                     lvItems.SuspendLayout();
-                    lvi.SubItems[1].Text = iqGold.qty.ToString();
+                    lvi.SubItems[1].Text = iq.qty.ToString();
+                    lvi.SubItems[3].Text = (iq.item.cost * iq.qty).ToString();
+                    lvItems.Sort();
                     lvItems.ResumeLayout();
                 }
             }
@@ -471,6 +690,70 @@ namespace Catonia_Item_Tracker
             }
 
             otherLv.SelectedIndices.Clear();
+        }
+
+        /// <summary>
+        /// Event handler for the context menu opening, sets if the edit option should show, (only if a single item is selected.)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cmsItemList_Opening(object sender, CancelEventArgs e)
+        {
+            editItemToolStripMenuItem.Visible = (lvItems.SelectedItems.Count == 1);
+        }
+
+        /// <summary>
+        /// Event handler for the edit item context menu option
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editItemToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmItem itemForm = new FrmItem(((ItemQty)lvItems.SelectedItems[0].Tag).item);
+            itemForm.Show();
+        }
+
+        /// <summary>
+        /// Event handler for the create new item context menu option
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void createNewItemToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmItem itemForm = new FrmItem();
+            itemForm.Show();
+        }
+
+        /// <summary>
+        /// Event Handler for the column being clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void lvItems_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            // Determine whether the column is the same as the last column clicked.
+            if (e.Column != sortColumn)
+            {
+                // Set the sort column to the new column.
+                sortColumn = e.Column;
+                // Set the sort order to ascending by default.
+                lvItems.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            }
+            else
+            {
+                // Determine what the last sort order was and change it.
+                if (lvItems.Sorting == System.Windows.Forms.SortOrder.Ascending)
+                    lvItems.Sorting = System.Windows.Forms.SortOrder.Descending;
+                else
+                    lvItems.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            }
+
+            // Set the ListViewItemSorter property to a new ListViewItemComparer
+            // object.
+            lvItems.ListViewItemSorter = new lvItemComparer(e.Column, lvItems.Sorting);
+
+            // Call the sort method to manually sort.
+            lvItems.Sort();
         }
     }
 }

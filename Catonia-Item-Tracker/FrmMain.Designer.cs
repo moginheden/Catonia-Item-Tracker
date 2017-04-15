@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.lblSearch = new System.Windows.Forms.Label();
             this.lvItems = new System.Windows.Forms.ListView();
@@ -37,6 +38,9 @@
             this.valueTotal = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.professions = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.usable = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cmsItemList = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.editItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createNewItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nudOwned = new System.Windows.Forms.NumericUpDown();
             this.lblNumOwned = new System.Windows.Forms.Label();
             this.lblGold = new System.Windows.Forms.Label();
@@ -69,8 +73,9 @@
             this.rbOnHand = new System.Windows.Forms.RadioButton();
             this.rbLeftBehind = new System.Windows.Forms.RadioButton();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.txtDescription = new System.Windows.Forms.TextBox();
+            this.txtDescription = new System.Windows.Forms.RichTextBox();
             this.cbSearchDescriptions = new System.Windows.Forms.CheckBox();
+            this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddGold)).BeginInit();
@@ -108,6 +113,7 @@
             this.valueTotal,
             this.professions,
             this.usable});
+            this.lvItems.ContextMenuStrip = this.cmsItemList;
             this.lvItems.FullRowSelect = true;
             this.lvItems.HideSelection = false;
             this.lvItems.Location = new System.Drawing.Point(12, 78);
@@ -116,6 +122,7 @@
             this.lvItems.TabIndex = 3;
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
+            this.lvItems.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvItems_ColumnClick);
             this.lvItems.SelectedIndexChanged += new System.EventHandler(this.lvItems_SelectedIndexChanged);
             // 
             // itemName
@@ -146,6 +153,29 @@
             // usable
             // 
             this.usable.Text = "Usable";
+            // 
+            // cmsItemList
+            // 
+            this.cmsItemList.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.editItemToolStripMenuItem,
+            this.createNewItemToolStripMenuItem});
+            this.cmsItemList.Name = "cmsItemList";
+            this.cmsItemList.Size = new System.Drawing.Size(163, 48);
+            this.cmsItemList.Opening += new System.ComponentModel.CancelEventHandler(this.cmsItemList_Opening);
+            // 
+            // editItemToolStripMenuItem
+            // 
+            this.editItemToolStripMenuItem.Name = "editItemToolStripMenuItem";
+            this.editItemToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.editItemToolStripMenuItem.Text = "Edit Item";
+            this.editItemToolStripMenuItem.Click += new System.EventHandler(this.editItemToolStripMenuItem_Click);
+            // 
+            // createNewItemToolStripMenuItem
+            // 
+            this.createNewItemToolStripMenuItem.Name = "createNewItemToolStripMenuItem";
+            this.createNewItemToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.createNewItemToolStripMenuItem.Text = "Create New Item";
+            this.createNewItemToolStripMenuItem.Click += new System.EventHandler(this.createNewItemToolStripMenuItem_Click);
             // 
             // nudOwned
             // 
@@ -502,7 +532,7 @@
             this.cbSearchDescriptions.TabIndex = 16;
             this.cbSearchDescriptions.Text = "Search Descriptions";
             this.cbSearchDescriptions.UseVisualStyleBackColor = true;
-            this.cbSearchDescriptions.CheckedChanged += new System.EventHandler(this.cbSearchDiscriptions_CheckedChanged);
+            this.cbSearchDescriptions.CheckedChanged += new System.EventHandler(this.cbSearchDescriptions_CheckedChanged);
             // 
             // FrmMain
             // 
@@ -523,7 +553,8 @@
             this.MinimumSize = new System.Drawing.Size(916, 1000);
             this.Name = "FrmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Catonia Item Tracker v0.1";
+            this.Text = "Catonia Item Tracker v0.2";
+            this.cmsItemList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddGold)).EndInit();
@@ -576,7 +607,7 @@
         private System.Windows.Forms.Button btnTransfer;
         private System.Windows.Forms.ColumnHeader profession;
         private System.Windows.Forms.ColumnHeader crafterLevel;
-        private System.Windows.Forms.TextBox txtDescription;
+        private System.Windows.Forms.RichTextBox txtDescription;
         private System.Windows.Forms.ListView lvRecipiesUsingItem;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
@@ -584,5 +615,8 @@
         private System.Windows.Forms.Label lblUsingItem;
         private System.Windows.Forms.CheckBox cbSearchDescriptions;
         private System.Windows.Forms.Button btnUndo;
+        private System.Windows.Forms.ContextMenuStrip cmsItemList;
+        private System.Windows.Forms.ToolStripMenuItem editItemToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createNewItemToolStripMenuItem;
     }
 }

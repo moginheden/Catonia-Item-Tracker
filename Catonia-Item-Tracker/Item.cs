@@ -12,6 +12,7 @@ namespace Catonia_Item_Tracker
         public string name = null;
         public int cost = 0;
         public string description = "";
+        public bool usable = false;
 
         public override bool Equals(object a)
         {
