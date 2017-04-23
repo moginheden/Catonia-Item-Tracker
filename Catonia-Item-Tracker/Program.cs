@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -117,42 +118,42 @@ namespace Catonia_Item_Tracker
                 }
 
                 //load recipies
+                DataSet dsRecipies = new DataSet();
                 string selectRecipies = @"SELECT *
 									  FROM recipies
 									  ORDER BY id";
-                using (SqlCommand comm = new SqlCommand(selectRecipies, dataConnection))
+                using (SqlDataAdapter da = new SqlDataAdapter(selectRecipies, dataConnection))
                 {
-                    using (SqlDataReader reader = comm.ExecuteReader())
+                    da.Fill(dsRecipies);
+                }
+
+                foreach(DataRow row in dsRecipies.Tables[0].Rows)
+                { 
+                    Recipie r = new Recipie();
+                    r.id = (int)row["id"];
+                    r.result = findLootByID((int)row["result"]);
+                    r.resultQty = (int)row["resultQty"];
+                    r.profession = (string)row["profession"];
+                    r.crafterLevel = (string)row["crafterLevel"];
+
+                    string selectIngredients = @"SELECT *
+												FROM recipieIngredients
+												WHERE recipieID = '" + r.id + "'";
+                    using (SqlCommand commIngredients = new SqlCommand(selectIngredients, dataConnection))
                     {
-                        while (reader.Read())
+                        using (SqlDataReader reader = commIngredients.ExecuteReader())
                         {
-                            Recipie r = new Recipie();
-                            r.id = (int)reader["id"];
-
-                            string selectIngredients = @"SELECT *
-													 FROM recipieIngredients
-													 WHERE recipieID = '" + r.id + "'";
-                            using (SqlCommand commIngredients = new SqlCommand(selectIngredients, dataConnection))
+                            while (reader.Read())
                             {
-                                using (SqlDataReader readerIngredients = commIngredients.ExecuteReader())
-                                {
-                                    while (readerIngredients.Read())
-                                    {
-                                        ItemQty iq = new ItemQty();
-                                        iq.item = findLootByID((int)reader["ingredient"]);
-                                        iq.qty = (int)reader["qty"];
-                                        r.ingredients.Add(iq);
-                                    }
-                                }
+                                ItemQty iq = new ItemQty();
+                                iq.item = findLootByID((int)reader["ingredient"]);
+                                iq.qty = (int)reader["qty"];
+                                r.ingredients.Add(iq);
                             }
-                            Item result = findLootByID((int)reader["result"]);
-                            r.resultQty = (int)reader["resultQty"];
-                            r.profession = (string)reader["profession"];
-                            r.crafterLevel = (string)reader["crafterLevel"];
-
-                            recipies.Add(r);
                         }
                     }
+
+                    recipies.Add(r);
                 }
             }
 

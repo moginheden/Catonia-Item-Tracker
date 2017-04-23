@@ -14,7 +14,7 @@ namespace Catonia_Item_Tracker
 {
     public partial class FrmMain : Form
     {
-        public const string defaultTitle = "Catonia Item Tracker v0.3";
+        public const string defaultTitle = "Catonia Item Tracker v0.4";
 
         /// <summary>
         /// class to sort the item list with the 0 qty at the bottom, then by clicked column
@@ -65,6 +65,11 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
+        /// the column # that was clicked last in the inventory list
+        /// </summary>
+        private int sortColumnInventory = 0;
+
+        /// <summary>
         /// reference to the loot item "Gold" for use in the numeric up/down field
         /// </summary>
         private ItemQty iqGold = Program.onHand.loot.First(x => x.item.name.Equals("Gold Coins"));
@@ -73,8 +78,7 @@ namespace Catonia_Item_Tracker
         /// The inventory list this form is currently using
         /// </summary>
         internal Inventory inventory = Program.onHand;
-        private int sortColumn;
-
+        
         /// <summary>
         /// entry point
         /// </summary>
@@ -108,7 +112,7 @@ namespace Catonia_Item_Tracker
             lvItemHistory.ResumeLayout();
 
             //set initial item list
-            sortColumn = 0;
+            sortColumnInventory = 0;
             lvItems.Sorting = System.Windows.Forms.SortOrder.Ascending;
             updateLvItems(inventory.loot);
         }
@@ -186,7 +190,7 @@ namespace Catonia_Item_Tracker
             //resize name column
             lvItems.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
             lvItems.Columns[0].Width = -2;
-
+            
             //re-sort
             lvItems.Sort();
 
@@ -218,11 +222,16 @@ namespace Catonia_Item_Tracker
             ItemQty compare = new ItemQty() { item = item };
             foreach(Recipie r in Program.recipies)
             {
-                //if the recipie produces or uses the item, and the profession is not listed yet, add it
-                if(((r.result == item) || (r.ingredients.Contains(compare)))
-                   && (!returnVal.Contains(r.profession)))
+                char marker = r.profession[0];
+                if((r.profession[0] == 'B') && (r.profession[1] == 'o'))
                 {
-                    returnVal += r.profession + " ";
+                    marker = 'O';
+                }
+                //if the recipie produces or uses the item, and the profession is not listed yet, add it
+                if (((r.result == item) || (r.ingredients.Contains(compare)))
+                   && (!returnVal.Contains(marker)))
+                {
+                    returnVal += marker;
                 }
             }
 
@@ -232,7 +241,7 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// updates the list of item in the left hand list view control to match the given list
         /// </summary>
-        /// <remarks>does not clear filters or sorts</remarks>
+        /// <remarks>does not clear sorts</remarks>
         /// <param name="newItemList">The new list of items to use</param>
         private void updateLvItems(IEnumerable<ItemQty> newItemList)
         {
@@ -256,7 +265,7 @@ namespace Catonia_Item_Tracker
             lvItems.Columns[0].Width = -2;
 
             //sort itemList
-            lvItems.ListViewItemSorter = new lvItemComparer(sortColumn, lvItems.Sorting);
+            lvItems.ListViewItemSorter = new lvItemComparer(sortColumnInventory, lvItems.Sorting);
             lvItems.Sort();
 
             lvItems.ResumeLayout();
@@ -297,11 +306,11 @@ namespace Catonia_Item_Tracker
         }
         
         /// <summary>
-        /// event handler for the search bar having a new value, (doesn't auto-run till you leave the field)
+        /// event handler for the search bar having a new value
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void txtSearch_TextChanged(object sender, EventArgs e)
+        internal void txtSearch_TextChanged(object sender, EventArgs e)
         {
             string search = txtSearch.Text.ToLower().Replace('-', ' ');
             if(cbSearchDescriptions.Checked)
@@ -320,7 +329,7 @@ namespace Catonia_Item_Tracker
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void lvItems_SelectedIndexChanged(object sender, EventArgs e)
+        internal void lvItems_SelectedIndexChanged(object sender, EventArgs e)
         {
             /// TODO: check why this isn't called when the search eliminates the current item
             lvRecipiesMakingItem.SuspendLayout();
@@ -364,11 +373,11 @@ namespace Catonia_Item_Tracker
         {
             /// TODO: look into multi-step recipies, maybe convert the list views to control to trees
 
-            //make a fake ItemQty to compare the ingredients to.  Since we overrode the equals on ItemQty to only check items qty is irrelivant.
+            //make a fake ItemQty to compare the ingredients to.  Since we overrode the equals on ItemQty to only check items, qty is irrelivant.
             ItemQty comparison = new ItemQty() { item = item, qty = 0 };
             
             //remove extra ingredient columns
-            for (int i = lvRecipiesMakingItem.Columns.Count - 1; i > 3; i--)
+            for (int i = lvRecipiesMakingItem.Columns.Count - 1; i > 2; i--)
             {
                 lvRecipiesMakingItem.Columns.RemoveAt(i);
             }
@@ -384,8 +393,7 @@ namespace Catonia_Item_Tracker
                 //if it can make this item
                 if (r.result == item)
                 {
-                    ListViewItem row = new ListViewItem();
-                    row.SubItems.Add(r.profession);
+                    ListViewItem row = new ListViewItem(r.profession);
                     row.SubItems.Add(r.crafterLevel);
                     row.SubItems.Add(r.resultQty.ToString());
 
@@ -393,15 +401,17 @@ namespace Catonia_Item_Tracker
                     for (int i = 0; i < r.ingredients.Count; i++)
                     {
                         ItemQty ingredient = r.ingredients[i];
-                        if (lvRecipiesMakingItem.Columns.Count < ((i * 2) + 3))
+                        if (lvRecipiesMakingItem.Columns.Count < (((i+1) * 2) + 3))
                         {
-                            lvRecipiesMakingItem.Columns.Add("Ingredient " + i);
-                            lvRecipiesMakingItem.Columns.Add("# Needed");
+                            lvRecipiesMakingItem.Columns.Add("Ingredient " + (i+1));
+                            lvRecipiesMakingItem.Columns.Add("#");
                         }
 
                         row.SubItems.Add(ingredient.item.name);
                         row.SubItems.Add(ingredient.qty.ToString());
                     }
+
+                    row.Tag = r;
 
                     lvRecipiesMakingItem.Items.Add(row);
                 }
@@ -409,24 +419,28 @@ namespace Catonia_Item_Tracker
                 //if it uses this item
                 if (r.ingredients.Contains(comparison))
                 {
-                    ListViewItem row = new ListViewItem();
-                    row.SubItems.Add(r.profession);
+                    ListViewItem row = new ListViewItem(r.profession);
                     row.SubItems.Add(r.crafterLevel);
+                    row.SubItems.Add(r.result.name);
+                    lvRecipiesUsingItem.Columns[2].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                    lvRecipiesUsingItem.Columns[2].Width = -2;
                     row.SubItems.Add(r.resultQty.ToString());
 
                     //add columns for each ingredient
                     for (int i = 0; i < r.ingredients.Count; i++)
                     {
                         ItemQty ingredient = r.ingredients[i];
-                        if (lvRecipiesUsingItem.Columns.Count < ((i * 2) + 3))
+                        if (lvRecipiesUsingItem.Columns.Count < (((i+1) * 2) + 3))
                         {
-                            lvRecipiesUsingItem.Columns.Add("Ingredient " + i);
-                            lvRecipiesUsingItem.Columns.Add("# Needed");
+                            lvRecipiesUsingItem.Columns.Add("Ingredient " + (i+1));
+                            lvRecipiesUsingItem.Columns.Add("#");
                         }
 
                         row.SubItems.Add(ingredient.item.name);
                         row.SubItems.Add(ingredient.qty.ToString());
                     }
+
+                    row.Tag = r;
 
                     lvRecipiesUsingItem.Items.Add(row);
                 }
@@ -693,13 +707,24 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
-        /// Event handler for the context menu opening, sets if the edit option should show, (only if a single item is selected.)
+        /// Event handler for the item context menu opening, sets if the edit option should show, (only if a single item is selected.)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void cmsItemList_Opening(object sender, CancelEventArgs e)
         {
             editItemToolStripMenuItem.Visible = (lvItems.SelectedItems.Count == 1);
+        }
+
+        /// <summary>
+        /// Event handler for the recipie context menu opening, sets if the edit option should show, (only if a single recipie is selected.)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cmsRecipieList_Opening(object sender, CancelEventArgs e)
+        {
+            editRecipieToolStripMenuItem.Visible = ((lvRecipiesMakingItem.SelectedIndices.Count == 1)
+                                                    || (lvRecipiesUsingItem.SelectedIndices.Count == 1));
         }
 
         /// <summary>
@@ -725,6 +750,36 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
+        /// Event handler for the edit item context menu option
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editRecipieToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (lvRecipiesMakingItem.SelectedIndices.Count == 1)
+            {
+                FrmRecipie recipieForm = new FrmRecipie(((Recipie)lvRecipiesMakingItem.SelectedItems[0].Tag));
+                recipieForm.Show();
+            }
+            else if (lvRecipiesUsingItem.SelectedIndices.Count == 1)
+            {
+                FrmRecipie recipieForm = new FrmRecipie(((Recipie)lvRecipiesUsingItem.SelectedItems[0].Tag));
+                recipieForm.Show();
+            }
+        }
+
+        /// <summary>
+        /// Event handler for the create new item context menu option
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void createNewRecipieToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmRecipie recipieForm = new FrmRecipie();
+            recipieForm.Show();
+        }
+
+        /// <summary>
         /// Event Handler for the column being clicked
         /// </summary>
         /// <param name="sender"></param>
@@ -732,10 +787,10 @@ namespace Catonia_Item_Tracker
         private void lvItems_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             // Determine whether the column is the same as the last column clicked.
-            if (e.Column != sortColumn)
+            if (e.Column != sortColumnInventory)
             {
                 // Set the sort column to the new column.
-                sortColumn = e.Column;
+                sortColumnInventory = e.Column;
                 // Set the sort order to ascending by default.
                 lvItems.Sorting = System.Windows.Forms.SortOrder.Ascending;
             }

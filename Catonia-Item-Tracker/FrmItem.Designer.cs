@@ -134,6 +134,8 @@
             this.Controls.Add(this.lblGoldValue);
             this.Controls.Add(this.lblItemName);
             this.Controls.Add(this.txtItemName);
+            this.MaximumSize = new System.Drawing.Size(543, 398);
+            this.MinimumSize = new System.Drawing.Size(543, 398);
             this.Name = "FrmItem";
             this.Text = "Item #";
             ((System.ComponentModel.ISupportInitialize)(this.nudGoldValue)).EndInit();

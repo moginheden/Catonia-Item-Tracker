@@ -113,7 +113,10 @@ namespace Catonia_Item_Tracker
         {
             string unsaved = " Unsaved Changes";
 
-            while (true)
+            //Wait for the main window to be created
+            Thread.Sleep(1000);
+
+            while (Program.mainForm.Visible || (!this.sqlTasks.IsEmpty))
             {
                 Thread.Sleep(1000);
 

@@ -16,6 +16,14 @@ namespace Catonia_Item_Tracker
 
         public override bool Equals(object a)
         {
+            if(a == null)
+            {
+                return false;
+            }
+            if(!(a is Item))
+            {
+                return false;
+            }
             return this.id.Equals(((Item)a).id);
         }
 
@@ -32,6 +40,11 @@ namespace Catonia_Item_Tracker
         public override int GetHashCode()
         {
             return this.id;
+        }
+
+        public override string ToString()
+        {
+            return name;
         }
     }
 }

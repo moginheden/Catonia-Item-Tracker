@@ -51,18 +51,21 @@
             this.gbItemManagment = new System.Windows.Forms.GroupBox();
             this.btnUndo = new System.Windows.Forms.Button();
             this.lvRecipiesUsingItem = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.professionUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.crafterLevelUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.numMadeUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cmsRecipieList = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.editRecipieToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createNewRecipieToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblUsingItem = new System.Windows.Forms.Label();
             this.btnTransfer = new System.Windows.Forms.Button();
             this.nudAddItems = new System.Windows.Forms.NumericUpDown();
             this.btnAddItems = new System.Windows.Forms.Button();
             this.btnMake = new System.Windows.Forms.Button();
             this.lvRecipiesMakingItem = new System.Windows.Forms.ListView();
-            this.profession = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.crafterLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.numMade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.professionMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.crafterLevelMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.numMadeMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblItemHistory = new System.Windows.Forms.Label();
             this.lvItemHistory = new System.Windows.Forms.ListView();
             this.dateTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -75,12 +78,14 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.txtDescription = new System.Windows.Forms.RichTextBox();
             this.cbSearchDescriptions = new System.Windows.Forms.CheckBox();
+            this.resultUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddGold)).BeginInit();
             this.gbGold.SuspendLayout();
             this.gbItemManagment.SuspendLayout();
+            this.cmsRecipieList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddItems)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -138,17 +143,17 @@
             // value
             // 
             this.value.Text = "Value";
-            this.value.Width = 39;
+            this.value.Width = 42;
             // 
             // valueTotal
             // 
             this.valueTotal.Text = "Total";
-            this.valueTotal.Width = 38;
+            this.valueTotal.Width = 42;
             // 
             // professions
             // 
             this.professions.Text = "Professions";
-            this.professions.Width = 164;
+            this.professions.Width = 70;
             // 
             // usable
             // 
@@ -307,9 +312,11 @@
             // lvRecipiesUsingItem
             // 
             this.lvRecipiesUsingItem.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3});
+            this.professionUsing,
+            this.crafterLevelUsing,
+            this.resultUsing,
+            this.numMadeUsing});
+            this.lvRecipiesUsingItem.ContextMenuStrip = this.cmsRecipieList;
             this.lvRecipiesUsingItem.FullRowSelect = true;
             this.lvRecipiesUsingItem.HideSelection = false;
             this.lvRecipiesUsingItem.Location = new System.Drawing.Point(9, 296);
@@ -321,17 +328,42 @@
             this.lvRecipiesUsingItem.View = System.Windows.Forms.View.Details;
             this.lvRecipiesUsingItem.SelectedIndexChanged += new System.EventHandler(this.lvRecipies_SelectedIndexChanged);
             // 
-            // columnHeader1
+            // professionUsing
             // 
-            this.columnHeader1.Text = "Profession";
+            this.professionUsing.Text = "Profession";
+            this.professionUsing.Width = 68;
             // 
-            // columnHeader2
+            // crafterLevelUsing
             // 
-            this.columnHeader2.Text = "Crafter Level";
+            this.crafterLevelUsing.Text = "Crafter Level";
+            this.crafterLevelUsing.Width = 77;
             // 
-            // columnHeader3
+            // numMadeUsing
             // 
-            this.columnHeader3.Text = "# Made";
+            this.numMadeUsing.Text = "# Made";
+            // 
+            // cmsRecipieList
+            // 
+            this.cmsRecipieList.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.editRecipieToolStripMenuItem,
+            this.createNewRecipieToolStripMenuItem});
+            this.cmsRecipieList.Name = "cmsRecipieList";
+            this.cmsRecipieList.Size = new System.Drawing.Size(177, 48);
+            this.cmsRecipieList.Opening += new System.ComponentModel.CancelEventHandler(this.cmsRecipieList_Opening);
+            // 
+            // editRecipieToolStripMenuItem
+            // 
+            this.editRecipieToolStripMenuItem.Name = "editRecipieToolStripMenuItem";
+            this.editRecipieToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.editRecipieToolStripMenuItem.Text = "Edit Recipie";
+            this.editRecipieToolStripMenuItem.Click += new System.EventHandler(this.editRecipieToolStripMenuItem_Click);
+            // 
+            // createNewRecipieToolStripMenuItem
+            // 
+            this.createNewRecipieToolStripMenuItem.Name = "createNewRecipieToolStripMenuItem";
+            this.createNewRecipieToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.createNewRecipieToolStripMenuItem.Text = "Create New Recipie";
+            this.createNewRecipieToolStripMenuItem.Click += new System.EventHandler(this.createNewRecipieToolStripMenuItem_Click);
             // 
             // lblUsingItem
             // 
@@ -398,9 +430,10 @@
             // lvRecipiesMakingItem
             // 
             this.lvRecipiesMakingItem.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.profession,
-            this.crafterLevel,
-            this.numMade});
+            this.professionMaking,
+            this.crafterLevelMaking,
+            this.numMadeMaking});
+            this.lvRecipiesMakingItem.ContextMenuStrip = this.cmsRecipieList;
             this.lvRecipiesMakingItem.FullRowSelect = true;
             this.lvRecipiesMakingItem.HideSelection = false;
             this.lvRecipiesMakingItem.Location = new System.Drawing.Point(9, 167);
@@ -412,17 +445,19 @@
             this.lvRecipiesMakingItem.View = System.Windows.Forms.View.Details;
             this.lvRecipiesMakingItem.SelectedIndexChanged += new System.EventHandler(this.lvRecipies_SelectedIndexChanged);
             // 
-            // profession
+            // professionMaking
             // 
-            this.profession.Text = "Profession";
+            this.professionMaking.Text = "Profession";
+            this.professionMaking.Width = 71;
             // 
-            // crafterLevel
+            // crafterLevelMaking
             // 
-            this.crafterLevel.Text = "Crafter Level";
+            this.crafterLevelMaking.Text = "Crafter Level";
+            this.crafterLevelMaking.Width = 81;
             // 
-            // numMade
+            // numMadeMaking
             // 
-            this.numMade.Text = "# Made";
+            this.numMadeMaking.Text = "# Made";
             // 
             // lblItemHistory
             // 
@@ -514,11 +549,11 @@
             // 
             this.txtDescription.BackColor = System.Drawing.SystemColors.Window;
             this.txtDescription.Location = new System.Drawing.Point(12, 860);
-            this.txtDescription.Multiline = true;
             this.txtDescription.Name = "txtDescription";
             this.txtDescription.ReadOnly = true;
             this.txtDescription.Size = new System.Drawing.Size(494, 104);
             this.txtDescription.TabIndex = 15;
+            this.txtDescription.Text = "";
             // 
             // cbSearchDescriptions
             // 
@@ -533,6 +568,10 @@
             this.cbSearchDescriptions.Text = "Search Descriptions";
             this.cbSearchDescriptions.UseVisualStyleBackColor = true;
             this.cbSearchDescriptions.CheckedChanged += new System.EventHandler(this.cbSearchDescriptions_CheckedChanged);
+            // 
+            // resultUsing
+            // 
+            this.resultUsing.Text = "Result";
             // 
             // FrmMain
             // 
@@ -553,7 +592,7 @@
             this.MinimumSize = new System.Drawing.Size(916, 1000);
             this.Name = "FrmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Catonia Item Tracker v0.2";
+            this.Text = "Catonia Item Tracker v";
             this.cmsItemList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).EndInit();
@@ -562,6 +601,7 @@
             this.gbGold.PerformLayout();
             this.gbItemManagment.ResumeLayout(false);
             this.gbItemManagment.PerformLayout();
+            this.cmsRecipieList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudAddItems)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
@@ -594,7 +634,7 @@
         private System.Windows.Forms.ColumnHeader dateTime;
         private System.Windows.Forms.Label lblMakingItem;
         private System.Windows.Forms.ListView lvRecipiesMakingItem;
-        private System.Windows.Forms.ColumnHeader numMade;
+        private System.Windows.Forms.ColumnHeader numMadeMaking;
         private System.Windows.Forms.NumericUpDown nudAddItems;
         private System.Windows.Forms.Button btnAddItems;
         private System.Windows.Forms.ColumnHeader numAdded;
@@ -605,18 +645,22 @@
         private System.Windows.Forms.RadioButton rbLeftBehind;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnTransfer;
-        private System.Windows.Forms.ColumnHeader profession;
-        private System.Windows.Forms.ColumnHeader crafterLevel;
+        private System.Windows.Forms.ColumnHeader professionMaking;
+        private System.Windows.Forms.ColumnHeader crafterLevelMaking;
         private System.Windows.Forms.RichTextBox txtDescription;
         private System.Windows.Forms.ListView lvRecipiesUsingItem;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader professionUsing;
+        private System.Windows.Forms.ColumnHeader crafterLevelUsing;
+        private System.Windows.Forms.ColumnHeader numMadeUsing;
         private System.Windows.Forms.Label lblUsingItem;
         private System.Windows.Forms.CheckBox cbSearchDescriptions;
         private System.Windows.Forms.Button btnUndo;
         private System.Windows.Forms.ContextMenuStrip cmsItemList;
         private System.Windows.Forms.ToolStripMenuItem editItemToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createNewItemToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip cmsRecipieList;
+        private System.Windows.Forms.ToolStripMenuItem editRecipieToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createNewRecipieToolStripMenuItem;
+        private System.Windows.Forms.ColumnHeader resultUsing;
     }
 }
