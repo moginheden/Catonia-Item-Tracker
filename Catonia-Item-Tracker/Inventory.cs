@@ -114,7 +114,10 @@ namespace Catonia_Item_Tracker
             string unsaved = " Unsaved Changes";
 
             //Wait for the main window to be created
-            Thread.Sleep(1000);
+            while (Program.mainForm == null)
+            {
+                Thread.Sleep(1000);
+            }
 
             while (Program.mainForm.Visible || (!this.sqlTasks.IsEmpty))
             {
@@ -306,6 +309,15 @@ namespace Catonia_Item_Tracker
         public IEnumerator<HistoryRecord> getHistory()
         {
             return history.GetEnumerator();
+        }
+
+        /// <summary>
+        /// returns the number of rows in the history stack
+        /// </summary>
+        /// <returns></returns>
+        public int countHistory()
+        {
+            return history.Count;
         }
 
         /// <summary>

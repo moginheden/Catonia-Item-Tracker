@@ -16,11 +16,13 @@ namespace Catonia_Item_Tracker
     {
         private const string sqlServer = "858d5789-ed56-4b0c-9364-a73301643bf4.sqlserver.sequelizer.com";
         private const string database = "db858d5789ed564b0c9364a73301643bf4";
+        private const string sqlUser = "pidrrcbeptdchsdu";
+        private const string sqlPassword = "gZYWgihc2QRCFSbS3Vggaby376XduRrLsnD2UsmAkfX8vGMZTwmDMbXfA6XitePj";
 
         /// <summary>
         /// The connection string to the SQL server
         /// </summary>
-        public const string connectionString = "Server=" + sqlServer + ";Database=" + database + ";User ID=pidrrcbeptdchsdu;Password=gZYWgihc2QRCFSbS3Vggaby376XduRrLsnD2UsmAkfX8vGMZTwmDMbXfA6XitePj;";
+        public const string connectionString = "Server=" + sqlServer + ";Database=" + database + ";User ID=" + sqlUser + ";Password=" + sqlPassword + ";";
 
         /// <summary>
         /// the list of items in the game
@@ -67,11 +69,11 @@ namespace Catonia_Item_Tracker
                 mainForm = new FrmMain();
                 Application.Run(mainForm);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                
             }
+
             HistoryRecord hrCloser = new HistoryRecord() { iq = new ItemQty() { item = new Item() { id = -1 } } };
             if(onHand != null)
             {

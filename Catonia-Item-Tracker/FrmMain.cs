@@ -14,7 +14,7 @@ namespace Catonia_Item_Tracker
 {
     public partial class FrmMain : Form
     {
-        public const string defaultTitle = "Catonia Item Tracker v0.4";
+        public const string defaultTitle = "Catonia Item Tracker v0.5";
 
         /// <summary>
         /// class to sort the item list with the 0 qty at the bottom, then by clicked column
@@ -245,9 +245,12 @@ namespace Catonia_Item_Tracker
         /// <param name="newItemList">The new list of items to use</param>
         private void updateLvItems(IEnumerable<ItemQty> newItemList)
         {
-            lvItems.SuspendLayout();
-            
+            lvItems.Visible = false;
+            //lvItems.SuspendLayout();
+
             lvItems.Items.Clear();
+            ListViewItem[] rowsToAdd = new ListViewItem[newItemList.Count()];
+            int i = 0;
             foreach (ItemQty iq in newItemList.OrderBy(o => (o.qty == 0)).ThenBy(o => o.item.name))
             {
                 ListViewItem row = new ListViewItem(new string[] { iq.item.name,
@@ -257,18 +260,20 @@ namespace Catonia_Item_Tracker
                                                                    getProfessionsForItem(iq.item),
                                                                    iq.item.usable.ToString()});
                 row.Tag = iq;
-                lvItems.Items.Add(row);
+                rowsToAdd[i] = row;
+                i++;
             }
+            lvItems.Items.AddRange(rowsToAdd);
 
             //auto-size the name column
-            lvItems.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
             lvItems.Columns[0].Width = -2;
 
             //sort itemList
             lvItems.ListViewItemSorter = new lvItemComparer(sortColumnInventory, lvItems.Sorting);
             lvItems.Sort();
 
-            lvItems.ResumeLayout();
+            //lvItems.ResumeLayout();
+            lvItems.Visible = true;
         }
 
         /// <summary>
@@ -388,6 +393,8 @@ namespace Catonia_Item_Tracker
             }
 
             //loop through each recipie
+            List<ListViewItem> rowsToAddToMake = new List<ListViewItem>();
+            List<ListViewItem> rowsToAddToUse = new List<ListViewItem>();
             foreach (Recipie r in Program.recipies)
             {
                 //if it can make this item
@@ -413,7 +420,7 @@ namespace Catonia_Item_Tracker
 
                     row.Tag = r;
 
-                    lvRecipiesMakingItem.Items.Add(row);
+                    rowsToAddToMake.Add(row);
                 }
 
                 //if it uses this item
@@ -442,10 +449,13 @@ namespace Catonia_Item_Tracker
 
                     row.Tag = r;
 
-                    lvRecipiesUsingItem.Items.Add(row);
+                    rowsToAddToUse.Add(row);
                 }
             }
-            foreach(ColumnHeader col in lvRecipiesMakingItem.Columns)
+            lvRecipiesMakingItem.Items.AddRange(rowsToAddToMake.ToArray());
+            lvRecipiesUsingItem.Items.AddRange(rowsToAddToUse.ToArray());
+
+            foreach (ColumnHeader col in lvRecipiesMakingItem.Columns)
             {
                 col.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
                 col.Width = -2;
@@ -466,6 +476,7 @@ namespace Catonia_Item_Tracker
             /// TODO: limit this generation to only updating the top couple of rows instead of re-generating everything every time
             IEnumerator<HistoryRecord> rows = inventory.getHistory();
 
+            List<ListViewItem> rowsToAdd = new List<ListViewItem>(inventory.countHistory());
             while (rows.MoveNext())
             {
                 HistoryRecord hr = rows.Current;
@@ -479,9 +490,10 @@ namespace Catonia_Item_Tracker
 
                     row.Tag = hr;
 
-                    lvItemHistory.Items.Add(row);
+                    rowsToAdd.Add(row);
                 }
             }
+            lvItemHistory.Items.AddRange(rowsToAdd.ToArray());
         }
 
         private void btnMake_Click(object sender, EventArgs e)
