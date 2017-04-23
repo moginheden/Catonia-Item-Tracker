@@ -340,7 +340,11 @@ namespace Catonia_Item_Tracker
             string unsaved = " Unsaved Changes";
             if (!Program.mainForm.Text.EndsWith(unsaved))
             {
-                Program.mainForm.Text += unsaved;
+                if (Program.mainForm.InvokeRequired)
+                {
+                    Program.mainForm.Invoke(new Action(() => Program.mainForm.Text += unsaved));  // do stuff on UI thread, not here
+                    return;
+                }
             }
 
             //enqueue a copy of the HistoryRecord and it's subitem to avoid cross-threading issues

@@ -14,7 +14,7 @@ namespace Catonia_Item_Tracker
 {
     public partial class FrmMain : Form
     {
-        public const string defaultTitle = "Catonia Item Tracker v0.5";
+        public const string defaultTitle = "Catonia Item Tracker v0.6";
 
         /// <summary>
         /// class to sort the item list with the 0 qty at the bottom, then by clicked column
@@ -382,12 +382,12 @@ namespace Catonia_Item_Tracker
             ItemQty comparison = new ItemQty() { item = item, qty = 0 };
             
             //remove extra ingredient columns
-            for (int i = lvRecipiesMakingItem.Columns.Count - 1; i > 2; i--)
+            for (int i = lvRecipiesMakingItem.Columns.Count - 1; i > 3; i--)
             {
                 lvRecipiesMakingItem.Columns.RemoveAt(i);
             }
 
-            for (int i = lvRecipiesUsingItem.Columns.Count - 1; i > 3; i--)
+            for (int i = lvRecipiesUsingItem.Columns.Count - 1; i > 4; i--)
             {
                 lvRecipiesUsingItem.Columns.RemoveAt(i);
             }
@@ -403,21 +403,33 @@ namespace Catonia_Item_Tracker
                     ListViewItem row = new ListViewItem(r.profession);
                     row.SubItems.Add(r.crafterLevel);
                     row.SubItems.Add(r.resultQty.ToString());
+                    row.SubItems.Add("");
 
+                    int numWeCanMake = int.MaxValue;
                     //add columns for each ingredient
                     for (int i = 0; i < r.ingredients.Count; i++)
                     {
                         ItemQty ingredient = r.ingredients[i];
-                        if (lvRecipiesMakingItem.Columns.Count < (((i+1) * 2) + 3))
+                        if (lvRecipiesMakingItem.Columns.Count < (((i+1) * 3) + 4))
                         {
                             lvRecipiesMakingItem.Columns.Add("Ingredient " + (i+1));
-                            lvRecipiesMakingItem.Columns.Add("#");
+                            lvRecipiesMakingItem.Columns.Add("Uses");
+                            lvRecipiesMakingItem.Columns.Add("Have");
                         }
 
                         row.SubItems.Add(ingredient.item.name);
                         row.SubItems.Add(ingredient.qty.ToString());
+
+                        int inInventory = inventory.findLoot(ingredient.item.id).qty;
+                        row.SubItems.Add(inInventory.ToString());
+
+                        if((inInventory / ingredient.qty) < numWeCanMake)
+                        {
+                            numWeCanMake = inInventory / ingredient.qty;
+                        }
                     }
 
+                    row.SubItems[3].Text = numWeCanMake.ToString();
                     row.Tag = r;
 
                     rowsToAddToMake.Add(row);
@@ -432,21 +444,34 @@ namespace Catonia_Item_Tracker
                     lvRecipiesUsingItem.Columns[2].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
                     lvRecipiesUsingItem.Columns[2].Width = -2;
                     row.SubItems.Add(r.resultQty.ToString());
+                    row.SubItems.Add("");
+
+                    int numWeCanMake = int.MaxValue;
 
                     //add columns for each ingredient
                     for (int i = 0; i < r.ingredients.Count; i++)
                     {
                         ItemQty ingredient = r.ingredients[i];
-                        if (lvRecipiesUsingItem.Columns.Count < (((i+1) * 2) + 3))
+                        if (lvRecipiesUsingItem.Columns.Count < (((i+1) * 3) + 5))
                         {
                             lvRecipiesUsingItem.Columns.Add("Ingredient " + (i+1));
-                            lvRecipiesUsingItem.Columns.Add("#");
+                            lvRecipiesUsingItem.Columns.Add("Uses");
+                            lvRecipiesUsingItem.Columns.Add("Have");
                         }
 
                         row.SubItems.Add(ingredient.item.name);
                         row.SubItems.Add(ingredient.qty.ToString());
+
+                        int inInventory = inventory.findLoot(ingredient.item.id).qty;
+                        row.SubItems.Add(inInventory.ToString());
+
+                        if ((inInventory / ingredient.qty) < numWeCanMake)
+                        {
+                            numWeCanMake = inInventory / ingredient.qty;
+                        }
                     }
 
+                    row.SubItems[4].Text = numWeCanMake.ToString();
                     row.Tag = r;
 
                     rowsToAddToUse.Add(row);

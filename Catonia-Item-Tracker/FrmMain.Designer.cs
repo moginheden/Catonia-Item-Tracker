@@ -79,6 +79,8 @@
             this.txtDescription = new System.Windows.Forms.RichTextBox();
             this.cbSearchDescriptions = new System.Windows.Forms.CheckBox();
             this.resultUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.numCanMakeUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.numCanMakeMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
@@ -315,7 +317,8 @@
             this.professionUsing,
             this.crafterLevelUsing,
             this.resultUsing,
-            this.numMadeUsing});
+            this.numMadeUsing,
+            this.numCanMakeUsing});
             this.lvRecipiesUsingItem.ContextMenuStrip = this.cmsRecipieList;
             this.lvRecipiesUsingItem.FullRowSelect = true;
             this.lvRecipiesUsingItem.HideSelection = false;
@@ -340,7 +343,7 @@
             // 
             // numMadeUsing
             // 
-            this.numMadeUsing.Text = "# Made";
+            this.numMadeUsing.Text = "Makes";
             // 
             // cmsRecipieList
             // 
@@ -432,7 +435,8 @@
             this.lvRecipiesMakingItem.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.professionMaking,
             this.crafterLevelMaking,
-            this.numMadeMaking});
+            this.numMadeMaking,
+            this.numCanMakeMaking});
             this.lvRecipiesMakingItem.ContextMenuStrip = this.cmsRecipieList;
             this.lvRecipiesMakingItem.FullRowSelect = true;
             this.lvRecipiesMakingItem.HideSelection = false;
@@ -457,7 +461,8 @@
             // 
             // numMadeMaking
             // 
-            this.numMadeMaking.Text = "# Made";
+            this.numMadeMaking.Text = "Makes";
+            this.numMadeMaking.Width = 44;
             // 
             // lblItemHistory
             // 
@@ -573,6 +578,16 @@
             // 
             this.resultUsing.Text = "Result";
             // 
+            // numCanMakeUsing
+            // 
+            this.numCanMakeUsing.Text = "Can Do";
+            this.numCanMakeUsing.Width = 48;
+            // 
+            // numCanMakeMaking
+            // 
+            this.numCanMakeMaking.Text = "Can Do";
+            this.numCanMakeMaking.Width = 49;
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -662,5 +677,7 @@
         private System.Windows.Forms.ToolStripMenuItem editRecipieToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createNewRecipieToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader resultUsing;
+        private System.Windows.Forms.ColumnHeader numCanMakeUsing;
+        private System.Windows.Forms.ColumnHeader numCanMakeMaking;
     }
 }

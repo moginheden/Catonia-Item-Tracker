@@ -24,6 +24,8 @@ namespace Catonia_Item_Tracker
         {
             InitializeComponent();
 
+            this.Text += item.id;
+
             itemNum = item.id;
             txtItemName.Text = item.name;
             txtDescription.Text = item.description;
