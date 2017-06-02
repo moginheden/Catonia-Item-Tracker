@@ -337,7 +337,7 @@ namespace Catonia_Item_Tracker
         internal void txtSearch_TextChanged(object sender, EventArgs e)
         {
             string search = txtSearch.Text.ToLower().Replace('-', ' ');
-            if (txtSearch.Text.Length == 0)
+            if (txtSearch.Text.Length < 3)
             {
                 lvFilteredItems.Visible = false;
 
