@@ -375,10 +375,5 @@ namespace Catonia_Item_Tracker
             }
             return history.Peek();
         }
-
-        public void undo()
-        {
-            /// TODO: update DB
-        }
     }
 }

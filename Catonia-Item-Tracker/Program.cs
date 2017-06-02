@@ -62,11 +62,18 @@ namespace Catonia_Item_Tracker
         {
             try
             {
-                loadAllFromDB();
-
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+
+                FrmLoading.ShowSplashScreen();
+
+                loadAllFromDB();
+
+                FrmLoading.setText("Creating main form...");
                 mainForm = new FrmMain();
+
+                FrmLoading.setText("Loading main form...");
+
                 Application.Run(mainForm);
             }
             catch (Exception ex)
@@ -88,15 +95,17 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// Loads all the items and recipies from the database
         /// </summary>
-        private static void loadAllFromDB()
+        public static void loadAllFromDB()
         {
             items = new List<Item>();
             recipies = new List<Recipie>();
 
+            FrmLoading.setText("Connecting to DB...");
             using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
             {
                 dataConnection.Open();
 
+                FrmLoading.setText("Loading Items from DB...");
                 //load loot
                 string selectLoot = @"SELECT *
 								  FROM items
@@ -118,6 +127,8 @@ namespace Catonia_Item_Tracker
                         }
                     }
                 }
+
+                FrmLoading.setText("Loading Recipies from DB...");
 
                 //load recipies
                 DataSet dsRecipies = new DataSet();
@@ -159,6 +170,8 @@ namespace Catonia_Item_Tracker
                 }
             }
 
+
+            FrmLoading.setText("Generating Local Inventory Lists...");
             onHand = new Inventory("On Hand");
             leftBehind = new Inventory("Left Behind");
         }

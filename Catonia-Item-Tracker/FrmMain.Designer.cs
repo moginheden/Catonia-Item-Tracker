@@ -41,6 +41,13 @@
             this.cmsItemList = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createNewItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lvFilteredItems = new System.Windows.Forms.ListView();
+            this.itemNameFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.numOwnedFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.valueFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.valueTotalFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.professionsFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.usableFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.nudOwned = new System.Windows.Forms.NumericUpDown();
             this.lblNumOwned = new System.Windows.Forms.Label();
             this.lblGold = new System.Windows.Forms.Label();
@@ -49,16 +56,17 @@
             this.nudAddGold = new System.Windows.Forms.NumericUpDown();
             this.gbGold = new System.Windows.Forms.GroupBox();
             this.gbItemManagment = new System.Windows.Forms.GroupBox();
-            this.btnUndo = new System.Windows.Forms.Button();
             this.lvRecipiesUsingItem = new System.Windows.Forms.ListView();
             this.professionUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.crafterLevelUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.resultUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numMadeUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.numCanMakeUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmsRecipieList = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editRecipieToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createNewRecipieToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblUsingItem = new System.Windows.Forms.Label();
-            this.btnTransfer = new System.Windows.Forms.Button();
+            this.btnBuy = new System.Windows.Forms.Button();
             this.nudAddItems = new System.Windows.Forms.NumericUpDown();
             this.btnAddItems = new System.Windows.Forms.Button();
             this.btnMake = new System.Windows.Forms.Button();
@@ -66,6 +74,7 @@
             this.professionMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.crafterLevelMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numMadeMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.numCanMakeMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblItemHistory = new System.Windows.Forms.Label();
             this.lvItemHistory = new System.Windows.Forms.ListView();
             this.dateTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -78,9 +87,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.txtDescription = new System.Windows.Forms.RichTextBox();
             this.cbSearchDescriptions = new System.Windows.Forms.CheckBox();
-            this.resultUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.numCanMakeUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.numCanMakeMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.btnCreateNew = new System.Windows.Forms.Button();
             this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
@@ -184,6 +191,57 @@
             this.createNewItemToolStripMenuItem.Text = "Create New Item";
             this.createNewItemToolStripMenuItem.Click += new System.EventHandler(this.createNewItemToolStripMenuItem_Click);
             // 
+            // lvFilteredItems
+            // 
+            this.lvFilteredItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.itemNameFiltered,
+            this.numOwnedFiltered,
+            this.valueFiltered,
+            this.valueTotalFiltered,
+            this.professionsFiltered,
+            this.usableFiltered});
+            this.lvFilteredItems.ContextMenuStrip = this.cmsItemList;
+            this.lvFilteredItems.FullRowSelect = true;
+            this.lvFilteredItems.HideSelection = false;
+            this.lvFilteredItems.Location = new System.Drawing.Point(12, 78);
+            this.lvFilteredItems.Name = "lvFilteredItems";
+            this.lvFilteredItems.Size = new System.Drawing.Size(494, 776);
+            this.lvFilteredItems.TabIndex = 3;
+            this.lvFilteredItems.UseCompatibleStateImageBehavior = false;
+            this.lvFilteredItems.View = System.Windows.Forms.View.Details;
+            this.lvFilteredItems.Visible = false;
+            this.lvFilteredItems.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvItems_ColumnClick);
+            this.lvFilteredItems.SelectedIndexChanged += new System.EventHandler(this.lvItems_SelectedIndexChanged);
+            // 
+            // itemNameFiltered
+            // 
+            this.itemNameFiltered.Text = "Item Name";
+            this.itemNameFiltered.Width = 143;
+            // 
+            // numOwnedFiltered
+            // 
+            this.numOwnedFiltered.Text = "#";
+            this.numOwnedFiltered.Width = 45;
+            // 
+            // valueFiltered
+            // 
+            this.valueFiltered.Text = "Value";
+            this.valueFiltered.Width = 42;
+            // 
+            // valueTotalFiltered
+            // 
+            this.valueTotalFiltered.Text = "Total";
+            this.valueTotalFiltered.Width = 42;
+            // 
+            // professionsFiltered
+            // 
+            this.professionsFiltered.Text = "Professions";
+            this.professionsFiltered.Width = 70;
+            // 
+            // usableFiltered
+            // 
+            this.usableFiltered.Text = "Usable";
+            // 
             // nudOwned
             // 
             this.nudOwned.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -280,10 +338,9 @@
             // 
             // gbItemManagment
             // 
-            this.gbItemManagment.Controls.Add(this.btnUndo);
             this.gbItemManagment.Controls.Add(this.lvRecipiesUsingItem);
             this.gbItemManagment.Controls.Add(this.lblUsingItem);
-            this.gbItemManagment.Controls.Add(this.btnTransfer);
+            this.gbItemManagment.Controls.Add(this.btnBuy);
             this.gbItemManagment.Controls.Add(this.nudAddItems);
             this.gbItemManagment.Controls.Add(this.btnAddItems);
             this.gbItemManagment.Controls.Add(this.btnMake);
@@ -299,17 +356,6 @@
             this.gbItemManagment.TabIndex = 11;
             this.gbItemManagment.TabStop = false;
             this.gbItemManagment.Text = "Item";
-            // 
-            // btnUndo
-            // 
-            this.btnUndo.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnUndo.Location = new System.Drawing.Point(318, 571);
-            this.btnUndo.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.btnUndo.Name = "btnUndo";
-            this.btnUndo.Size = new System.Drawing.Size(63, 28);
-            this.btnUndo.TabIndex = 17;
-            this.btnUndo.Text = "Undo";
-            this.btnUndo.UseVisualStyleBackColor = true;
             // 
             // lvRecipiesUsingItem
             // 
@@ -341,9 +387,18 @@
             this.crafterLevelUsing.Text = "Crafter Level";
             this.crafterLevelUsing.Width = 77;
             // 
+            // resultUsing
+            // 
+            this.resultUsing.Text = "Result";
+            // 
             // numMadeUsing
             // 
             this.numMadeUsing.Text = "Makes";
+            // 
+            // numCanMakeUsing
+            // 
+            this.numCanMakeUsing.Text = "Can Do";
+            this.numCanMakeUsing.Width = 48;
             // 
             // cmsRecipieList
             // 
@@ -377,16 +432,17 @@
             this.lblUsingItem.TabIndex = 16;
             this.lblUsingItem.Text = "Recipies Using This Item";
             // 
-            // btnTransfer
+            // btnBuy
             // 
-            this.btnTransfer.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnTransfer.Location = new System.Drawing.Point(88, 82);
-            this.btnTransfer.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
-            this.btnTransfer.Name = "btnTransfer";
-            this.btnTransfer.Size = new System.Drawing.Size(65, 53);
-            this.btnTransfer.TabIndex = 12;
-            this.btnTransfer.Text = "To NPCs";
-            this.btnTransfer.UseVisualStyleBackColor = true;
+            this.btnBuy.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBuy.Location = new System.Drawing.Point(88, 82);
+            this.btnBuy.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
+            this.btnBuy.Name = "btnBuy";
+            this.btnBuy.Size = new System.Drawing.Size(65, 53);
+            this.btnBuy.TabIndex = 12;
+            this.btnBuy.Text = "Buy";
+            this.btnBuy.UseVisualStyleBackColor = true;
+            this.btnBuy.Click += new System.EventHandler(this.btnBuy_Click);
             // 
             // nudAddItems
             // 
@@ -409,7 +465,7 @@
             // 
             // btnAddItems
             // 
-            this.btnAddItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAddItems.Location = new System.Drawing.Point(9, 82);
             this.btnAddItems.Name = "btnAddItems";
             this.btnAddItems.Size = new System.Drawing.Size(73, 53);
@@ -463,6 +519,11 @@
             // 
             this.numMadeMaking.Text = "Makes";
             this.numMadeMaking.Width = 44;
+            // 
+            // numCanMakeMaking
+            // 
+            this.numCanMakeMaking.Text = "Can Do";
+            this.numCanMakeMaking.Width = 49;
             // 
             // lblItemHistory
             // 
@@ -563,8 +624,6 @@
             // cbSearchDescriptions
             // 
             this.cbSearchDescriptions.AutoSize = true;
-            this.cbSearchDescriptions.Checked = true;
-            this.cbSearchDescriptions.CheckState = System.Windows.Forms.CheckState.Checked;
             this.cbSearchDescriptions.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbSearchDescriptions.Location = new System.Drawing.Point(385, 55);
             this.cbSearchDescriptions.Name = "cbSearchDescriptions";
@@ -574,30 +633,29 @@
             this.cbSearchDescriptions.UseVisualStyleBackColor = true;
             this.cbSearchDescriptions.CheckedChanged += new System.EventHandler(this.cbSearchDescriptions_CheckedChanged);
             // 
-            // resultUsing
+            // btnCreateNew
             // 
-            this.resultUsing.Text = "Result";
-            // 
-            // numCanMakeUsing
-            // 
-            this.numCanMakeUsing.Text = "Can Do";
-            this.numCanMakeUsing.Width = 48;
-            // 
-            // numCanMakeMaking
-            // 
-            this.numCanMakeMaking.Text = "Can Do";
-            this.numCanMakeMaking.Width = 49;
+            this.btnCreateNew.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCreateNew.Location = new System.Drawing.Point(385, 28);
+            this.btnCreateNew.Name = "btnCreateNew";
+            this.btnCreateNew.Size = new System.Drawing.Size(121, 24);
+            this.btnCreateNew.TabIndex = 17;
+            this.btnCreateNew.Text = "Create New";
+            this.btnCreateNew.UseVisualStyleBackColor = true;
+            this.btnCreateNew.Click += new System.EventHandler(this.btnCreateNew_Click);
             // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(908, 976);
+            this.ClientSize = new System.Drawing.Size(900, 961);
+            this.Controls.Add(this.btnCreateNew);
             this.Controls.Add(this.cbSearchDescriptions);
             this.Controls.Add(this.txtDescription);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.gbItemManagment);
             this.Controls.Add(this.lvItems);
+            this.Controls.Add(this.lvFilteredItems);
             this.Controls.Add(this.gbGold);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.txtSearch);
@@ -608,6 +666,7 @@
             this.Name = "FrmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Catonia Item Tracker v";
+            this.Shown += new System.EventHandler(this.FrmMain_Shown);
             this.cmsItemList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).EndInit();
@@ -635,6 +694,14 @@
         private System.Windows.Forms.ColumnHeader value;
         private System.Windows.Forms.ColumnHeader valueTotal;
         private System.Windows.Forms.ColumnHeader professions;
+        private System.Windows.Forms.ColumnHeader usable;
+        private System.Windows.Forms.ListView lvFilteredItems;
+        private System.Windows.Forms.ColumnHeader itemNameFiltered;
+        private System.Windows.Forms.ColumnHeader numOwnedFiltered;
+        private System.Windows.Forms.ColumnHeader valueFiltered;
+        private System.Windows.Forms.ColumnHeader valueTotalFiltered;
+        private System.Windows.Forms.ColumnHeader professionsFiltered;
+        private System.Windows.Forms.ColumnHeader usableFiltered;
         private System.Windows.Forms.NumericUpDown nudOwned;
         private System.Windows.Forms.Label lblNumOwned;
         private System.Windows.Forms.Label lblGold;
@@ -654,12 +721,11 @@
         private System.Windows.Forms.Button btnAddItems;
         private System.Windows.Forms.ColumnHeader numAdded;
         private System.Windows.Forms.ColumnHeader note;
-        private System.Windows.Forms.ColumnHeader usable;
         private System.Windows.Forms.ColumnHeader item;
         private System.Windows.Forms.RadioButton rbOnHand;
         private System.Windows.Forms.RadioButton rbLeftBehind;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button btnTransfer;
+        private System.Windows.Forms.Button btnBuy;
         private System.Windows.Forms.ColumnHeader professionMaking;
         private System.Windows.Forms.ColumnHeader crafterLevelMaking;
         private System.Windows.Forms.RichTextBox txtDescription;
@@ -669,7 +735,6 @@
         private System.Windows.Forms.ColumnHeader numMadeUsing;
         private System.Windows.Forms.Label lblUsingItem;
         private System.Windows.Forms.CheckBox cbSearchDescriptions;
-        private System.Windows.Forms.Button btnUndo;
         private System.Windows.Forms.ContextMenuStrip cmsItemList;
         private System.Windows.Forms.ToolStripMenuItem editItemToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createNewItemToolStripMenuItem;
@@ -679,5 +744,6 @@
         private System.Windows.Forms.ColumnHeader resultUsing;
         private System.Windows.Forms.ColumnHeader numCanMakeUsing;
         private System.Windows.Forms.ColumnHeader numCanMakeMaking;
+        private System.Windows.Forms.Button btnCreateNew;
     }
 }
