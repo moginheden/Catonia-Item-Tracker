@@ -105,10 +105,16 @@ namespace Catonia_Item_Tracker
             lvRecipiesUsingItem.Columns[2].Width = -2;
 
             //set previous history list
-            lvItemHistory.SuspendLayout();
-            lvItemHistory.Items.Clear();
-            generateHistory();
-            lvItemHistory.ResumeLayout();
+            try
+            {
+                lvItemHistory.BeginUpdate();
+                lvItemHistory.Items.Clear();
+                generateHistory();
+            }
+            finally
+            {
+                lvItemHistory.EndUpdate();
+            }
 
             //set initial item list
             sortColumnInventory = 0;
@@ -147,73 +153,84 @@ namespace Catonia_Item_Tracker
 
         private void updateItem(Item item, ItemQty iq, ListView lvItemsToChange)
         {
-            //update main item list
-            lvItemsToChange.SuspendLayout();
-
-            //try to update an existing row
-            bool found = false;
-            foreach (ListViewItem row in lvItemsToChange.Items)
+            try
             {
-                if (((ItemQty)row.Tag).item.id == item.id)
+                //update main item list
+                lvItemsToChange.BeginUpdate();
+
+                //try to update an existing row
+                bool found = false;
+                foreach (ListViewItem row in lvItemsToChange.Items)
                 {
-                    //update row
-                    row.SubItems[0].Text = item.name;
-                    row.SubItems[1].Text = iq.qty.ToString();
-                    row.SubItems[2].Text = item.cost.ToString();
-                    row.SubItems[3].Text = (item.cost * iq.qty).ToString();
-                    row.SubItems[4].Text = getProfessionsForItem(item);
-                    row.SubItems[5].Text = item.usable.ToString();
-                    found = true;
+                    if (((ItemQty)row.Tag).item.id == item.id)
+                    {
+                        //update row
+                        row.SubItems[0].Text = item.name;
+                        row.SubItems[1].Text = iq.qty.ToString();
+                        row.SubItems[2].Text = item.cost.ToString();
+                        row.SubItems[3].Text = (item.cost * iq.qty).ToString();
+                        row.SubItems[4].Text = getProfessionsForItem(item);
+                        row.SubItems[5].Text = item.usable.ToString();
+                        found = true;
+
+                        //select new item
+                        lvItemsToChange.SelectedItems.Clear();
+                        row.Selected = true;
+                        row.Focused = true;
+                    }
+                }
+
+                //if no row is found, add a new one at the bottom
+                if (!found)
+                {
+                    //create new row
+                    ListViewItem row = new ListViewItem(new string[] { item.name,
+                                                                   iq.qty.ToString(),
+                                                                   item.cost.ToString(),
+                                                                   (item.cost * iq.qty).ToString(),
+                                                                   getProfessionsForItem(item),
+                                                                   item.usable.ToString() });
+                    row.Tag = iq;
+
+                    //add to list
+                    lvItemsToChange.Items.Add(row);
 
                     //select new item
                     lvItemsToChange.SelectedItems.Clear();
                     row.Selected = true;
                     row.Focused = true;
                 }
-            }
 
-            //if no row is found, add a new one at the bottom
-            if(!found)
+                //resize name column
+                lvItemsToChange.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                lvItemsToChange.Columns[0].Width = -2;
+
+                //re-sort
+                lvItemsToChange.Sort();
+            }
+            finally
             {
-                //create new row
-                ListViewItem row = new ListViewItem(new string[] { item.name,
-                                                                   iq.qty.ToString(),
-                                                                   item.cost.ToString(),
-                                                                   (item.cost * iq.qty).ToString(),
-                                                                   getProfessionsForItem(item),
-                                                                   item.usable.ToString() });
-                row.Tag = iq;
-                        
-                //add to list
-                lvItemsToChange.Items.Add(row);
-
-                //select new item
-                lvItemsToChange.SelectedItems.Clear();
-                row.Selected = true;
-                row.Focused = true;
+                lvItemsToChange.EndUpdate();
             }
-
-            //resize name column
-            lvItemsToChange.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvItemsToChange.Columns[0].Width = -2;
-            
-            //re-sort
-            lvItemsToChange.Sort();
-
-            lvItemsToChange.ResumeLayout();
 
             //update description and recipies if it's the active item
             if(lvItemsToChange.Visible && (lvItemsToChange.SelectedItems.Count > 0) && (item.id == ((ItemQty)lvItemsToChange.SelectedItems[0].Tag).item.id))
             {
                 txtDescription.Text = item.description;
 
-                lvRecipiesMakingItem.SuspendLayout();
-                lvRecipiesUsingItem.SuspendLayout();
-                lvRecipiesMakingItem.Items.Clear();
-                lvRecipiesUsingItem.Items.Clear();
-                updateCreationPaths(item);
-                lvRecipiesMakingItem.ResumeLayout();
-                lvRecipiesUsingItem.ResumeLayout();
+                try
+                {
+                    lvRecipiesMakingItem.BeginUpdate();
+                    lvRecipiesUsingItem.BeginUpdate();
+                    lvRecipiesMakingItem.Items.Clear();
+                    lvRecipiesUsingItem.Items.Clear();
+                    updateCreationPaths(item);
+                }
+                finally
+                {
+                    lvRecipiesMakingItem.EndUpdate();
+                    lvRecipiesUsingItem.EndUpdate();
+                }
             }
         }
 
@@ -252,35 +269,38 @@ namespace Catonia_Item_Tracker
         /// <param name="lvItemsToChange">The listview to update</param>
         private void updateLvItems(IEnumerable<ItemQty> newItemList, ListView lvItemsToChange)
         {
-            lvItemsToChange.Visible = false;
-            //lvItems.SuspendLayout();
-
-            lvItemsToChange.Items.Clear();
-            ListViewItem[] rowsToAdd = new ListViewItem[newItemList.Count()];
-            int i = 0;
-            foreach (ItemQty iq in newItemList.OrderBy(o => (o.qty == 0)).ThenBy(o => o.item.name))
+            try
             {
-                ListViewItem row = new ListViewItem(new string[] { iq.item.name,
+                lvItemsToChange.BeginUpdate();
+
+                lvItemsToChange.Items.Clear();
+                ListViewItem[] rowsToAdd = new ListViewItem[newItemList.Count()];
+                int i = 0;
+                foreach (ItemQty iq in newItemList.OrderBy(o => (o.qty == 0)).ThenBy(o => o.item.name))
+                {
+                    ListViewItem row = new ListViewItem(new string[] { iq.item.name,
                                                                    iq.qty.ToString(),
                                                                    iq.item.cost.ToString(),
                                                                    (iq.item.cost * iq.qty).ToString(),
                                                                    getProfessionsForItem(iq.item),
                                                                    iq.item.usable.ToString()});
-                row.Tag = iq;
-                rowsToAdd[i] = row;
-                i++;
+                    row.Tag = iq;
+                    rowsToAdd[i] = row;
+                    i++;
+                }
+                lvItemsToChange.Items.AddRange(rowsToAdd);
+
+                //auto-size the name column
+                lvItemsToChange.Columns[0].Width = -2;
+
+                //sort itemList
+                lvItemsToChange.ListViewItemSorter = new lvItemComparer(sortColumnInventory, lvItemsToChange.Sorting);
+                lvItemsToChange.Sort();
             }
-            lvItemsToChange.Items.AddRange(rowsToAdd);
-
-            //auto-size the name column
-            lvItemsToChange.Columns[0].Width = -2;
-
-            //sort itemList
-            lvItemsToChange.ListViewItemSorter = new lvItemComparer(sortColumnInventory, lvItemsToChange.Sorting);
-            lvItemsToChange.Sort();
-
-            //lvItems.ResumeLayout();
-            lvItemsToChange.Visible = true;
+            finally
+            {
+                lvItemsToChange.EndUpdate();
+            }
         }
 
         /// <summary>
@@ -407,45 +427,50 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         internal void lvItems_SelectedIndexChanged(object sender, EventArgs e)
         {
-            lvRecipiesMakingItem.SuspendLayout();
-            lvRecipiesUsingItem.SuspendLayout();
-            lvItemHistory.SuspendLayout();
-
-            lvRecipiesMakingItem.Items.Clear();
-            lvRecipiesUsingItem.Items.Clear();
-            lvItemHistory.Items.Clear();
-
-            //use the currently active item list/filtered item list
-            ListView lvItemsActive = lvItems;
-            if(!lvItems.Visible)
+            try
             {
-                lvItemsActive = lvFilteredItems;
-            }
+                lvRecipiesMakingItem.BeginUpdate();
+                lvRecipiesUsingItem.BeginUpdate();
+                lvItemHistory.BeginUpdate();
 
-            if (lvItemsActive.SelectedItems.Count == 0)
-            {
-                generateHistory();
-                using (new TriggerLock())
+                lvRecipiesMakingItem.Items.Clear();
+                lvRecipiesUsingItem.Items.Clear();
+                lvItemHistory.Items.Clear();
+
+                //use the currently active item list/filtered item list
+                ListView lvItemsActive = lvItems;
+                if (!lvItems.Visible)
                 {
-                    nudOwned.Value = 0;
+                    lvItemsActive = lvFilteredItems;
                 }
-                txtDescription.Text = "";
-            }
-            else
-            {
-                ItemQty iq = (ItemQty)lvItemsActive.SelectedItems[0].Tag;
-                using (new TriggerLock())
-                {
-                    nudOwned.Value = iq.qty;
-                }
-                txtDescription.Text = iq.item.description;
-                updateCreationPaths(iq.item);
-                generateHistory(iq.item.id);
-            }
 
-            lvRecipiesMakingItem.ResumeLayout();
-            lvRecipiesUsingItem.ResumeLayout();
-            lvItemHistory.ResumeLayout();
+                if (lvItemsActive.SelectedItems.Count == 0)
+                {
+                    generateHistory();
+                    using (new TriggerLock())
+                    {
+                        nudOwned.Value = 0;
+                    }
+                    txtDescription.Text = "";
+                }
+                else
+                {
+                    ItemQty iq = (ItemQty)lvItemsActive.SelectedItems[0].Tag;
+                    using (new TriggerLock())
+                    {
+                        nudOwned.Value = iq.qty;
+                    }
+                    txtDescription.Text = iq.item.description;
+                    updateCreationPaths(iq.item);
+                    generateHistory(iq.item.id);
+                }
+            }
+            finally
+            {
+                lvRecipiesMakingItem.EndUpdate();
+                lvRecipiesUsingItem.EndUpdate();
+                lvItemHistory.EndUpdate();
+            }
         }
 
         /// <summary>
@@ -847,19 +872,31 @@ namespace Catonia_Item_Tracker
                     nudOwned.Value = iq.qty;
                 }
 
-                lvItemHistory.SuspendLayout();
-                lvItemHistory.Items.Clear();
-                generateHistory(iq.item.id);
-                lvItemHistory.ResumeLayout();
+                try
+                {
+                    lvItemHistory.BeginUpdate();
+                    lvItemHistory.Items.Clear();
+                    generateHistory(iq.item.id);
+                }
+                finally
+                {
+                    lvItemHistory.EndUpdate();
+                }
             }
 
             //if no item selected, update overall history
             if (lvItemsActive.SelectedItems.Count == 0)
             {
-                lvItemHistory.SuspendLayout();
-                lvItemHistory.Items.Clear();
-                generateHistory();
-                lvItemHistory.ResumeLayout();
+                try
+                {
+                    lvItemHistory.BeginUpdate();
+                    lvItemHistory.Items.Clear();
+                    generateHistory();
+                }
+                finally
+                {
+                    lvItemHistory.EndUpdate();
+                }
             }
 
             //if it's in the list of items, update that
@@ -867,22 +904,34 @@ namespace Catonia_Item_Tracker
             {
                 if ((ItemQty)lvi.Tag == iq)
                 {
-                    lvItems.SuspendLayout();
-                    lvi.SubItems[1].Text = iq.qty.ToString();
-                    lvi.SubItems[3].Text = (iq.item.cost * iq.qty).ToString();
-                    lvItems.Sort();
-                    lvItems.ResumeLayout();
+                    try
+                    {
+                        lvItems.BeginUpdate();
+                        lvi.SubItems[1].Text = iq.qty.ToString();
+                        lvi.SubItems[3].Text = (iq.item.cost * iq.qty).ToString();
+                        lvItems.Sort();
+                    }
+                    finally
+                    {
+                        lvItems.EndUpdate();
+                    }
                 }
             }
             foreach (ListViewItem lvi in lvFilteredItems.Items)
             {
                 if ((ItemQty)lvi.Tag == iq)
                 {
-                    lvFilteredItems.SuspendLayout();
-                    lvi.SubItems[1].Text = iq.qty.ToString();
-                    lvi.SubItems[3].Text = (iq.item.cost * iq.qty).ToString();
-                    lvFilteredItems.Sort();
-                    lvFilteredItems.ResumeLayout();
+                    try
+                    {
+                        lvFilteredItems.BeginUpdate();
+                        lvi.SubItems[1].Text = iq.qty.ToString();
+                        lvi.SubItems[3].Text = (iq.item.cost * iq.qty).ToString();
+                        lvFilteredItems.Sort();
+                    }
+                    finally
+                    {
+                        lvFilteredItems.EndUpdate();
+                    }
                 }
             }
         }
