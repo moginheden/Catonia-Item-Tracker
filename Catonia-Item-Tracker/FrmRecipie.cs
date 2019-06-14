@@ -380,7 +380,6 @@ namespace Catonia_Item_Tracker
 
                 //update the main window with the recipie
                 Program.mainForm.lvItems_SelectedIndexChanged(null, null);
-                Program.mainForm.txtSearch_TextChanged(null, null);
             }
 
             this.Close();

@@ -29,25 +29,19 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.txtSearch = new System.Windows.Forms.TextBox();
+            this.txtSearch = new System.Windows.Forms.ComboBox();
             this.lblSearch = new System.Windows.Forms.Label();
             this.lvItems = new System.Windows.Forms.ListView();
             this.itemName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numOwned = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.value = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.valueTotal = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.professions = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.craft = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.usable = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.lastUpdated = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmsItemList = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createNewItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.lvFilteredItems = new System.Windows.Forms.ListView();
-            this.itemNameFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.numOwnedFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.valueFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.valueTotalFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.professionsFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.usableFiltered = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.nudOwned = new System.Windows.Forms.NumericUpDown();
             this.lblNumOwned = new System.Windows.Forms.Label();
             this.lblGold = new System.Windows.Forms.Label();
@@ -82,12 +76,11 @@
             this.item = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.note = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblMakingItem = new System.Windows.Forms.Label();
-            this.rbOnHand = new System.Windows.Forms.RadioButton();
-            this.rbLeftBehind = new System.Windows.Forms.RadioButton();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.txtDescription = new System.Windows.Forms.RichTextBox();
             this.cbSearchDescriptions = new System.Windows.Forms.CheckBox();
             this.btnCreateNew = new System.Windows.Forms.Button();
+            this.ddlInventories = new System.Windows.Forms.ComboBox();
+            this.btnCrafter = new System.Windows.Forms.Button();
             this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
@@ -96,18 +89,19 @@
             this.gbItemManagment.SuspendLayout();
             this.cmsRecipieList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddItems)).BeginInit();
-            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtSearch
             // 
             this.txtSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtSearch.FormattingEnabled = true;
             this.txtSearch.ImeMode = System.Windows.Forms.ImeMode.On;
             this.txtSearch.Location = new System.Drawing.Point(12, 28);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(367, 44);
+            this.txtSearch.Size = new System.Drawing.Size(367, 45);
             this.txtSearch.TabIndex = 1;
-            this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
+            this.txtSearch.SelectedIndexChanged += new System.EventHandler(this.TxtSearch_SelectedIndexChanged);
+            this.txtSearch.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TxtSearch_KeyUp);
             // 
             // lblSearch
             // 
@@ -125,12 +119,13 @@
             this.numOwned,
             this.value,
             this.valueTotal,
-            this.professions,
-            this.usable});
+            this.craft,
+            this.usable,
+            this.lastUpdated});
             this.lvItems.ContextMenuStrip = this.cmsItemList;
             this.lvItems.FullRowSelect = true;
             this.lvItems.HideSelection = false;
-            this.lvItems.Location = new System.Drawing.Point(12, 78);
+            this.lvItems.Location = new System.Drawing.Point(12, 79);
             this.lvItems.Name = "lvItems";
             this.lvItems.Size = new System.Drawing.Size(494, 776);
             this.lvItems.TabIndex = 3;
@@ -159,14 +154,20 @@
             this.valueTotal.Text = "Total";
             this.valueTotal.Width = 42;
             // 
-            // professions
+            // craft
             // 
-            this.professions.Text = "Professions";
-            this.professions.Width = 70;
+            this.craft.Text = "Craft";
+            this.craft.Width = 34;
             // 
             // usable
             // 
-            this.usable.Text = "Usable";
+            this.usable.Text = "Use";
+            this.usable.Width = 31;
+            // 
+            // lastUpdated
+            // 
+            this.lastUpdated.Text = "Updated";
+            this.lastUpdated.Width = 75;
             // 
             // cmsItemList
             // 
@@ -190,57 +191,6 @@
             this.createNewItemToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.createNewItemToolStripMenuItem.Text = "Create New Item";
             this.createNewItemToolStripMenuItem.Click += new System.EventHandler(this.createNewItemToolStripMenuItem_Click);
-            // 
-            // lvFilteredItems
-            // 
-            this.lvFilteredItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.itemNameFiltered,
-            this.numOwnedFiltered,
-            this.valueFiltered,
-            this.valueTotalFiltered,
-            this.professionsFiltered,
-            this.usableFiltered});
-            this.lvFilteredItems.ContextMenuStrip = this.cmsItemList;
-            this.lvFilteredItems.FullRowSelect = true;
-            this.lvFilteredItems.HideSelection = false;
-            this.lvFilteredItems.Location = new System.Drawing.Point(12, 78);
-            this.lvFilteredItems.Name = "lvFilteredItems";
-            this.lvFilteredItems.Size = new System.Drawing.Size(494, 776);
-            this.lvFilteredItems.TabIndex = 3;
-            this.lvFilteredItems.UseCompatibleStateImageBehavior = false;
-            this.lvFilteredItems.View = System.Windows.Forms.View.Details;
-            this.lvFilteredItems.Visible = false;
-            this.lvFilteredItems.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvItems_ColumnClick);
-            this.lvFilteredItems.SelectedIndexChanged += new System.EventHandler(this.lvItems_SelectedIndexChanged);
-            // 
-            // itemNameFiltered
-            // 
-            this.itemNameFiltered.Text = "Item Name";
-            this.itemNameFiltered.Width = 143;
-            // 
-            // numOwnedFiltered
-            // 
-            this.numOwnedFiltered.Text = "#";
-            this.numOwnedFiltered.Width = 45;
-            // 
-            // valueFiltered
-            // 
-            this.valueFiltered.Text = "Value";
-            this.valueFiltered.Width = 42;
-            // 
-            // valueTotalFiltered
-            // 
-            this.valueTotalFiltered.Text = "Total";
-            this.valueTotalFiltered.Width = 42;
-            // 
-            // professionsFiltered
-            // 
-            this.professionsFiltered.Text = "Professions";
-            this.professionsFiltered.Width = 70;
-            // 
-            // usableFiltered
-            // 
-            this.usableFiltered.Text = "Usable";
             // 
             // nudOwned
             // 
@@ -578,46 +528,13 @@
             this.lblMakingItem.TabIndex = 7;
             this.lblMakingItem.Text = "Recipies Making This Item";
             // 
-            // rbOnHand
-            // 
-            this.rbOnHand.AutoSize = true;
-            this.rbOnHand.Checked = true;
-            this.rbOnHand.Location = new System.Drawing.Point(3, 3);
-            this.rbOnHand.Name = "rbOnHand";
-            this.rbOnHand.Size = new System.Drawing.Size(115, 17);
-            this.rbOnHand.TabIndex = 12;
-            this.rbOnHand.TabStop = true;
-            this.rbOnHand.Text = "Inventory On Hand";
-            this.rbOnHand.UseVisualStyleBackColor = true;
-            this.rbOnHand.CheckedChanged += new System.EventHandler(this.rbOnHand_CheckedChanged);
-            // 
-            // rbLeftBehind
-            // 
-            this.rbLeftBehind.AutoSize = true;
-            this.rbLeftBehind.Location = new System.Drawing.Point(120, 3);
-            this.rbLeftBehind.Name = "rbLeftBehind";
-            this.rbLeftBehind.Size = new System.Drawing.Size(124, 17);
-            this.rbLeftBehind.TabIndex = 13;
-            this.rbLeftBehind.Text = "Inventory With NPCs";
-            this.rbLeftBehind.UseVisualStyleBackColor = true;
-            this.rbLeftBehind.CheckedChanged += new System.EventHandler(this.rbLeftBehind_CheckedChanged);
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.rbOnHand);
-            this.panel1.Controls.Add(this.rbLeftBehind);
-            this.panel1.Location = new System.Drawing.Point(106, 2);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(250, 26);
-            this.panel1.TabIndex = 14;
-            // 
             // txtDescription
             // 
             this.txtDescription.BackColor = System.Drawing.SystemColors.Window;
             this.txtDescription.Location = new System.Drawing.Point(12, 860);
             this.txtDescription.Name = "txtDescription";
             this.txtDescription.ReadOnly = true;
-            this.txtDescription.Size = new System.Drawing.Size(494, 104);
+            this.txtDescription.Size = new System.Drawing.Size(494, 98);
             this.txtDescription.TabIndex = 15;
             this.txtDescription.Text = "";
             // 
@@ -644,18 +561,38 @@
             this.btnCreateNew.UseVisualStyleBackColor = true;
             this.btnCreateNew.Click += new System.EventHandler(this.btnCreateNew_Click);
             // 
+            // ddlInventories
+            // 
+            this.ddlInventories.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ddlInventories.FormattingEnabled = true;
+            this.ddlInventories.Location = new System.Drawing.Point(108, 4);
+            this.ddlInventories.Name = "ddlInventories";
+            this.ddlInventories.Size = new System.Drawing.Size(171, 21);
+            this.ddlInventories.TabIndex = 18;
+            this.ddlInventories.SelectedIndexChanged += new System.EventHandler(this.DdlInventories_SelectedIndexChanged);
+            // 
+            // btnCrafter
+            // 
+            this.btnCrafter.Location = new System.Drawing.Point(304, 4);
+            this.btnCrafter.Name = "btnCrafter";
+            this.btnCrafter.Size = new System.Drawing.Size(75, 21);
+            this.btnCrafter.TabIndex = 19;
+            this.btnCrafter.Text = "Crafter Guide";
+            this.btnCrafter.UseVisualStyleBackColor = true;
+            this.btnCrafter.Click += new System.EventHandler(this.BtnCrafter_Click);
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(900, 961);
+            this.Controls.Add(this.btnCrafter);
+            this.Controls.Add(this.ddlInventories);
             this.Controls.Add(this.btnCreateNew);
+            this.Controls.Add(this.lvItems);
             this.Controls.Add(this.cbSearchDescriptions);
             this.Controls.Add(this.txtDescription);
-            this.Controls.Add(this.panel1);
             this.Controls.Add(this.gbItemManagment);
-            this.Controls.Add(this.lvItems);
-            this.Controls.Add(this.lvFilteredItems);
             this.Controls.Add(this.gbGold);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.txtSearch);
@@ -677,8 +614,6 @@
             this.gbItemManagment.PerformLayout();
             this.cmsRecipieList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudAddItems)).EndInit();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -686,22 +621,15 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox txtSearch;
+        private System.Windows.Forms.ComboBox txtSearch;
         private System.Windows.Forms.Label lblSearch;
         private System.Windows.Forms.ListView lvItems;
         private System.Windows.Forms.ColumnHeader itemName;
         private System.Windows.Forms.ColumnHeader numOwned;
         private System.Windows.Forms.ColumnHeader value;
         private System.Windows.Forms.ColumnHeader valueTotal;
-        private System.Windows.Forms.ColumnHeader professions;
+        private System.Windows.Forms.ColumnHeader craft;
         private System.Windows.Forms.ColumnHeader usable;
-        private System.Windows.Forms.ListView lvFilteredItems;
-        private System.Windows.Forms.ColumnHeader itemNameFiltered;
-        private System.Windows.Forms.ColumnHeader numOwnedFiltered;
-        private System.Windows.Forms.ColumnHeader valueFiltered;
-        private System.Windows.Forms.ColumnHeader valueTotalFiltered;
-        private System.Windows.Forms.ColumnHeader professionsFiltered;
-        private System.Windows.Forms.ColumnHeader usableFiltered;
         private System.Windows.Forms.NumericUpDown nudOwned;
         private System.Windows.Forms.Label lblNumOwned;
         private System.Windows.Forms.Label lblGold;
@@ -722,9 +650,6 @@
         private System.Windows.Forms.ColumnHeader numAdded;
         private System.Windows.Forms.ColumnHeader note;
         private System.Windows.Forms.ColumnHeader item;
-        private System.Windows.Forms.RadioButton rbOnHand;
-        private System.Windows.Forms.RadioButton rbLeftBehind;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnBuy;
         private System.Windows.Forms.ColumnHeader professionMaking;
         private System.Windows.Forms.ColumnHeader crafterLevelMaking;
@@ -745,5 +670,8 @@
         private System.Windows.Forms.ColumnHeader numCanMakeUsing;
         private System.Windows.Forms.ColumnHeader numCanMakeMaking;
         private System.Windows.Forms.Button btnCreateNew;
+        private System.Windows.Forms.ComboBox ddlInventories;
+        private System.Windows.Forms.ColumnHeader lastUpdated;
+        private System.Windows.Forms.Button btnCrafter;
     }
 }

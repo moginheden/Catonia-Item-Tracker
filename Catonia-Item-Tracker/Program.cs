@@ -30,14 +30,9 @@ namespace Catonia_Item_Tracker
         public static List<Item> items = null;
 
         /// <summary>
-        /// The list of items we have on hand
+        /// The list of items referenced by where they are stored
         /// </summary>
-        public static Inventory onHand = null;
-
-        /// <summary>
-        /// The list of items we left with NPCs
-        /// </summary>
-        public static Inventory leftBehind = null;
+        public static Dictionary<string, Inventory> inventories = null;
 
         /// <summary>
         /// The information on what items combine to create what items
@@ -82,13 +77,9 @@ namespace Catonia_Item_Tracker
             }
 
             HistoryRecord hrCloser = new HistoryRecord() { iq = new ItemQty() { item = new Item() { id = -1 } } };
-            if(onHand != null)
+            foreach(KeyValuePair<string, Inventory> i in inventories)
             {
-                onHand.addHistory(hrCloser);
-            }
-            if(leftBehind != null)
-            {
-                leftBehind.addHistory(hrCloser);
+                i.Value.addHistory(hrCloser);
             }
         }
 
@@ -168,12 +159,24 @@ namespace Catonia_Item_Tracker
 
                     recipies.Add(r);
                 }
+
+
+                FrmLoading.setText("Generating Local Inventory Lists...");
+                inventories = new Dictionary<string, Inventory>();
+                inventories.Add("On Hand", new Inventory("On Hand"));
+                string selectLootLocations = @"select distinct location from lootByLocation where location != 'On Hand'";
+                using (SqlCommand commIngredients = new SqlCommand(selectLootLocations, dataConnection))
+                {
+                    using (SqlDataReader reader = commIngredients.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            inventories.Add(reader.GetString(0), new Inventory(reader.GetString(0)));
+                        }
+                    }
+                }
+
             }
-
-
-            FrmLoading.setText("Generating Local Inventory Lists...");
-            onHand = new Inventory("On Hand");
-            leftBehind = new Inventory("Left Behind");
         }
 
         /// <summary>

@@ -39,6 +39,10 @@ namespace Catonia_Item_Tracker
                 {
                     returnVal = int.Parse(((ListViewItem)x).SubItems[col].Text).CompareTo(int.Parse(((ListViewItem)y).SubItems[col].Text));
                 }
+                else if(col == 6)
+                {
+                    returnVal = DateTime.Compare((DateTime)((ListViewItem)x).SubItems[col].Tag, (DateTime)((ListViewItem)y).SubItems[col].Tag);
+                }
                 else
                 {
                     returnVal = String.Compare(((ListViewItem)x).SubItems[col].Text, ((ListViewItem)y).SubItems[col].Text);
@@ -70,12 +74,17 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// reference to the loot item "Gold" for use in the numeric up/down field
         /// </summary>
-        private ItemQty iqGold = Program.onHand.loot.First(x => x.item.name.Equals("Gold Coins"));
+        private ItemQty iqGold = Program.inventories["On Hand"].loot.First(x => x.item.name.Equals("Gold Coins"));
 
         /// <summary>
         /// The inventory list this form is currently using
         /// </summary>
-        internal Inventory inventory = Program.onHand;
+        internal Inventory inventory = Program.inventories["On Hand"];
+
+        /// <summary>
+        /// The previously searched string to make sure we don't do weird things with the auto-complete if the text doesn't change
+        /// </summary>
+        private string oldSearch = "";
 
         /// <summary>
         /// entry point
@@ -86,6 +95,13 @@ namespace Catonia_Item_Tracker
 
             ResetText();
 
+            foreach (KeyValuePair<string, Inventory> i in Program.inventories)
+            {
+                ddlInventories.Items.Add(i.Key);
+            }
+            ddlInventories.SelectedIndex = 0;
+            
+
             using (new TriggerLock())
             {
                 nudGold.Value = iqGold.qty;
@@ -93,7 +109,6 @@ namespace Catonia_Item_Tracker
             
             //setup column size for item list
             lvItems.Columns[0].Width = -2;
-            lvFilteredItems.Columns[0].Width = -2;
 
             //setup column size for recipie listviews
             lvRecipiesMakingItem.Columns[0].Width = -2;
@@ -117,9 +132,8 @@ namespace Catonia_Item_Tracker
             }
 
             //set initial item list
-            sortColumnInventory = 0;
-            lvItems.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            lvFilteredItems.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            sortColumnInventory = 6;
+            lvItems.Sorting = System.Windows.Forms.SortOrder.Descending;
             updateLvItems(inventory.loot, lvItems);
         }
 
@@ -128,7 +142,7 @@ namespace Catonia_Item_Tracker
         /// </summary>
         public override void ResetText()
         {
-            if(this.InvokeRequired)
+            if (this.InvokeRequired)
             {
                 Program.mainForm.Invoke(new Action(() =>
                 {
@@ -137,6 +151,22 @@ namespace Catonia_Item_Tracker
             }
 
             Text = "Catonia Item Tracker v" + Application.ProductVersion;
+        }
+        
+        /// <summary>
+         /// Sets the title of this form to the given value
+         /// </summary>
+        public void setText(string newText)
+        {
+            if (this.InvokeRequired)
+            {
+                Program.mainForm.Invoke(new Action(() =>
+                {
+                    setText(newText);
+                }));
+            }
+
+            Text = newText;
         }
 
         /// <summary>
@@ -147,20 +177,19 @@ namespace Catonia_Item_Tracker
         {
             ItemQty iq = inventory.findLoot(item.id);
 
-            updateItem(item, iq, lvItems);
-            updateItem(item, iq, lvFilteredItems);
+            updateItem(item, iq);
         }
 
-        private void updateItem(Item item, ItemQty iq, ListView lvItemsToChange)
+        private void updateItem(Item item, ItemQty iq)
         {
             try
             {
                 //update main item list
-                lvItemsToChange.BeginUpdate();
+                lvItems.BeginUpdate();
 
                 //try to update an existing row
                 bool found = false;
-                foreach (ListViewItem row in lvItemsToChange.Items)
+                foreach (ListViewItem row in lvItems.Items)
                 {
                     if (((ItemQty)row.Tag).item.id == item.id)
                     {
@@ -170,11 +199,13 @@ namespace Catonia_Item_Tracker
                         row.SubItems[2].Text = item.cost.ToString();
                         row.SubItems[3].Text = (item.cost * iq.qty).ToString();
                         row.SubItems[4].Text = getProfessionsForItem(item);
-                        row.SubItems[5].Text = item.usable.ToString();
+                        row.SubItems[5].Text = (item.usable ? "Y" : "N");
+                        row.SubItems[6].Text = DateTime.Now.ToString("yyyy-MM-dd, h:mm tt");
+                        row.SubItems[6].Tag = DateTime.Now;
                         found = true;
 
                         //select new item
-                        lvItemsToChange.SelectedItems.Clear();
+                        lvItems.SelectedItems.Clear();
                         row.Selected = true;
                         row.Focused = true;
                     }
@@ -189,32 +220,32 @@ namespace Catonia_Item_Tracker
                                                                    item.cost.ToString(),
                                                                    (item.cost * iq.qty).ToString(),
                                                                    getProfessionsForItem(item),
-                                                                   item.usable.ToString() });
+                                                                   (item.usable ? "Y" : "N") });
                     row.Tag = iq;
 
                     //add to list
-                    lvItemsToChange.Items.Add(row);
+                    lvItems.Items.Add(row);
 
                     //select new item
-                    lvItemsToChange.SelectedItems.Clear();
+                    lvItems.SelectedItems.Clear();
                     row.Selected = true;
                     row.Focused = true;
                 }
 
                 //resize name column
-                lvItemsToChange.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-                lvItemsToChange.Columns[0].Width = -2;
+                lvItems.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                lvItems.Columns[0].Width = -2;
 
                 //re-sort
-                lvItemsToChange.Sort();
+                lvItems.Sort();
             }
             finally
             {
-                lvItemsToChange.EndUpdate();
+                lvItems.EndUpdate();
             }
 
             //update description and recipies if it's the active item
-            if(lvItemsToChange.Visible && (lvItemsToChange.SelectedItems.Count > 0) && (item.id == ((ItemQty)lvItemsToChange.SelectedItems[0].Tag).item.id))
+            if(lvItems.Visible && (lvItems.SelectedItems.Count > 0) && (item.id == ((ItemQty)lvItems.SelectedItems[0].Tag).item.id))
             {
                 txtDescription.Text = item.description;
 
@@ -274,21 +305,25 @@ namespace Catonia_Item_Tracker
                 lvItemsToChange.BeginUpdate();
 
                 lvItemsToChange.Items.Clear();
-                ListViewItem[] rowsToAdd = new ListViewItem[newItemList.Count()];
-                int i = 0;
+                List<ListViewItem> rowsToAdd = new List<ListViewItem>(newItemList.Count());
                 foreach (ItemQty iq in newItemList.OrderBy(o => (o.qty == 0)).ThenBy(o => o.item.name))
                 {
-                    ListViewItem row = new ListViewItem(new string[] { iq.item.name,
-                                                                   iq.qty.ToString(),
-                                                                   iq.item.cost.ToString(),
-                                                                   (iq.item.cost * iq.qty).ToString(),
-                                                                   getProfessionsForItem(iq.item),
-                                                                   iq.item.usable.ToString()});
-                    row.Tag = iq;
-                    rowsToAdd[i] = row;
-                    i++;
+                    if(iq.item.id != 0) //don't add gold to the list
+                    {
+                        DateTime lastMod = inventory.getLatestModification(iq.item.id);
+                        ListViewItem row = new ListViewItem(new string[] { iq.item.name,
+                                                                       iq.qty.ToString(),
+                                                                       iq.item.cost.ToString(),
+                                                                       (iq.item.cost * iq.qty).ToString(),
+                                                                       getProfessionsForItem(iq.item),
+                                                                       (iq.item.usable ? "Y" : "N"),
+                                                                       lastMod.ToString("yyyy-MM-dd, h:mm tt")});
+                        row.SubItems[6].Tag = lastMod;
+                        row.Tag = iq;
+                        rowsToAdd.Add(row);
+                    }
                 }
-                lvItemsToChange.Items.AddRange(rowsToAdd);
+                lvItemsToChange.Items.AddRange(rowsToAdd.ToArray());
 
                 //auto-size the name column
                 lvItemsToChange.Columns[0].Width = -2;
@@ -304,39 +339,14 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
-        /// event handler for on hand radio button
+        /// event handler for changing what inventory we are looking at
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void rbOnHand_CheckedChanged(object sender, EventArgs e)
+        private void DdlInventories_SelectedIndexChanged(object sender, EventArgs e)
         {
-            inventory = Program.onHand;
-            if(txtSearch.Text.Length == 0)
-            {
-                updateLvItems(inventory.loot, lvItems);
-            }
-            else
-            {
-                txtSearch_TextChanged(sender, e);
-            }
-        }
-
-        /// <summary>
-        /// event handler for left behind radio button
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void rbLeftBehind_CheckedChanged(object sender, EventArgs e)
-        {
-            inventory = Program.leftBehind;
-            if (txtSearch.Text.Length == 0)
-            {
-                updateLvItems(inventory.loot, lvItems);
-            }
-            else
-            {
-                txtSearch_TextChanged(sender, e);
-            }
+            inventory = Program.inventories[ddlInventories.SelectedItem.ToString()];
+            updateLvItems(inventory.loot, lvItems);
         }
 
         /// <summary>
@@ -346,76 +356,95 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void cbSearchDescriptions_CheckedChanged(object sender, EventArgs e)
         {
-            txtSearch_TextChanged(sender, e);
+            oldSearch = "";
+            TxtSearch_KeyUp(txtSearch, new KeyEventArgs(Keys.A));
         }
-        
+
         /// <summary>
         /// event handler for the search bar having a new value
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        internal void txtSearch_TextChanged(object sender, EventArgs e)
+        private void TxtSearch_KeyUp(object sender, KeyEventArgs e)
         {
-            string search = txtSearch.Text.ToLower().Replace('-', ' ');
-            if (txtSearch.Text.Length < 3)
-            {
-                lvFilteredItems.Visible = false;
+            //use keyUp event, as text changed traps too many other evengts.
+            ComboBox oBox = (ComboBox)sender;
+            string search = oBox.Text;
 
-                //update selected item to match the now hidden list
-                int selectedID = -1;
-                if (lvFilteredItems.SelectedItems.Count != 0)
-                {
-                    selectedID = ((ItemQty)lvFilteredItems.SelectedItems[0].Tag).item.id;
-                }
-                foreach(ListViewItem row in lvItems.Items)
-                {
-                    if(((ItemQty)row.Tag).item.id == selectedID)
-                    {
-                        row.Selected = true;
-                    }
-                    else
-                    {
-                        row.Selected = false;
-                    }
-                }
-                lvItems.Visible = true;
-            }
-            else
+            //if hitting escape, close the drop
+            if (e.KeyCode == Keys.Escape)
             {
-                lvItems.Visible = false;
-                
-                //rebuild the filtered list
-                if (cbSearchDescriptions.Checked)
-                {
-                    updateLvItems(inventory.loot.Where(x => (x.item.name.ToLower().Replace('-', ' ').Contains(search)
-                                                            || x.item.description.ToLower().Replace('-', ' ').Contains(search))),
-                                  lvFilteredItems);
-                }
-                else
-                {
-                    updateLvItems(inventory.loot.Where(x => x.item.name.ToLower().Replace('-', ' ').Contains(search)),
-                                  lvFilteredItems);
-                }
-
-                //update selected item to match the now hidden list
-                int selectedID = -1;
-                if (lvItems.SelectedItems.Count != 0)
-                {
-                    selectedID = ((ItemQty)lvItems.SelectedItems[0].Tag).item.id;
-                }
-                foreach (ListViewItem row in lvFilteredItems.Items)
-                {
-                    if (((ItemQty)row.Tag).item.id == selectedID)
-                    {
-                        row.Selected = true;
-                    }
-                    else
-                    {
-                        row.Selected = false;
-                    }
-                }
-                lvFilteredItems.Visible = true;
+                oBox.DroppedDown = false;
+                TxtSearch_SelectedIndexChanged(sender, null);
+                return;
             }
+
+            //if hitting enter, close the drop, but use the newly selected value
+            if ((e.KeyCode == Keys.Enter)
+                || (e.KeyCode == Keys.Return))
+            {
+                oBox.DroppedDown = false;
+                lvItems.SelectedItems.Clear();
+                TxtSearch_SelectedIndexChanged(sender, null);
+                return;
+            }
+
+            //if selecting with the arrow keys, don't clear the other options
+            if ((e.KeyCode == Keys.Down) || (e.KeyCode == Keys.Up))
+            {
+                return;
+            }
+
+            //if the text hasn't changed, don't do anything
+            if (search == oldSearch)
+            {
+                return;
+            }
+            oldSearch = search;
+
+            //otherwise setup the dropdown options
+            List<Item> results = new List<Item>();
+            for(int i = 0; results.Count < 20 && i < lvItems.Items.Count; i++)
+            {
+                ListViewItem row = lvItems.Items[i];
+                if ((((ItemQty)row.Tag).item.name.ToLower().Contains(search.ToLower()))
+                    || (cbSearchDescriptions.Checked && (((ItemQty)row.Tag).item.description.ToLower().Contains(search.ToLower()))))
+                {
+                    results.Add(((ItemQty)row.Tag).item);
+                }
+            }
+
+            //NOW THAT WE HAVE OUR FILTERED LIST, WE NEED TO RE-BIND IT WIHOUT CHANGING THE TEXT IN THE ComboBox.
+
+            //1).UNREGISTER THE SELECTED EVENT BEFORE RE-BINDING, b/c IT TRIGGERS ON BIND.
+            oBox.SelectedIndexChanged -= TxtSearch_SelectedIndexChanged; //don't select on typing.
+            oBox.DataSource = results; //2).rebind to filtered list.
+            oBox.SelectedIndexChanged += TxtSearch_SelectedIndexChanged;
+
+
+            //3).show the user the new filtered list.
+            oBox.DroppedDown = true; //this will overwrite the text in the ComboBox, so 4&5 put it back.
+
+            //4).binding data source erases text, so now we need to put the user's text back,
+            oBox.Text = search;
+            oBox.SelectionStart = search.Length; //5). need to put the user's cursor back where it was.
+        }
+
+        private void TxtSearch_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (txtSearch.SelectedItem != null)
+            {
+                foreach (ListViewItem row in lvItems.Items)
+                {
+                    if (((ItemQty)row.Tag).item.id == ((Item)txtSearch.SelectedItem).id)
+                    {
+                        lvItems.SelectedItems.Clear();
+                        row.Selected = true;
+                        row.Focused = true;
+                    }
+                }
+            }
+
             //update the right panel
             lvItems_SelectedIndexChanged(null, null);
         }
@@ -437,14 +466,7 @@ namespace Catonia_Item_Tracker
                 lvRecipiesUsingItem.Items.Clear();
                 lvItemHistory.Items.Clear();
 
-                //use the currently active item list/filtered item list
-                ListView lvItemsActive = lvItems;
-                if (!lvItems.Visible)
-                {
-                    lvItemsActive = lvFilteredItems;
-                }
-
-                if (lvItemsActive.SelectedItems.Count == 0)
+                if (lvItems.SelectedItems.Count == 0)
                 {
                     generateHistory();
                     using (new TriggerLock())
@@ -455,7 +477,7 @@ namespace Catonia_Item_Tracker
                 }
                 else
                 {
-                    ItemQty iq = (ItemQty)lvItemsActive.SelectedItems[0].Tag;
+                    ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
                     using (new TriggerLock())
                     {
                         nudOwned.Value = iq.qty;
@@ -695,7 +717,7 @@ namespace Catonia_Item_Tracker
         }
         
         /// <summary>
-        /// event handler for the tota amount of gold being changed
+        /// event handler for the total amount of gold being changed
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -707,21 +729,14 @@ namespace Catonia_Item_Tracker
                 return;
             }
 
-            //use the currently active item list/filtered item list
-            ListView lvItemsActive = lvItems;
-            if (!lvItems.Visible)
-            {
-                lvItemsActive = lvFilteredItems;
-            }
-
             //Don't do anything if there is no item selected
-            if (lvItemsActive.SelectedItems.Count == 0)
+            if (lvItems.SelectedItems.Count == 0)
             {
                 nudOwned.Value = 0M;
                 return;
             }
 
-            ItemQty iq = (ItemQty)lvItemsActive.SelectedItems[0].Tag;
+            ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
 
             //create or update the history record
             HistoryRecord hr = inventory.latestHistory();
@@ -755,20 +770,13 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void btnAddItems_Click(object sender, EventArgs e)
         {
-            //use the currently active item list/filtered item list
-            ListView lvItemsActive = lvItems;
-            if (!lvItems.Visible)
-            {
-                lvItemsActive = lvFilteredItems;
-            }
-
             //Don't do anything if it's a quantity of 0, or if there is no item selected
-            if ((nudAddItems.Value == 0M) || (lvItemsActive.SelectedItems.Count == 0))
+            if ((nudAddItems.Value == 0M) || (lvItems.SelectedItems.Count == 0))
             {
                 return;
             }
 
-            ItemQty iq = (ItemQty)lvItemsActive.SelectedItems[0].Tag;
+            ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
 
             iq.qty += (int)nudAddItems.Value;
 
@@ -791,21 +799,14 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void btnBuy_Click(object sender, EventArgs e)
         {
-            //use the currently active item list/filtered item list
-            ListView lvItemsActive = lvItems;
-            if (!lvItems.Visible)
-            {
-                lvItemsActive = lvFilteredItems;
-            }
-
             //Don't do anything if it's a quantity of 0, or if there is no item selected
-            if ((nudAddItems.Value == 0M) || (lvItemsActive.SelectedItems.Count == 0))
+            if ((nudAddItems.Value == 0M) || (lvItems.SelectedItems.Count == 0))
             {
                 return;
             }
 
             //update # items owned
-            ItemQty iq = (ItemQty)lvItemsActive.SelectedItems[0].Tag;
+            ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
 
             iq.qty += (int)nudAddItems.Value;
 
@@ -857,15 +858,8 @@ namespace Catonia_Item_Tracker
                 }
             }
 
-            //use the currently active item list/filtered item list
-            ListView lvItemsActive = lvItems;
-            if (!lvItems.Visible)
-            {
-                lvItemsActive = lvFilteredItems;
-            }
-
             //if it's the current item update other related fields
-            if ((lvItemsActive.SelectedItems.Count > 0) && ((ItemQty)lvItemsActive.SelectedItems[0].Tag == iq))
+            if ((lvItems.SelectedItems.Count > 0) && ((ItemQty)lvItems.SelectedItems[0].Tag == iq))
             {
                 using (new TriggerLock())
                 {
@@ -885,7 +879,7 @@ namespace Catonia_Item_Tracker
             }
 
             //if no item selected, update overall history
-            if (lvItemsActive.SelectedItems.Count == 0)
+            if (lvItems.SelectedItems.Count == 0)
             {
                 try
                 {
@@ -909,28 +903,13 @@ namespace Catonia_Item_Tracker
                         lvItems.BeginUpdate();
                         lvi.SubItems[1].Text = iq.qty.ToString();
                         lvi.SubItems[3].Text = (iq.item.cost * iq.qty).ToString();
+                        lvi.SubItems[6].Text = DateTime.Now.ToString("yyyy-MM-dd, h:mm tt");
+                        lvi.SubItems[6].Tag = DateTime.Now;
                         lvItems.Sort();
                     }
                     finally
                     {
                         lvItems.EndUpdate();
-                    }
-                }
-            }
-            foreach (ListViewItem lvi in lvFilteredItems.Items)
-            {
-                if ((ItemQty)lvi.Tag == iq)
-                {
-                    try
-                    {
-                        lvFilteredItems.BeginUpdate();
-                        lvi.SubItems[1].Text = iq.qty.ToString();
-                        lvi.SubItems[3].Text = (iq.item.cost * iq.qty).ToString();
-                        lvFilteredItems.Sort();
-                    }
-                    finally
-                    {
-                        lvFilteredItems.EndUpdate();
                     }
                 }
             }
@@ -961,14 +940,7 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void cmsItemList_Opening(object sender, CancelEventArgs e)
         {
-            //use the currently active item list/filtered item list
-            ListView lvItemsActive = lvItems;
-            if (!lvItems.Visible)
-            {
-                lvItemsActive = lvFilteredItems;
-            }
-
-            editItemToolStripMenuItem.Visible = (lvItemsActive.SelectedItems.Count == 1);
+            editItemToolStripMenuItem.Visible = (lvItems.SelectedItems.Count == 1);
         }
 
         /// <summary>
@@ -989,14 +961,7 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void editItemToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //use the currently active item list/filtered item list
-            ListView lvItemsActive = lvItems;
-            if (!lvItems.Visible)
-            {
-                lvItemsActive = lvFilteredItems;
-            }
-
-            FrmItem itemForm = new FrmItem(((ItemQty)lvItemsActive.SelectedItems[0].Tag).item);
+            FrmItem itemForm = new FrmItem(((ItemQty)lvItems.SelectedItems[0].Tag).item);
             itemForm.Show();
         }
 
@@ -1069,16 +1034,11 @@ namespace Catonia_Item_Tracker
                 }
             }
 
-            //make the other list mirror the sort
-            lvFilteredItems.Sorting = lvItems.Sorting;
-
             // Set the ListViewItemSorter property to a new ListViewItemComparer object.
             lvItems.ListViewItemSorter = new lvItemComparer(e.Column, lvItems.Sorting);
-            lvFilteredItems.ListViewItemSorter = new lvItemComparer(e.Column, lvFilteredItems.Sorting);
 
             // Call the sort method to manually sort.
             lvItems.Sort();
-            lvFilteredItems.Sort();
         }
 
         /// <summary>
@@ -1124,20 +1084,28 @@ namespace Catonia_Item_Tracker
                 };
 
                 Program.items.Add(item);
-                Program.leftBehind.loot.Add(new ItemQty()
+                foreach (KeyValuePair<string, Inventory> i in Program.inventories)
                 {
-                    item = item,
-                    qty = 0
-                });
-
-                Program.onHand.loot.Add(new ItemQty()
-                {
-                    item = item,
-                    qty = 0
-                });
+                    i.Value.loot.Add(new ItemQty()
+                    {
+                        item = item,
+                        qty = 0
+                    });
+                }
 
                 updateItem(item);
             }
+        }
+
+        /// <summary>
+        /// event handler for when the crafter button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnCrafter_Click(object sender, EventArgs e)
+        {
+            FrmCrafter craftForm = new FrmCrafter();
+            craftForm.Show();
         }
 
         /// <summary>

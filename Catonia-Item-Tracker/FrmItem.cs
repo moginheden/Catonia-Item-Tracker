@@ -85,17 +85,14 @@ namespace Catonia_Item_Tracker
                     };
 
                     Program.items.Add(item);
-                    Program.leftBehind.loot.Add(new ItemQty()
+                    foreach (KeyValuePair<string, Inventory> i in Program.inventories)
                     {
-                        item = item,
-                        qty = 0
-                    });
-
-                    Program.onHand.loot.Add(new ItemQty()
-                    {
-                        item = item,
-                        qty = 0
-                    });
+                        i.Value.loot.Add(new ItemQty()
+                        {
+                            item = item,
+                            qty = 0
+                        });
+                    }
 
                     Program.mainForm.updateItem(item);
                 }
