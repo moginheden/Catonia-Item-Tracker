@@ -68,6 +68,8 @@
             // 
             // txtDescription
             // 
+            this.txtDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDescription.BackColor = System.Drawing.SystemColors.Window;
             this.txtDescription.Location = new System.Drawing.Point(12, 509);
             this.txtDescription.Name = "txtDescription";
@@ -78,6 +80,8 @@
             // 
             // txtSearch
             // 
+            this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtSearch.ImeMode = System.Windows.Forms.ImeMode.On;
             this.txtSearch.Location = new System.Drawing.Point(12, 28);
@@ -97,15 +101,19 @@
             // 
             // lbItemSearch
             // 
+            this.lbItemSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lbItemSearch.FormattingEnabled = true;
-            this.lbItemSearch.Location = new System.Drawing.Point(16, 79);
+            this.lbItemSearch.Location = new System.Drawing.Point(12, 78);
             this.lbItemSearch.Name = "lbItemSearch";
-            this.lbItemSearch.Size = new System.Drawing.Size(363, 420);
+            this.lbItemSearch.Size = new System.Drawing.Size(367, 420);
             this.lbItemSearch.TabIndex = 24;
             this.lbItemSearch.SelectedIndexChanged += new System.EventHandler(this.lbItemSearch_SelectedIndexChanged);
             // 
             // nudNumProduced
             // 
+            this.nudNumProduced.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.nudNumProduced.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.nudNumProduced.Location = new System.Drawing.Point(586, 114);
             this.nudNumProduced.Maximum = new decimal(new int[] {
@@ -124,6 +132,7 @@
             // 
             // lblGoldValue
             // 
+            this.lblGoldValue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblGoldValue.AutoSize = true;
             this.lblGoldValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblGoldValue.Location = new System.Drawing.Point(399, 116);
@@ -134,6 +143,7 @@
             // 
             // txtResultName
             // 
+            this.txtResultName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txtResultName.Location = new System.Drawing.Point(492, 88);
             this.txtResultName.Name = "txtResultName";
             this.txtResultName.ReadOnly = true;
@@ -142,6 +152,7 @@
             // 
             // btnSetResult
             // 
+            this.btnSetResult.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSetResult.Location = new System.Drawing.Point(385, 88);
             this.btnSetResult.Name = "btnSetResult";
             this.btnSetResult.Size = new System.Drawing.Size(101, 23);
@@ -152,6 +163,7 @@
             // 
             // btnIngredients
             // 
+            this.btnIngredients.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnIngredients.Location = new System.Drawing.Point(385, 162);
             this.btnIngredients.Name = "btnIngredients";
             this.btnIngredients.Size = new System.Drawing.Size(75, 46);
@@ -162,6 +174,7 @@
             // 
             // nudAddIngredient
             // 
+            this.nudAddIngredient.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.nudAddIngredient.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.nudAddIngredient.Location = new System.Drawing.Point(586, 164);
             this.nudAddIngredient.Maximum = new decimal(new int[] {
@@ -180,6 +193,7 @@
             // 
             // btnRemoveIngredient
             // 
+            this.btnRemoveIngredient.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRemoveIngredient.Location = new System.Drawing.Point(385, 569);
             this.btnRemoveIngredient.Name = "btnRemoveIngredient";
             this.btnRemoveIngredient.Size = new System.Drawing.Size(75, 44);
@@ -190,6 +204,7 @@
             // 
             // label2
             // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(462, 166);
@@ -200,6 +215,7 @@
             // 
             // cbProfession
             // 
+            this.cbProfession.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbProfession.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbProfession.FormattingEnabled = true;
             this.cbProfession.Location = new System.Drawing.Point(508, 12);
@@ -209,6 +225,7 @@
             // 
             // lblProfession
             // 
+            this.lblProfession.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblProfession.AutoSize = true;
             this.lblProfession.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblProfession.Location = new System.Drawing.Point(404, 15);
@@ -219,6 +236,7 @@
             // 
             // lblCrafterLevel
             // 
+            this.lblCrafterLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblCrafterLevel.AutoSize = true;
             this.lblCrafterLevel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCrafterLevel.Location = new System.Drawing.Point(388, 53);
@@ -229,6 +247,7 @@
             // 
             // cbCrafterLevel
             // 
+            this.cbCrafterLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbCrafterLevel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbCrafterLevel.FormattingEnabled = true;
             this.cbCrafterLevel.Location = new System.Drawing.Point(508, 50);
@@ -238,6 +257,8 @@
             // 
             // lvIngredients
             // 
+            this.lvIngredients.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lvIngredients.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ItemName,
             this.numUsed});
@@ -262,6 +283,7 @@
             // 
             // btnSave
             // 
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSave.Location = new System.Drawing.Point(522, 569);
             this.btnSave.Name = "btnSave";

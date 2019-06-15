@@ -16,7 +16,7 @@ namespace Catonia_Item_Tracker
 
         public override bool Equals(object a)
         {
-            if(a == null)
+            if(a is null)
             {
                 return false;
             }
@@ -29,11 +29,27 @@ namespace Catonia_Item_Tracker
 
         public static bool operator ==(Item i1, Item i2)
         {
+            if((i1 is null) && (i2 is null))
+            {
+                return true;
+            }
+            else if((i1 is null) || (i2 is null))
+            {
+                return false;
+            }
             return i1.Equals(i2);
         }
 
         public static bool operator !=(Item i1, Item i2)
         {
+            if ((i1 is null) && (i2 is null))
+            {
+                return false;
+            }
+            else if ((i1 is null) || (i2 is null))
+            {
+                return true;
+            }
             return !i1.Equals(i2);
         }
 

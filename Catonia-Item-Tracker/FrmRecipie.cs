@@ -284,6 +284,27 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void btnSave_Click(object sender, EventArgs e)
         {
+            if (cbProfession.Text.Replace("'", "''").Length == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("Profession is a required field", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+            if (cbCrafterLevel.Text.Replace("'", "''").Length == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("Crafter level is a required field", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+            if (result == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Result is a required field", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+            if (lvIngredients.Items.Count == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("Ingedients must be specified", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+            
             //setup the update to the main sql table
             string sql;
             if (this.curRecipie == null)

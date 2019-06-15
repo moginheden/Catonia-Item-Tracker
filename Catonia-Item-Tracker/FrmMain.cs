@@ -42,6 +42,14 @@ namespace Catonia_Item_Tracker
                 else if(col == 6)
                 {
                     returnVal = DateTime.Compare((DateTime)((ListViewItem)x).SubItems[col].Tag, (DateTime)((ListViewItem)y).SubItems[col].Tag);
+                    if(returnVal == 0)
+                    {
+                        returnVal = String.Compare(((ListViewItem)x).SubItems[0].Text, ((ListViewItem)y).SubItems[0].Text);
+                        if (order == System.Windows.Forms.SortOrder.Descending)
+                        {
+                            returnVal *= -1;
+                        }
+                    }
                 }
                 else
                 {
@@ -208,6 +216,7 @@ namespace Catonia_Item_Tracker
                         lvItems.SelectedItems.Clear();
                         row.Selected = true;
                         row.Focused = true;
+                        lvItems.EnsureVisible(lvItems.Items.IndexOf(row));
                     }
                 }
 
@@ -215,12 +224,15 @@ namespace Catonia_Item_Tracker
                 if (!found)
                 {
                     //create new row
+                    DateTime lastMod = inventory.getLatestModification(iq.item.id);
                     ListViewItem row = new ListViewItem(new string[] { item.name,
                                                                    iq.qty.ToString(),
                                                                    item.cost.ToString(),
                                                                    (item.cost * iq.qty).ToString(),
                                                                    getProfessionsForItem(item),
-                                                                   (item.usable ? "Y" : "N") });
+                                                                   (item.usable ? "Y" : "N"),
+                                                                   lastMod.ToString("yyyy-MM-dd, h:mm tt") });
+                    row.SubItems[6].Tag = lastMod;
                     row.Tag = iq;
 
                     //add to list
@@ -230,6 +242,13 @@ namespace Catonia_Item_Tracker
                     lvItems.SelectedItems.Clear();
                     row.Selected = true;
                     row.Focused = true;
+
+                    //re-sort list
+                    lvItems.Sort();
+
+                    //scroll to item
+                    lvItems.EnsureVisible(lvItems.Items.IndexOf(row));
+
                 }
 
                 //resize name column
@@ -367,7 +386,7 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void TxtSearch_KeyUp(object sender, KeyEventArgs e)
         {
-            //use keyUp event, as text changed traps too many other evengts.
+            //use keyUp event, as text changed traps too many other events.
             ComboBox oBox = (ComboBox)sender;
             string search = oBox.Text;
 
@@ -404,7 +423,7 @@ namespace Catonia_Item_Tracker
 
             //otherwise setup the dropdown options
             List<Item> results = new List<Item>();
-            for(int i = 0; results.Count < 20 && i < lvItems.Items.Count; i++)
+            for (int i = 0; results.Count < 20 && i < lvItems.Items.Count; i++)
             {
                 ListViewItem row = lvItems.Items[i];
                 if ((((ItemQty)row.Tag).item.name.ToLower().Contains(search.ToLower()))
@@ -412,6 +431,12 @@ namespace Catonia_Item_Tracker
                 {
                     results.Add(((ItemQty)row.Tag).item);
                 }
+            }
+
+            if(results.Count == 0)
+            {
+                oBox.DroppedDown = false;
+                return;
             }
 
             //NOW THAT WE HAVE OUR FILTERED LIST, WE NEED TO RE-BIND IT WIHOUT CHANGING THE TEXT IN THE ComboBox.
@@ -424,10 +449,15 @@ namespace Catonia_Item_Tracker
 
             //3).show the user the new filtered list.
             oBox.DroppedDown = true; //this will overwrite the text in the ComboBox, so 4&5 put it back.
+            Cursor.Current = Cursors.Default;
 
             //4).binding data source erases text, so now we need to put the user's text back,
             oBox.Text = search;
-            oBox.SelectionStart = search.Length; //5). need to put the user's cursor back where it was.
+            
+            //5). need to put the user's cursor back where it was.
+            oBox.SelectionStart = search.Length;
+
+
         }
 
         private void TxtSearch_SelectedIndexChanged(object sender, EventArgs e)
@@ -1048,30 +1078,55 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void btnCreateNew_Click(object sender, EventArgs e)
         {
-            string sql = @"INSERT INTO items
-                                        (name,
-                                         description,
-                                         cost,
-                                         usable)
-                            VALUES ('" + txtSearch.Text.Replace("'", "") + @"',
-                                    '',
-                                    '0',
-                                    '0')";
+            if (txtSearch.Text.Replace("'", "").Length == 0)
+            {
+                return;
+            }
+
+            //check if the item already exists
+            if(Program.items.FirstOrDefault(x => x.name == txtSearch.Text) != null)
+            {
+                return;
+            }
+
+            string insertSql = @"INSERT INTO items (name,
+                                                    description,
+                                                    cost,
+                                                    usable)
+                                             VALUES ('" + txtSearch.Text.Replace("'", "") + @"',
+                                                     '',
+                                                     '0',
+                                                     '0')";
             using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
             {
                 dataConnection.Open();
-                using (SqlCommand comm = new SqlCommand(sql, dataConnection))
-                {
-                    comm.ExecuteNonQuery();
-                }
 
                 int itemNum = -1;
-                sql = @"SELECT id
-                        FROM items
-                        WHERE name = '" + txtSearch.Text.Replace("'", "") + @"'";
-                using (SqlCommand comm = new SqlCommand(sql, dataConnection))
+                string selectSql = @"SELECT id
+                                     FROM items
+                                     WHERE name = '" + txtSearch.Text.Replace("'", "") + @"'";
+                using (SqlCommand comm = new SqlCommand(selectSql, dataConnection))
                 {
-                    itemNum = (int)comm.ExecuteScalar();
+                    var result = comm.ExecuteScalar();
+                    if ((result != null) && (result != DBNull.Value))
+                    {
+                        itemNum = (int)result;
+                    }
+                }
+
+                //if the item doesn't yet exist
+                if (itemNum == -1)
+                {
+                    using (SqlCommand comm = new SqlCommand(insertSql, dataConnection))
+                    {
+                        comm.ExecuteNonQuery();
+                    }
+
+                    itemNum = -1;
+                    using (SqlCommand comm = new SqlCommand(selectSql, dataConnection))
+                    {
+                        itemNum = (int)comm.ExecuteScalar();
+                    }
                 }
 
                 Item item = new Item()

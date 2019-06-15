@@ -114,6 +114,9 @@
             // 
             // lvItems
             // 
+            this.lvItems.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lvItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.itemName,
             this.numOwned,
@@ -194,6 +197,7 @@
             // 
             // nudOwned
             // 
+            this.nudOwned.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.nudOwned.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.nudOwned.Location = new System.Drawing.Point(159, 19);
             this.nudOwned.Maximum = new decimal(new int[] {
@@ -209,6 +213,7 @@
             // 
             // lblNumOwned
             // 
+            this.lblNumOwned.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblNumOwned.AutoSize = true;
             this.lblNumOwned.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblNumOwned.Location = new System.Drawing.Point(31, 32);
@@ -275,6 +280,7 @@
             // 
             // gbGold
             // 
+            this.gbGold.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.gbGold.Controls.Add(this.nudGold);
             this.gbGold.Controls.Add(this.lblGold);
             this.gbGold.Controls.Add(this.nudAddGold);
@@ -288,6 +294,8 @@
             // 
             // gbItemManagment
             // 
+            this.gbItemManagment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gbItemManagment.Controls.Add(this.lvRecipiesUsingItem);
             this.gbItemManagment.Controls.Add(this.lblUsingItem);
             this.gbItemManagment.Controls.Add(this.btnBuy);
@@ -309,6 +317,7 @@
             // 
             // lvRecipiesUsingItem
             // 
+            this.lvRecipiesUsingItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lvRecipiesUsingItem.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.professionUsing,
             this.crafterLevelUsing,
@@ -375,6 +384,7 @@
             // 
             // lblUsingItem
             // 
+            this.lblUsingItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblUsingItem.AutoSize = true;
             this.lblUsingItem.Location = new System.Drawing.Point(6, 280);
             this.lblUsingItem.Name = "lblUsingItem";
@@ -384,6 +394,7 @@
             // 
             // btnBuy
             // 
+            this.btnBuy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnBuy.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnBuy.Location = new System.Drawing.Point(88, 82);
             this.btnBuy.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
@@ -396,6 +407,7 @@
             // 
             // nudAddItems
             // 
+            this.nudAddItems.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.nudAddItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.nudAddItems.Location = new System.Drawing.Point(159, 82);
             this.nudAddItems.Maximum = new decimal(new int[] {
@@ -415,6 +427,7 @@
             // 
             // btnAddItems
             // 
+            this.btnAddItems.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAddItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAddItems.Location = new System.Drawing.Point(9, 82);
             this.btnAddItems.Name = "btnAddItems";
@@ -426,6 +439,7 @@
             // 
             // btnMake
             // 
+            this.btnMake.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnMake.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnMake.Location = new System.Drawing.Point(318, 264);
             this.btnMake.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
@@ -438,6 +452,8 @@
             // 
             // lvRecipiesMakingItem
             // 
+            this.lvRecipiesMakingItem.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lvRecipiesMakingItem.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.professionMaking,
             this.crafterLevelMaking,
@@ -477,6 +493,7 @@
             // 
             // lblItemHistory
             // 
+            this.lblItemHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblItemHistory.AutoSize = true;
             this.lblItemHistory.Location = new System.Drawing.Point(9, 586);
             this.lblItemHistory.Name = "lblItemHistory";
@@ -486,6 +503,7 @@
             // 
             // lvItemHistory
             // 
+            this.lvItemHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lvItemHistory.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.dateTime,
             this.numAdded,
@@ -521,6 +539,7 @@
             // 
             // lblMakingItem
             // 
+            this.lblMakingItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblMakingItem.AutoSize = true;
             this.lblMakingItem.Location = new System.Drawing.Point(6, 151);
             this.lblMakingItem.Name = "lblMakingItem";
@@ -530,6 +549,8 @@
             // 
             // txtDescription
             // 
+            this.txtDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDescription.BackColor = System.Drawing.SystemColors.Window;
             this.txtDescription.Location = new System.Drawing.Point(12, 860);
             this.txtDescription.Name = "txtDescription";
@@ -597,8 +618,6 @@
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.txtSearch);
             this.Location = new System.Drawing.Point(-8, 0);
-            this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(916, 1000);
             this.MinimumSize = new System.Drawing.Size(916, 1000);
             this.Name = "FrmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
