@@ -153,5 +153,13 @@ namespace Catonia_Item_Tracker
                 col.Width = -2;
             }
         }
+
+        private void LvRecipies_DoubleClick(object sender, EventArgs e)
+        {
+            if(lvRecipies.SelectedItems.Count > 0)
+            {
+                Program.mainForm.selectItem(((Recipie)lvRecipies.SelectedItems[0].Tag).result);
+            }
+        }
     }
 }

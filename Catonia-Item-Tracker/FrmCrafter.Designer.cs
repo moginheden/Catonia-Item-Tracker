@@ -99,6 +99,7 @@
             this.lvRecipies.TabIndex = 45;
             this.lvRecipies.UseCompatibleStateImageBehavior = false;
             this.lvRecipies.View = System.Windows.Forms.View.Details;
+            this.lvRecipies.DoubleClick += new System.EventHandler(this.LvRecipies_DoubleClick);
             // 
             // result
             // 

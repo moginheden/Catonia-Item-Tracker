@@ -285,6 +285,24 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
+        /// selects a specific item
+        /// </summary>
+        /// <param name="item"></param>
+        internal void selectItem(Item item)
+        {
+            foreach (ListViewItem row in lvItems.Items)
+            {
+                if (((ItemQty)row.Tag).item.id == item.id)
+                {
+                    lvItems.SelectedItems.Clear();
+                    row.Selected = true;
+                    row.Focused = true;
+                }
+            }
+            lvItems.EnsureVisible(lvItems.SelectedIndices[0]);
+        }
+
+        /// <summary>
         /// returns a string showing what prefessions use the given item
         /// </summary>
         /// <param name="item"></param>
@@ -405,6 +423,10 @@ namespace Catonia_Item_Tracker
                 oBox.DroppedDown = false;
                 lvItems.SelectedItems.Clear();
                 TxtSearch_SelectedIndexChanged(sender, null);
+                if (lvItems.SelectedIndices.Count > 0)
+                {
+                    lvItems.EnsureVisible(lvItems.SelectedIndices[0]);
+                }
                 return;
             }
 
@@ -676,6 +698,11 @@ namespace Catonia_Item_Tracker
             lvItemHistory.Items.AddRange(rowsToAdd.ToArray());
         }
 
+        /// <summary>
+        /// event handler for hitting the make button on a recipe
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnMake_Click(object sender, EventArgs e)
         {
 
