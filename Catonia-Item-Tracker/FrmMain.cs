@@ -705,7 +705,66 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void btnMake_Click(object sender, EventArgs e)
         {
+            Recipie r = null;
+            if (lvRecipiesMakingItem.SelectedItems.Count == 1)
+            {
+                r = (Recipie)lvRecipiesMakingItem.SelectedItems[0].Tag;
+            }
+            else if (lvRecipiesUsingItem.SelectedItems.Count == 1)
+            {
+                r = (Recipie)lvRecipiesUsingItem.SelectedItems[0].Tag;
+            }
 
+            if(r != null)
+            {
+                ItemQty result = inventory.findLoot(r.result.id);
+                using (new TriggerLock())
+                {
+                    //check we have ebnough ingredients
+                    foreach (ItemQty i in r.ingredients)
+                    {
+                        ItemQty ingredient = inventory.findLoot(i.item.id);
+                        if(ingredient.qty < i.qty)
+                        {
+                            MessageBox.Show("Unable to craft " + result.item.name + ". Not enough " + i.item.name + " " + inventory.location, "Crafting", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
+
+                    //remove the ingredients used
+                    foreach (ItemQty i in r.ingredients)
+                    {
+                        ItemQty ingredient = inventory.findLoot(i.item.id);
+                        updateItemQtyWithHistory(ingredient, i.qty * -1);
+                    }
+
+                    //create item
+                    updateItemQtyWithHistory(result, r.resultQty);
+                }
+
+                //update the right panel
+                lvItems_SelectedIndexChanged(null, null);
+
+                MessageBox.Show("Crafted " + r.resultQty + " " + result.item.name + " using " + r.crafterLevel.Substring(2) + " " + r.profession, "Crafting", MessageBoxButtons.OK, MessageBoxIcon.None);
+            }
+        }
+
+        /// <summary>
+        /// updates the quantity of an item including history records.
+        /// </summary>
+        /// <param name="iq"></param>
+        /// <param name="difference"></param>
+        private void updateItemQtyWithHistory(ItemQty iq, int difference)
+        {
+            HistoryRecord hr = new HistoryRecord();
+            hr.iq = iq;
+            hr.qtyChanged = difference;
+            inventory.addHistory(hr);
+
+            //update the inventory
+            iq.qty += difference;
+
+            updateItemQty(iq);
         }
 
         /// <summary>
@@ -818,6 +877,9 @@ namespace Catonia_Item_Tracker
             iq.qty = (int)nudOwned.Value;
 
             updateItemQty(iq);
+
+            //update the right panel
+            lvItems_SelectedIndexChanged(null, null);
         }
 
         /// <summary>
@@ -847,6 +909,9 @@ namespace Catonia_Item_Tracker
             nudAddItems.Value = 0M;
 
             updateItemQty(iq);
+
+            //update the right panel
+            lvItems_SelectedIndexChanged(null, null);
         }
 
         /// <summary>
@@ -892,6 +957,9 @@ namespace Catonia_Item_Tracker
             //reset the fields to avoid double adds
             nudAddItems.Value = 0M;
             nudAddGold.Value = 0M;
+
+            //update the right panel
+            lvItems_SelectedIndexChanged(null, null);
         }
 
         /// <summary>
