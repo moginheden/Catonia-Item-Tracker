@@ -112,7 +112,8 @@ namespace Catonia_Item_Tracker
                             item.name = (string)reader["name"];
                             item.cost = (int)reader["cost"];
                             item.description = (string)reader["description"];
-                            item.usable = (bool)reader["usable"];
+                            item.type = (string)reader["type"];
+                            item.subType = (string)reader["subType"];
 
                             items.Add(item);
                         }

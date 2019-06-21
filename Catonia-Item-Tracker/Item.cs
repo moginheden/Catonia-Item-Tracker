@@ -12,7 +12,8 @@ namespace Catonia_Item_Tracker
         public string name = null;
         public int cost = 0;
         public string description = "";
-        public bool usable = false;
+        public string type = "";
+        public string subType = "";
 
         public override bool Equals(object a)
         {
@@ -61,6 +62,18 @@ namespace Catonia_Item_Tracker
         public override string ToString()
         {
             return name;
+        }
+
+        public string TypeAbbreviation()
+        {
+            string returnVal = "";
+            string[] typeParts = this.type.Split(new string[] { " - " }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string part in typeParts)
+            {
+                returnVal += part[0];
+            }
+
+            return returnVal;
         }
     }
 }

@@ -32,13 +32,13 @@
             this.txtSearch = new System.Windows.Forms.ComboBox();
             this.lblSearch = new System.Windows.Forms.Label();
             this.lvItems = new System.Windows.Forms.ListView();
-            this.itemName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.numOwned = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.value = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.valueTotal = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.craft = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.usable = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.lastUpdated = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colItemName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colNumOwned = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colValueTotal = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colCraft = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colUsable = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colLastUpdated = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmsItemList = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createNewItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -118,13 +118,13 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lvItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.itemName,
-            this.numOwned,
-            this.value,
-            this.valueTotal,
-            this.craft,
-            this.usable,
-            this.lastUpdated});
+            this.colItemName,
+            this.colNumOwned,
+            this.colValue,
+            this.colValueTotal,
+            this.colCraft,
+            this.colUsable,
+            this.colLastUpdated});
             this.lvItems.ContextMenuStrip = this.cmsItemList;
             this.lvItems.FullRowSelect = true;
             this.lvItems.HideSelection = false;
@@ -137,40 +137,40 @@
             this.lvItems.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvItems_ColumnClick);
             this.lvItems.SelectedIndexChanged += new System.EventHandler(this.lvItems_SelectedIndexChanged);
             // 
-            // itemName
+            // colItemName
             // 
-            this.itemName.Text = "Item Name";
-            this.itemName.Width = 143;
+            this.colItemName.Text = "Item Name";
+            this.colItemName.Width = 143;
             // 
-            // numOwned
+            // colNumOwned
             // 
-            this.numOwned.Text = "#";
-            this.numOwned.Width = 45;
+            this.colNumOwned.Text = "#";
+            this.colNumOwned.Width = 40;
             // 
-            // value
+            // colValue
             // 
-            this.value.Text = "Value";
-            this.value.Width = 42;
+            this.colValue.Text = "Value";
+            this.colValue.Width = 42;
             // 
-            // valueTotal
+            // colValueTotal
             // 
-            this.valueTotal.Text = "Total";
-            this.valueTotal.Width = 42;
+            this.colValueTotal.Text = "Total";
+            this.colValueTotal.Width = 42;
             // 
-            // craft
+            // colCraft
             // 
-            this.craft.Text = "Craft";
-            this.craft.Width = 34;
+            this.colCraft.Text = "Craft";
+            this.colCraft.Width = 34;
             // 
-            // usable
+            // colUsable
             // 
-            this.usable.Text = "Use";
-            this.usable.Width = 31;
+            this.colUsable.Text = "Type";
+            this.colUsable.Width = 36;
             // 
-            // lastUpdated
+            // colLastUpdated
             // 
-            this.lastUpdated.Text = "Updated";
-            this.lastUpdated.Width = 75;
+            this.colLastUpdated.Text = "Updated";
+            this.colLastUpdated.Width = 75;
             // 
             // cmsItemList
             // 
@@ -178,20 +178,22 @@
             this.editItemToolStripMenuItem,
             this.createNewItemToolStripMenuItem});
             this.cmsItemList.Name = "cmsItemList";
-            this.cmsItemList.Size = new System.Drawing.Size(163, 48);
+            this.cmsItemList.ShowImageMargin = false;
+            this.cmsItemList.Size = new System.Drawing.Size(138, 48);
+            this.cmsItemList.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.CmsItemList_Closing);
             this.cmsItemList.Opening += new System.ComponentModel.CancelEventHandler(this.cmsItemList_Opening);
             // 
             // editItemToolStripMenuItem
             // 
             this.editItemToolStripMenuItem.Name = "editItemToolStripMenuItem";
-            this.editItemToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.editItemToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
             this.editItemToolStripMenuItem.Text = "Edit Item";
             this.editItemToolStripMenuItem.Click += new System.EventHandler(this.editItemToolStripMenuItem_Click);
             // 
             // createNewItemToolStripMenuItem
             // 
             this.createNewItemToolStripMenuItem.Name = "createNewItemToolStripMenuItem";
-            this.createNewItemToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.createNewItemToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
             this.createNewItemToolStripMenuItem.Text = "Create New Item";
             this.createNewItemToolStripMenuItem.Click += new System.EventHandler(this.createNewItemToolStripMenuItem_Click);
             // 
@@ -365,20 +367,21 @@
             this.editRecipieToolStripMenuItem,
             this.createNewRecipieToolStripMenuItem});
             this.cmsRecipieList.Name = "cmsRecipieList";
-            this.cmsRecipieList.Size = new System.Drawing.Size(177, 48);
+            this.cmsRecipieList.ShowImageMargin = false;
+            this.cmsRecipieList.Size = new System.Drawing.Size(152, 48);
             this.cmsRecipieList.Opening += new System.ComponentModel.CancelEventHandler(this.cmsRecipieList_Opening);
             // 
             // editRecipieToolStripMenuItem
             // 
             this.editRecipieToolStripMenuItem.Name = "editRecipieToolStripMenuItem";
-            this.editRecipieToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.editRecipieToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             this.editRecipieToolStripMenuItem.Text = "Edit Recipie";
             this.editRecipieToolStripMenuItem.Click += new System.EventHandler(this.editRecipieToolStripMenuItem_Click);
             // 
             // createNewRecipieToolStripMenuItem
             // 
             this.createNewRecipieToolStripMenuItem.Name = "createNewRecipieToolStripMenuItem";
-            this.createNewRecipieToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.createNewRecipieToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             this.createNewRecipieToolStripMenuItem.Text = "Create New Recipie";
             this.createNewRecipieToolStripMenuItem.Click += new System.EventHandler(this.createNewRecipieToolStripMenuItem_Click);
             // 
@@ -643,12 +646,12 @@
         private System.Windows.Forms.ComboBox txtSearch;
         private System.Windows.Forms.Label lblSearch;
         private System.Windows.Forms.ListView lvItems;
-        private System.Windows.Forms.ColumnHeader itemName;
-        private System.Windows.Forms.ColumnHeader numOwned;
-        private System.Windows.Forms.ColumnHeader value;
-        private System.Windows.Forms.ColumnHeader valueTotal;
-        private System.Windows.Forms.ColumnHeader craft;
-        private System.Windows.Forms.ColumnHeader usable;
+        private System.Windows.Forms.ColumnHeader colItemName;
+        private System.Windows.Forms.ColumnHeader colNumOwned;
+        private System.Windows.Forms.ColumnHeader colValue;
+        private System.Windows.Forms.ColumnHeader colValueTotal;
+        private System.Windows.Forms.ColumnHeader colCraft;
+        private System.Windows.Forms.ColumnHeader colUsable;
         private System.Windows.Forms.NumericUpDown nudOwned;
         private System.Windows.Forms.Label lblNumOwned;
         private System.Windows.Forms.Label lblGold;
@@ -690,7 +693,7 @@
         private System.Windows.Forms.ColumnHeader numCanMakeMaking;
         private System.Windows.Forms.Button btnCreateNew;
         private System.Windows.Forms.ComboBox ddlInventories;
-        private System.Windows.Forms.ColumnHeader lastUpdated;
+        private System.Windows.Forms.ColumnHeader colLastUpdated;
         private System.Windows.Forms.Button btnCrafter;
     }
 }

@@ -80,6 +80,16 @@ namespace Catonia_Item_Tracker
         private int sortColumnInventory = 0;
 
         /// <summary>
+        /// The list of item types that have been checked off in the filters
+        /// </summary>
+        private List<char> filterProfessions = new List<char>();
+
+        /// <summary>
+        /// The list of item types that have been checked off in the filters
+        /// </summary>
+        private List<string> filterTypes = new List<string>();
+
+        /// <summary>
         /// reference to the loot item "Gold" for use in the numeric up/down field
         /// </summary>
         private ItemQty iqGold = Program.inventories["On Hand"].loot.First(x => x.item.name.Equals("Gold Coins"));
@@ -207,7 +217,7 @@ namespace Catonia_Item_Tracker
                         row.SubItems[2].Text = item.cost.ToString();
                         row.SubItems[3].Text = (item.cost * iq.qty).ToString();
                         row.SubItems[4].Text = getProfessionsForItem(item);
-                        row.SubItems[5].Text = (item.usable ? "Y" : "N");
+                        row.SubItems[5].Text = item.TypeAbbreviation();
                         row.SubItems[6].Text = DateTime.Now.ToString("yyyy-MM-dd, h:mm tt");
                         row.SubItems[6].Tag = DateTime.Now;
                         found = true;
@@ -230,7 +240,7 @@ namespace Catonia_Item_Tracker
                                                                    item.cost.ToString(),
                                                                    (item.cost * iq.qty).ToString(),
                                                                    getProfessionsForItem(item),
-                                                                   (item.usable ? "Y" : "N"),
+                                                                   item.TypeAbbreviation(),
                                                                    lastMod.ToString("yyyy-MM-dd, h:mm tt") });
                     row.SubItems[6].Tag = lastMod;
                     row.Tag = iq;
@@ -313,11 +323,7 @@ namespace Catonia_Item_Tracker
             ItemQty compare = new ItemQty() { item = item };
             foreach(Recipie r in Program.recipies)
             {
-                char marker = r.profession[0];
-                if((r.profession[0] == 'B') && (r.profession[1] == 'o'))
-                {
-                    marker = 'O';
-                }
+                char marker = shortProfessionCode(r.profession);
                 //if the recipie produces or uses the item, and the profession is not listed yet, add it
                 if (((r.result == item) || (r.ingredients.Contains(compare)))
                    && (!returnVal.Contains(marker)))
@@ -327,6 +333,29 @@ namespace Catonia_Item_Tracker
             }
 
             return returnVal;
+        }
+
+        /// <summary>
+        /// converts a full profession name to a single character
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private char shortProfessionCode(string name)
+        {
+            char marker = name[0];
+            if ((name[0] == 'B') && (name[1] == 'o'))
+            {
+                marker = 'O';
+            }
+            else if ((name[0] == 'C') && (name[1] == 'a'))
+            {
+                marker = 'R';
+            }
+            else if ((name[0] == 'S') && (name[1] == 't'))
+            {
+                marker = 'M';
+            }
+            return marker;
         }
 
         /// <summary>
@@ -353,7 +382,7 @@ namespace Catonia_Item_Tracker
                                                                        iq.item.cost.ToString(),
                                                                        (iq.item.cost * iq.qty).ToString(),
                                                                        getProfessionsForItem(iq.item),
-                                                                       (iq.item.usable ? "Y" : "N"),
+                                                                       iq.item.TypeAbbreviation(),
                                                                        lastMod.ToString("yyyy-MM-dd, h:mm tt")});
                         row.SubItems[6].Tag = lastMod;
                         row.Tag = iq;
@@ -1059,15 +1088,192 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
-        /// Event handler for the item context menu opening, sets if the edit option should show, (only if a single item is selected.)
+        /// Event handler for the item context menu opening, sets it's menu items depending on what was clicked on.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void cmsItemList_Opening(object sender, CancelEventArgs e)
         {
-            editItemToolStripMenuItem.Visible = (lvItems.SelectedItems.Count == 1);
+            cmsItemList.SuspendLayout();
+            cmsItemList.Items.Clear();
+
+            Point clicked = lvItems.PointToClient(new Point(cmsItemList.Left, cmsItemList.Top));
+            int craftHeaderLeft = lvItems.Columns[0].Width + lvItems.Columns[1].Width + lvItems.Columns[2].Width + lvItems.Columns[3].Width;
+            int craftHeaderRight = craftHeaderLeft + lvItems.Columns[4].Width;
+            int typeHeaderRight = craftHeaderRight + lvItems.Columns[5].Width;
+
+            //figure out if we are in the craft header
+            if ((clicked.Y < 24) 
+                && (clicked.X > craftHeaderLeft) && (clicked.X < craftHeaderRight))
+            {
+                cmsItemList.ShowCheckMargin = true;
+
+                List<ToolStripMenuItem> toolStripMenuItems = new List<ToolStripMenuItem>();
+
+                using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
+                {
+                    dataConnection.Open();
+
+                    string selectSql = @"SELECT DISTINCT profession
+                                         FROM recipies";
+                    using (SqlCommand comm = new SqlCommand(selectSql, dataConnection))
+                    {
+                        using (SqlDataReader reader = comm.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem();
+                                toolStripMenuItem.CheckOnClick = true;
+                                toolStripMenuItem.Name = reader.GetString(0);
+                                toolStripMenuItem.Checked = filterProfessions.Contains(shortProfessionCode(toolStripMenuItem.Name));
+                                toolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+                                toolStripMenuItem.Text = reader.GetString(0);
+                                toolStripMenuItem.Click += new System.EventHandler(CmsItemListCraft_Click);
+                                toolStripMenuItems.Add(toolStripMenuItem);
+                            }
+                        }
+                    }
+                }
+
+                cmsItemList.Items.AddRange(toolStripMenuItems.ToArray());
+            }
+            //if in type header
+            else if ((clicked.Y < 24)
+                && (clicked.X > craftHeaderRight) && (clicked.X < typeHeaderRight))
+            {
+                cmsItemList.ShowCheckMargin = true;
+
+                List<ToolStripMenuItem> toolStripMenuItems = new List<ToolStripMenuItem>();
+
+                using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
+                {
+                    dataConnection.Open();
+
+                    string selectSql = @"SELECT DISTINCT type
+                                         FROM items";
+                    using (SqlCommand comm = new SqlCommand(selectSql, dataConnection))
+                    {
+                        using (SqlDataReader reader = comm.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem();
+                                toolStripMenuItem.CheckOnClick = true;
+                                toolStripMenuItem.Name = reader.GetString(0);
+                                toolStripMenuItem.Checked = filterTypes.Contains(toolStripMenuItem.Name);
+                                toolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+                                toolStripMenuItem.Text = reader.GetString(0);
+                                toolStripMenuItem.Click += new System.EventHandler(CmsItemListType_Click);
+                                toolStripMenuItems.Add(toolStripMenuItem);
+                            }
+                        }
+                    }
+                }
+
+                cmsItemList.Items.AddRange(toolStripMenuItems.ToArray());
+            }
+            else if (lvItems.SelectedItems.Count == 1)
+            {
+                cmsItemList.ShowCheckMargin = false;
+                cmsItemList.Items.AddRange(new ToolStripItem[] { editItemToolStripMenuItem, createNewRecipieToolStripMenuItem });
+            }
+            else
+            {
+                cmsItemList.ShowCheckMargin = false;
+                cmsItemList.Items.AddRange(new ToolStripItem[] { createNewRecipieToolStripMenuItem });
+            }
+
+            cmsItemList.ResumeLayout();
         }
 
+        /// <summary>
+        /// Event handler for the item context menu closing. Cancels the close if it's a checkbox being changed that caused the close
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CmsItemList_Closing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+            if ((!cmsItemList.Items.Contains(createNewItemToolStripMenuItem)) && (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked))
+            {
+                e.Cancel = true;
+            }
+        }
+
+        /// <summary>
+        /// Event handler for the item context menu's craft options being selected or unselected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CmsItemListCraft_Click(object sender, EventArgs e)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+
+            filterProfessions = new List<char>();
+            filterTypes = new List<string>();
+            foreach (ToolStripMenuItem option in cmsItemList.Items)
+            {
+                if(option.Checked)
+                {
+                    filterProfessions.Add(shortProfessionCode(option.Name));
+                }
+            }
+
+            updateLvItems(inventory.loot, lvItems);
+            if (filterProfessions.Count != 0)
+            {
+                foreach(ListViewItem lvi in lvItems.Items)
+                {
+                    //check each profession in this item
+                    bool found = false;
+                    foreach(char c in lvi.SubItems[4].Text)
+                    {
+                        if (filterProfessions.Contains(c))
+                        {
+                            found = true;
+                        }
+                    }
+                    //if it wasn't found, hide the line
+                    if (!found)
+                    {
+                        lvi.Remove();
+                    }
+                }
+            }
+            Cursor.Current = Cursors.Default;
+        }
+
+        /// <summary>
+        /// Event handler for the item context menu's type options being selected or unselected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CmsItemListType_Click(object sender, EventArgs e)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+
+            filterProfessions = new List<char>();
+            filterTypes = new List<string>();
+            foreach (ToolStripMenuItem option in cmsItemList.Items)
+            {
+                if (option.Checked)
+                {
+                    filterTypes.Add(option.Name);
+                }
+            }
+
+            updateLvItems(inventory.loot, lvItems);
+            if (filterTypes.Count != 0)
+            {
+                foreach (ListViewItem lvi in lvItems.Items)
+                {
+                    if (!filterTypes.Contains((((ItemQty)lvi.Tag).item.type)))
+                    {
+                        lvi.Remove();
+                    }
+                }
+            }
+            Cursor.Current = Cursors.Default;
+        }
         /// <summary>
         /// Event handler for the recipie context menu opening, sets if the edit option should show, (only if a single recipie is selected.)
         /// </summary>
@@ -1187,11 +1393,13 @@ namespace Catonia_Item_Tracker
             string insertSql = @"INSERT INTO items (name,
                                                     description,
                                                     cost,
-                                                    usable)
+                                                    type,
+                                                    subType)
                                              VALUES ('" + txtSearch.Text.Replace("'", "") + @"',
                                                      '',
                                                      '0',
-                                                     '0')";
+                                                     '',
+                                                     '')";
             using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
             {
                 dataConnection.Open();
@@ -1230,7 +1438,8 @@ namespace Catonia_Item_Tracker
                     description = "",
                     name = txtSearch.Text,
                     id = itemNum,
-                    usable = false
+                    type = "",
+                    subType = ""
                 };
 
                 Program.items.Add(item);

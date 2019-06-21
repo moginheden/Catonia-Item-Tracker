@@ -18,6 +18,7 @@ namespace Catonia_Item_Tracker
         public FrmItem()
         {
             InitializeComponent();
+            CbType_SelectedIndexChanged(null, null);
         }
 
         public FrmItem(Item item)
@@ -30,7 +31,10 @@ namespace Catonia_Item_Tracker
             txtItemName.Text = item.name;
             txtDescription.Text = item.description;
             nudGoldValue.Value = item.cost;
-            cbUseable.Checked = item.usable;
+            cbType.SelectedItem = item.type;
+            cbSubType.Text = item.subType;
+
+            CbType_SelectedIndexChanged(null, null);
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -42,11 +46,13 @@ namespace Catonia_Item_Tracker
                                     (name,
                                      description,
                                      cost,
-                                     usable)
+                                     type,
+                                     subType)
                         VALUES ('" + txtItemName.Text.Replace("'", "") + @"',
                                 '" + txtDescription.Text.Replace("'", "") + @"',
                                 '" + nudGoldValue.Value.ToString() + @"',
-                                '" + (cbUseable.Checked ? 1 : 0) + @"')";
+                                '" + ((string)cbType.SelectedItem).Replace("'", "") + @"',
+                                '" + ((string)cbSubType.Text).Replace("'", "") + @"')";
             }
             else
             {
@@ -54,7 +60,8 @@ namespace Catonia_Item_Tracker
                         SET name = '" + txtItemName.Text.Replace("'", "") + @"',
                             description = '" + txtDescription.Text.Replace("'", "") + @"',
                             cost = '" + nudGoldValue.Value.ToString() + @"',
-                            usable = '" + (cbUseable.Checked ? 1 : 0) + @"'
+                            type = '" + ((string)cbType.SelectedItem).Replace("'", "") + @"',
+                            subType = '" + ((string)cbSubType.Text).Replace("'", "") + @"'
                         WHERE id = '" + itemNum.ToString() + @"'";
             }
             using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
@@ -81,7 +88,8 @@ namespace Catonia_Item_Tracker
                         description = txtDescription.Text,
                         name = txtItemName.Text,
                         id = itemNum,
-                        usable = cbUseable.Checked
+                        type = ((string)cbType.SelectedItem),
+                        subType = ((string)cbSubType.Text)
                     };
 
                     Program.items.Add(item);
@@ -102,13 +110,48 @@ namespace Catonia_Item_Tracker
                     item.name = txtItemName.Text;
                     item.description = txtDescription.Text;
                     item.cost = (int)nudGoldValue.Value;
-                    item.usable = cbUseable.Checked;
+                    item.type = ((string)cbType.SelectedItem);
+                    item.subType = ((string)cbSubType.Text);
 
                     Program.mainForm.updateItem(item);
                 }
             }
 
             this.Close();
+        }
+
+        private void CbType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string type = (string)cbType.SelectedItem;
+
+            cbSubType.Visible = false;
+            cbSubType.Text = "";
+            lblSubType.Visible = false;
+            if (type.EndsWith(" - Mod"))
+            {
+                cbSubType.Items.Clear();
+
+                using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
+                {
+                    dataConnection.Open();
+
+                    string selectSql = @"SELECT DISTINCT subType
+                                         FROM items
+                                         WHERE type = '" + type.Replace("'", "") + @"'";
+                    using (SqlCommand comm = new SqlCommand(selectSql, dataConnection))
+                    {
+                        using (SqlDataReader reader = comm.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                cbSubType.Items.Add(reader.GetString(0));
+                            }
+                        }
+                    }
+                }
+                cbSubType.Visible = true;
+                lblSubType.Visible = true;
+            }
         }
     }
 }

@@ -35,7 +35,10 @@
             this.txtDescription = new System.Windows.Forms.RichTextBox();
             this.lblNotes = new System.Windows.Forms.Label();
             this.btnSave = new System.Windows.Forms.Button();
-            this.cbUseable = new System.Windows.Forms.CheckBox();
+            this.cbType = new System.Windows.Forms.ComboBox();
+            this.lblType = new System.Windows.Forms.Label();
+            this.lblSubType = new System.Windows.Forms.Label();
+            this.cbSubType = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudGoldValue)).BeginInit();
             this.SuspendLayout();
             // 
@@ -111,22 +114,78 @@
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
-            // cbUseable
+            // cbType
             // 
-            this.cbUseable.AutoSize = true;
-            this.cbUseable.Location = new System.Drawing.Point(19, 338);
-            this.cbUseable.Name = "cbUseable";
-            this.cbUseable.Size = new System.Drawing.Size(59, 17);
-            this.cbUseable.TabIndex = 8;
-            this.cbUseable.Text = "Usable";
-            this.cbUseable.UseVisualStyleBackColor = true;
+            this.cbType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbType.FormattingEnabled = true;
+            this.cbType.Items.AddRange(new object[] {
+            "",
+            "Raw Material",
+            "Armor - Light",
+            "Armor - Light - Mod",
+            "Armour - Medium",
+            "Armour - Medium - Mod",
+            "Armour - Heavy",
+            "Armour - Heavy - Mod",
+            "Shield - Buckler",
+            "Shield - Buckler - Mod",
+            "Shield - Light",
+            "Shield - Light - Mod",
+            "Shield - Heavy",
+            "Shield - Heavy - Mod",
+            "Shield - Tower",
+            "Shield - Tower - Mod",
+            "Ammunition",
+            "Ammunition - Mod",
+            "Weapon - Light",
+            "Weapon - Light - Mod",
+            "Weapon - 1H",
+            "Weapon - 1H - Mod",
+            "Weapon - 2H",
+            "Weapon - 2H - Mod",
+            "Consumable",
+            "Garments"});
+            this.cbType.Location = new System.Drawing.Point(53, 332);
+            this.cbType.Name = "cbType";
+            this.cbType.Size = new System.Drawing.Size(151, 21);
+            this.cbType.TabIndex = 8;
+            this.cbType.SelectedIndexChanged += new System.EventHandler(this.CbType_SelectedIndexChanged);
+            // 
+            // lblType
+            // 
+            this.lblType.AutoSize = true;
+            this.lblType.Location = new System.Drawing.Point(16, 335);
+            this.lblType.Name = "lblType";
+            this.lblType.Size = new System.Drawing.Size(31, 13);
+            this.lblType.TabIndex = 9;
+            this.lblType.Text = "Type";
+            // 
+            // lblSubType
+            // 
+            this.lblSubType.AutoSize = true;
+            this.lblSubType.Location = new System.Drawing.Point(210, 335);
+            this.lblSubType.Name = "lblSubType";
+            this.lblSubType.Size = new System.Drawing.Size(53, 13);
+            this.lblSubType.TabIndex = 11;
+            this.lblSubType.Text = "Sub Type";
+            // 
+            // cbSubType
+            // 
+            this.cbSubType.FormattingEnabled = true;
+            this.cbSubType.Location = new System.Drawing.Point(269, 332);
+            this.cbSubType.Name = "cbSubType";
+            this.cbSubType.Size = new System.Drawing.Size(121, 21);
+            this.cbSubType.TabIndex = 10;
             // 
             // FrmItem
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(527, 359);
-            this.Controls.Add(this.cbUseable);
+            this.Controls.Add(this.lblSubType);
+            this.Controls.Add(this.cbSubType);
+            this.Controls.Add(this.lblType);
+            this.Controls.Add(this.cbType);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.lblNotes);
             this.Controls.Add(this.txtDescription);
@@ -153,6 +212,9 @@
         private System.Windows.Forms.RichTextBox txtDescription;
         private System.Windows.Forms.Label lblNotes;
         private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.CheckBox cbUseable;
+        private System.Windows.Forms.ComboBox cbType;
+        private System.Windows.Forms.Label lblType;
+        private System.Windows.Forms.Label lblSubType;
+        private System.Windows.Forms.ComboBox cbSubType;
     }
 }
