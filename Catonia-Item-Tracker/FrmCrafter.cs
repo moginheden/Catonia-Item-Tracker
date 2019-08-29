@@ -119,7 +119,7 @@ namespace Catonia_Item_Tracker
                     //add columns for each ingredient
                     for (int i = 0; i < r.ingredients.Count; i++)
                     {
-                        ItemQty ingredient = r.ingredients[i];
+                        InventoryItem ingredient = r.ingredients[i];
                         if (lvRecipies.Columns.Count < (((i + 1) * 3) + 3))
                         {
                             lvRecipies.Columns.Add("Ingredient " + (i + 1));
@@ -130,7 +130,7 @@ namespace Catonia_Item_Tracker
                         row.SubItems.Add(ingredient.item.name);
                         row.SubItems.Add(ingredient.qty.ToString());
 
-                        int inInventory = Program.mainForm.inventory.findLoot(ingredient.item.id).qty;
+                        int inInventory = Program.mainForm.inventory.findLoot(ingredient.item).qty;
                         row.SubItems.Add(inInventory.ToString());
 
                         if ((inInventory / ingredient.qty) < numWeCanMake)

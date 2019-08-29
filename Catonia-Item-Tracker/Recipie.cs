@@ -9,7 +9,7 @@ namespace Catonia_Item_Tracker
     public class Recipie
     {
         public int id = -1;
-        public List<ItemQty> ingredients = new List<ItemQty>();
+        public List<InventoryItem> ingredients = new List<InventoryItem>();
         public Item result;
         public int resultQty = 1;
         public string profession = null;
@@ -17,7 +17,15 @@ namespace Catonia_Item_Tracker
 
         public override bool Equals(object a)
         {
-            return this.id.Equals(((Item)a).id);
+            if (a is null)
+            {
+                return false;
+            }
+            if (!(a is Recipie))
+            {
+                return false;
+            }
+            return this.id.Equals(((Recipie)a).id);
         }
 
         public override int GetHashCode()

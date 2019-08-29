@@ -27,7 +27,7 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// the list of items in the game
         /// </summary>
-        public static List<Item> items = null;
+        public static Dictionary<int, Item> items = null;
 
         /// <summary>
         /// The list of items referenced by where they are stored
@@ -76,7 +76,7 @@ namespace Catonia_Item_Tracker
                 MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            HistoryRecord hrCloser = new HistoryRecord() { iq = new ItemQty() { item = new Item() { id = -1 } } };
+            HistoryRecord hrCloser = new HistoryRecord() { ii = new InventoryItem() { item = new Item() { id = int.MaxValue } } };
             foreach(KeyValuePair<string, Inventory> i in inventories)
             {
                 i.Value.addHistory(hrCloser);
@@ -88,7 +88,7 @@ namespace Catonia_Item_Tracker
         /// </summary>
         public static void loadAllFromDB()
         {
-            items = new List<Item>();
+            items = new Dictionary<int, Item>();
             recipies = new List<Recipie>();
 
             FrmLoading.setText("Connecting to DB...");
@@ -115,7 +115,7 @@ namespace Catonia_Item_Tracker
                             item.type = (string)reader["type"];
                             item.subType = (string)reader["subType"];
 
-                            items.Add(item);
+                            items.Add(item.id, item);
                         }
                     }
                 }
@@ -136,7 +136,7 @@ namespace Catonia_Item_Tracker
                 { 
                     Recipie r = new Recipie();
                     r.id = (int)row["id"];
-                    r.result = findLootByID((int)row["result"]);
+                    r.result = Program.items[(int)row["result"]];
                     r.resultQty = (int)row["resultQty"];
                     r.profession = (string)row["profession"];
                     r.crafterLevel = (string)row["crafterLevel"];
@@ -150,8 +150,8 @@ namespace Catonia_Item_Tracker
                         {
                             while (reader.Read())
                             {
-                                ItemQty iq = new ItemQty();
-                                iq.item = findLootByID((int)reader["ingredient"]);
+                                InventoryItem iq = new InventoryItem();
+                                iq.item = Program.items[(int)reader["ingredient"]];
                                 iq.qty = (int)reader["qty"];
                                 r.ingredients.Add(iq);
                             }
@@ -178,35 +178,6 @@ namespace Catonia_Item_Tracker
                 }
 
             }
-        }
-
-        /// <summary>
-        /// Finds a LootItem in the loot list based on it's SQL id, (might be slightly off from it's list index due to add/delete.)
-        /// </summary>
-        /// <param name="lootID">the DB id of the loot item</param>
-        /// <exception cref="IndexOutOfRangeException">If the id isn't found</exception>
-        public static Item findLootByID(int lootID)
-        {
-            int lootIndex = lootID;
-            if (lootIndex > (items.Count - 1))
-            {
-                lootIndex = items.Count - 1;
-            }
-            while ((lootIndex > -1) && (items[lootIndex].id > lootID))
-            {
-                lootIndex--;
-            }
-            while ((lootIndex < items.Count) && (items[lootIndex].id < lootID))
-            {
-                lootIndex++;
-            }
-
-            if ((lootIndex <= -1) || (lootIndex >= items.Count) || (items[lootIndex].id != lootID))
-            {
-                throw new IndexOutOfRangeException("ID: " + lootID + " not found in loot list");
-            }
-
-            return items[lootIndex];
         }
     }
 }

@@ -92,7 +92,7 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// reference to the loot item "Gold" for use in the numeric up/down field
         /// </summary>
-        private ItemQty iqGold = Program.inventories["On Hand"].loot.First(x => x.item.name.Equals("Gold Coins"));
+        private InventoryItem iiGold = Program.inventories["On Hand"].loot[0];
 
         /// <summary>
         /// The inventory list this form is currently using
@@ -122,7 +122,7 @@ namespace Catonia_Item_Tracker
 
             using (new TriggerLock())
             {
-                nudGold.Value = iqGold.qty;
+                nudGold.Value = iiGold.qty;
             }
             
             //setup column size for item list
@@ -152,7 +152,7 @@ namespace Catonia_Item_Tracker
             //set initial item list
             sortColumnInventory = 6;
             lvItems.Sorting = System.Windows.Forms.SortOrder.Descending;
-            updateLvItems(inventory.loot, lvItems);
+            updateLvItems(inventory.loot.Values, lvItems);
         }
 
         /// <summary>
@@ -188,17 +188,10 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
-        /// updates the form to reflect a changed item
+        /// updates the main inventory listview after an item type is edited/created
         /// </summary>
-        /// <param name="item">The item that was updated</param>
-        internal void updateItem(Item item)
-        {
-            ItemQty iq = inventory.findLoot(item.id);
-
-            updateItem(item, iq);
-        }
-
-        private void updateItem(Item item, ItemQty iq)
+        /// <param name="item"></param>
+        public void updateItem(Item item)
         {
             try
             {
@@ -209,13 +202,13 @@ namespace Catonia_Item_Tracker
                 bool found = false;
                 foreach (ListViewItem row in lvItems.Items)
                 {
-                    if (((ItemQty)row.Tag).item.id == item.id)
+                    if (((InventoryItem)row.Tag).item.id == item.id)
                     {
                         //update row
                         row.SubItems[0].Text = item.name;
-                        row.SubItems[1].Text = iq.qty.ToString();
+                        row.SubItems[1].Text = ((InventoryItem)row.Tag).qty.ToString();
                         row.SubItems[2].Text = item.cost.ToString();
-                        row.SubItems[3].Text = (item.cost * iq.qty).ToString();
+                        row.SubItems[3].Text = (item.cost * ((InventoryItem)row.Tag).qty).ToString();
                         row.SubItems[4].Text = getProfessionsForItem(item);
                         row.SubItems[5].Text = item.TypeAbbreviation();
                         row.SubItems[6].Text = DateTime.Now.ToString("yyyy-MM-dd, h:mm tt");
@@ -233,6 +226,8 @@ namespace Catonia_Item_Tracker
                 //if no row is found, add a new one at the bottom
                 if (!found)
                 {
+                    InventoryItem iq = inventory.findLoot(item);
+
                     //create new row
                     DateTime lastMod = inventory.getLatestModification(iq.item.id);
                     ListViewItem row = new ListViewItem(new string[] { item.name,
@@ -274,7 +269,7 @@ namespace Catonia_Item_Tracker
             }
 
             //update description and recipies if it's the active item
-            if(lvItems.Visible && (lvItems.SelectedItems.Count > 0) && (item.id == ((ItemQty)lvItems.SelectedItems[0].Tag).item.id))
+            if(lvItems.Visible && (lvItems.SelectedItems.Count > 0) && (item.id == ((InventoryItem)lvItems.SelectedItems[0].Tag).item.id))
             {
                 txtDescription.Text = item.description;
 
@@ -302,7 +297,7 @@ namespace Catonia_Item_Tracker
         {
             foreach (ListViewItem row in lvItems.Items)
             {
-                if (((ItemQty)row.Tag).item.id == item.id)
+                if (((InventoryItem)row.Tag).item.id == item.id)
                 {
                     lvItems.SelectedItems.Clear();
                     row.Selected = true;
@@ -320,7 +315,7 @@ namespace Catonia_Item_Tracker
         private string getProfessionsForItem(Item item)
         {
             string returnVal = "";
-            ItemQty compare = new ItemQty() { item = item };
+            InventoryItem compare = new InventoryItem() { item = item };
             foreach(Recipie r in Program.recipies)
             {
                 char marker = shortProfessionCode(r.profession);
@@ -364,7 +359,7 @@ namespace Catonia_Item_Tracker
         /// <remarks>does not clear sorts</remarks>
         /// <param name="newItemList">The new list of items to use</param>
         /// <param name="lvItemsToChange">The listview to update</param>
-        private void updateLvItems(IEnumerable<ItemQty> newItemList, ListView lvItemsToChange)
+        private void updateLvItems(IEnumerable<InventoryItem> newItemList, ListView lvItemsToChange)
         {
             try
             {
@@ -372,7 +367,7 @@ namespace Catonia_Item_Tracker
 
                 lvItemsToChange.Items.Clear();
                 List<ListViewItem> rowsToAdd = new List<ListViewItem>(newItemList.Count());
-                foreach (ItemQty iq in newItemList.OrderBy(o => (o.qty == 0)).ThenBy(o => o.item.name))
+                foreach (InventoryItem iq in newItemList.OrderBy(o => (o.qty == 0)).ThenBy(o => o.item.name))
                 {
                     if(iq.item.id != 0) //don't add gold to the list
                     {
@@ -412,7 +407,7 @@ namespace Catonia_Item_Tracker
         private void DdlInventories_SelectedIndexChanged(object sender, EventArgs e)
         {
             inventory = Program.inventories[ddlInventories.SelectedItem.ToString()];
-            updateLvItems(inventory.loot, lvItems);
+            updateLvItems(inventory.loot.Values, lvItems);
         }
 
         /// <summary>
@@ -477,10 +472,10 @@ namespace Catonia_Item_Tracker
             for (int i = 0; results.Count < 20 && i < lvItems.Items.Count; i++)
             {
                 ListViewItem row = lvItems.Items[i];
-                if ((((ItemQty)row.Tag).item.name.ToLower().Contains(search.ToLower()))
-                    || (cbSearchDescriptions.Checked && (((ItemQty)row.Tag).item.description.ToLower().Contains(search.ToLower()))))
+                if ((((InventoryItem)row.Tag).item.name.ToLower().Contains(search.ToLower()))
+                    || (cbSearchDescriptions.Checked && (((InventoryItem)row.Tag).item.description.ToLower().Contains(search.ToLower()))))
                 {
-                    results.Add(((ItemQty)row.Tag).item);
+                    results.Add(((InventoryItem)row.Tag).item);
                 }
             }
 
@@ -517,7 +512,7 @@ namespace Catonia_Item_Tracker
             {
                 foreach (ListViewItem row in lvItems.Items)
                 {
-                    if (((ItemQty)row.Tag).item.id == ((Item)txtSearch.SelectedItem).id)
+                    if (((InventoryItem)row.Tag).item.id == ((Item)txtSearch.SelectedItem).id)
                     {
                         lvItems.SelectedItems.Clear();
                         row.Selected = true;
@@ -558,7 +553,7 @@ namespace Catonia_Item_Tracker
                 }
                 else
                 {
-                    ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
+                    InventoryItem iq = (InventoryItem)lvItems.SelectedItems[0].Tag;
                     using (new TriggerLock())
                     {
                         nudOwned.Value = iq.qty;
@@ -585,7 +580,7 @@ namespace Catonia_Item_Tracker
             /// TODO: look into multi-step recipies, maybe convert the list views to control to trees
 
             //make a fake ItemQty to compare the ingredients to.  Since we overrode the equals on ItemQty to only check items, qty is irrelivant.
-            ItemQty comparison = new ItemQty() { item = item, qty = 0 };
+            InventoryItem comparison = new InventoryItem() { item = item, qty = 0 };
             
             //remove extra ingredient columns
             for (int i = lvRecipiesMakingItem.Columns.Count - 1; i > 3; i--)
@@ -615,7 +610,7 @@ namespace Catonia_Item_Tracker
                     //add columns for each ingredient
                     for (int i = 0; i < r.ingredients.Count; i++)
                     {
-                        ItemQty ingredient = r.ingredients[i];
+                        InventoryItem ingredient = r.ingredients[i];
                         if (lvRecipiesMakingItem.Columns.Count < (((i+1) * 3) + 4))
                         {
                             lvRecipiesMakingItem.Columns.Add("Ingredient " + (i+1));
@@ -626,7 +621,7 @@ namespace Catonia_Item_Tracker
                         row.SubItems.Add(ingredient.item.name);
                         row.SubItems.Add(ingredient.qty.ToString());
 
-                        int inInventory = inventory.findLoot(ingredient.item.id).qty;
+                        int inInventory = inventory.findLoot(ingredient.item).qty;
                         row.SubItems.Add(inInventory.ToString());
 
                         if((inInventory / ingredient.qty) < numWeCanMake)
@@ -657,7 +652,7 @@ namespace Catonia_Item_Tracker
                     //add columns for each ingredient
                     for (int i = 0; i < r.ingredients.Count; i++)
                     {
-                        ItemQty ingredient = r.ingredients[i];
+                        InventoryItem ingredient = r.ingredients[i];
                         if (lvRecipiesUsingItem.Columns.Count < (((i+1) * 3) + 5))
                         {
                             lvRecipiesUsingItem.Columns.Add("Ingredient " + (i+1));
@@ -668,7 +663,7 @@ namespace Catonia_Item_Tracker
                         row.SubItems.Add(ingredient.item.name);
                         row.SubItems.Add(ingredient.qty.ToString());
 
-                        int inInventory = inventory.findLoot(ingredient.item.id).qty;
+                        int inInventory = inventory.findLoot(ingredient.item).qty;
                         row.SubItems.Add(inInventory.ToString());
 
                         if ((inInventory / ingredient.qty) < numWeCanMake)
@@ -712,11 +707,11 @@ namespace Catonia_Item_Tracker
             {
                 HistoryRecord hr = rows.Current;
 
-                if ((itemToSearch == -1) || (hr.iq.item.id == itemToSearch))
+                if ((itemToSearch == -1) || (hr.ii.item.id == itemToSearch))
                 {
                     ListViewItem row = new ListViewItem(hr.dateTime.ToString("MMMM dd, yyyy h:mm tt"));
                     row.SubItems.Add(hr.qtyChanged.ToString());
-                    row.SubItems.Add(hr.iq.item.name);
+                    row.SubItems.Add(hr.ii.item.name);
                     row.SubItems.Add(hr.note);
 
                     row.Tag = hr;
@@ -746,13 +741,13 @@ namespace Catonia_Item_Tracker
 
             if(r != null)
             {
-                ItemQty result = inventory.findLoot(r.result.id);
+                InventoryItem result = inventory.findLoot(r.result);
                 using (new TriggerLock())
                 {
-                    //check we have ebnough ingredients
-                    foreach (ItemQty i in r.ingredients)
+                    //check we have enough ingredients
+                    foreach (InventoryItem i in r.ingredients)
                     {
-                        ItemQty ingredient = inventory.findLoot(i.item.id);
+                        InventoryItem ingredient = inventory.findLoot(i.item);
                         if(ingredient.qty < i.qty)
                         {
                             MessageBox.Show("Unable to craft " + result.item.name + ". Not enough " + i.item.name + " " + inventory.location, "Crafting", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -761,9 +756,9 @@ namespace Catonia_Item_Tracker
                     }
 
                     //remove the ingredients used
-                    foreach (ItemQty i in r.ingredients)
+                    foreach (InventoryItem i in r.ingredients)
                     {
-                        ItemQty ingredient = inventory.findLoot(i.item.id);
+                        InventoryItem ingredient = inventory.findLoot(i.item);
                         updateItemQtyWithHistory(ingredient, i.qty * -1);
                     }
 
@@ -779,14 +774,14 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
-        /// updates the quantity of an item including history records.
+        /// updates the quantity of an item in the local database, sql database, and UI including history records.
         /// </summary>
         /// <param name="iq"></param>
         /// <param name="difference"></param>
-        private void updateItemQtyWithHistory(ItemQty iq, int difference)
+        private void updateItemQtyWithHistory(InventoryItem iq, int difference)
         {
             HistoryRecord hr = new HistoryRecord();
-            hr.iq = iq;
+            hr.ii = iq;
             hr.qtyChanged = difference;
             inventory.addHistory(hr);
 
@@ -797,7 +792,7 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
-        /// event handler for the tota amount of gold being changed
+        /// event handler for the total amount of gold being changed
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -809,11 +804,11 @@ namespace Catonia_Item_Tracker
             }
 
             //create or update the history record
-            int difference = (int)nudGold.Value - iqGold.qty;
+            int difference = (int)nudGold.Value - iiGold.qty;
 
             HistoryRecord hr = inventory.latestHistory();
             if ((hr != null)
-                && (hr.iq == iqGold)
+                && (hr.ii == iiGold)
                 && (hr.dateTime > DateTime.Now.AddSeconds(-10)))
             {
                 hr.qtyChanged += difference;
@@ -822,16 +817,16 @@ namespace Catonia_Item_Tracker
             else
             {
                 hr = new HistoryRecord();
-                hr.iq = iqGold;
+                hr.ii = iiGold;
                 hr.qtyChanged = difference;
                 inventory.addHistory(hr);
             }
 
             //update the inventory
-            iqGold.qty = (int)nudGold.Value;
+            iiGold.qty = (int)nudGold.Value;
 
             //update other ui fields
-            updateItemQty(iqGold);
+            updateItemQty(iiGold);
         }
 
         /// <summary>
@@ -847,10 +842,10 @@ namespace Catonia_Item_Tracker
                 return;
             }
 
-            iqGold.qty += (int)nudAddGold.Value;
+            iiGold.qty += (int)nudAddGold.Value;
 
             HistoryRecord hr = new HistoryRecord();
-            hr.iq = iqGold;
+            hr.ii = iiGold;
             hr.qtyChanged = (int)nudAddGold.Value;
 
             inventory.addHistory(hr);
@@ -858,7 +853,7 @@ namespace Catonia_Item_Tracker
             //reset the field to avoid double adds
             nudAddGold.Value = 0M;
 
-            updateItemQty(iqGold);
+            updateItemQty(iiGold);
         }
         
         /// <summary>
@@ -881,14 +876,14 @@ namespace Catonia_Item_Tracker
                 return;
             }
 
-            ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
+            InventoryItem iq = (InventoryItem)lvItems.SelectedItems[0].Tag;
 
             //create or update the history record
             HistoryRecord hr = inventory.latestHistory();
             int difference = (int)nudOwned.Value - iq.qty;
 
             if ((hr != null)
-                && (hr.iq == iq)
+                && (hr.ii == iq)
                 && (hr.dateTime > DateTime.Now.AddSeconds(-10)))
             {
                 hr.qtyChanged += difference;
@@ -897,7 +892,7 @@ namespace Catonia_Item_Tracker
             else
             {
                 hr = new HistoryRecord();
-                hr.iq = iq;
+                hr.ii = iq;
                 hr.qtyChanged = difference;
                 inventory.addHistory(hr);
             }
@@ -924,12 +919,12 @@ namespace Catonia_Item_Tracker
                 return;
             }
 
-            ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
+            InventoryItem iq = (InventoryItem)lvItems.SelectedItems[0].Tag;
 
             iq.qty += (int)nudAddItems.Value;
 
             HistoryRecord hr = new HistoryRecord();
-            hr.iq = iq;
+            hr.ii = iq;
             hr.qtyChanged = (int)nudAddItems.Value;
 
             inventory.addHistory(hr);
@@ -957,12 +952,12 @@ namespace Catonia_Item_Tracker
             }
 
             //update # items owned
-            ItemQty iq = (ItemQty)lvItems.SelectedItems[0].Tag;
+            InventoryItem iq = (InventoryItem)lvItems.SelectedItems[0].Tag;
 
             iq.qty += (int)nudAddItems.Value;
 
             HistoryRecord hr = new HistoryRecord();
-            hr.iq = iq;
+            hr.ii = iq;
             hr.qtyChanged = (int)nudAddItems.Value;
 
             inventory.addHistory(hr);
@@ -974,14 +969,14 @@ namespace Catonia_Item_Tracker
             {
                 valuePerItem = iq.item.cost;
             }
-            iqGold.qty -= valuePerItem * (int)nudAddItems.Value;
+            iiGold.qty -= valuePerItem * (int)nudAddItems.Value;
 
             HistoryRecord hrGold = new HistoryRecord();
-            hrGold.iq = iqGold;
+            hrGold.ii = iiGold;
             hrGold.qtyChanged = valuePerItem * (int)nudAddItems.Value;
 
             inventory.addHistory(hrGold);
-            updateItemQty(iqGold);
+            updateItemQty(iiGold);
 
             //reset the fields to avoid double adds
             nudAddItems.Value = 0M;
@@ -995,7 +990,7 @@ namespace Catonia_Item_Tracker
         /// Updates the gui fields related to a given ItemQty, (all the cases where it's quantity is used, and history)
         /// </summary>
         /// <param name="iq"></param>
-        internal void updateItemQty(ItemQty iq)
+        internal void updateItemQty(InventoryItem iq)
         {
             if (this.InvokeRequired)
             {
@@ -1004,16 +999,16 @@ namespace Catonia_Item_Tracker
             }
             
             //if it's the gold item, update it's numeric up down field
-            if (iq == iqGold)
+            if (iq == iiGold)
             {
                 using (new TriggerLock())
                 {
-                    nudGold.Value = iqGold.qty;
+                    nudGold.Value = iiGold.qty;
                 }
             }
 
             //if it's the current item update other related fields
-            if ((lvItems.SelectedItems.Count > 0) && ((ItemQty)lvItems.SelectedItems[0].Tag == iq))
+            if ((lvItems.SelectedItems.Count > 0) && ((InventoryItem)lvItems.SelectedItems[0].Tag == iq))
             {
                 using (new TriggerLock())
                 {
@@ -1050,7 +1045,7 @@ namespace Catonia_Item_Tracker
             //if it's in the list of items, update that
             foreach (ListViewItem lvi in lvItems.Items)
             {
-                if ((ItemQty)lvi.Tag == iq)
+                if ((InventoryItem)lvi.Tag == iq)
                 {
                     try
                     {
@@ -1218,7 +1213,7 @@ namespace Catonia_Item_Tracker
                 }
             }
 
-            updateLvItems(inventory.loot, lvItems);
+            updateLvItems(inventory.loot.Values, lvItems);
             if (filterProfessions.Count != 0)
             {
                 foreach(ListViewItem lvi in lvItems.Items)
@@ -1261,12 +1256,12 @@ namespace Catonia_Item_Tracker
                 }
             }
 
-            updateLvItems(inventory.loot, lvItems);
+            updateLvItems(inventory.loot.Values, lvItems);
             if (filterTypes.Count != 0)
             {
                 foreach (ListViewItem lvi in lvItems.Items)
                 {
-                    if (!filterTypes.Contains((((ItemQty)lvi.Tag).item.type)))
+                    if (!filterTypes.Contains((((InventoryItem)lvi.Tag).item.type)))
                     {
                         lvi.Remove();
                     }
@@ -1292,7 +1287,7 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void editItemToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FrmItem itemForm = new FrmItem(((ItemQty)lvItems.SelectedItems[0].Tag).item);
+            FrmItem itemForm = new FrmItem(((InventoryItem)lvItems.SelectedItems[0].Tag).item);
             itemForm.Show();
         }
 
@@ -1385,7 +1380,7 @@ namespace Catonia_Item_Tracker
             }
 
             //check if the item already exists
-            if(Program.items.FirstOrDefault(x => x.name == txtSearch.Text) != null)
+            if(Program.items.Count(x => x.Value.name == txtSearch.Text) > 0)
             {
                 return;
             }
@@ -1420,12 +1415,13 @@ namespace Catonia_Item_Tracker
                 //if the item doesn't yet exist
                 if (itemNum == -1)
                 {
+                    //create the item
                     using (SqlCommand comm = new SqlCommand(insertSql, dataConnection))
                     {
                         comm.ExecuteNonQuery();
                     }
 
-                    itemNum = -1;
+                    //grab its id
                     using (SqlCommand comm = new SqlCommand(selectSql, dataConnection))
                     {
                         itemNum = (int)comm.ExecuteScalar();
@@ -1442,10 +1438,10 @@ namespace Catonia_Item_Tracker
                     subType = ""
                 };
 
-                Program.items.Add(item);
+                Program.items.Add(item.id, item);
                 foreach (KeyValuePair<string, Inventory> i in Program.inventories)
                 {
-                    i.Value.loot.Add(new ItemQty()
+                    i.Value.loot.Add(item.id, new InventoryItem()
                     {
                         item = item,
                         qty = 0
@@ -1475,6 +1471,16 @@ namespace Catonia_Item_Tracker
         private void FrmMain_Shown(object sender, EventArgs e)
         {
             FrmLoading.CloseForm();
+        }
+
+        /// <summary>
+        /// event handler for when the mods button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnMods_Click(object sender, EventArgs e)
+        {
+            ///TODO: implement the mods sub-form
         }
     }
 }

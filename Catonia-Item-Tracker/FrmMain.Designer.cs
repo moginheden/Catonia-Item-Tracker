@@ -81,6 +81,7 @@
             this.btnCreateNew = new System.Windows.Forms.Button();
             this.ddlInventories = new System.Windows.Forms.ComboBox();
             this.btnCrafter = new System.Windows.Forms.Button();
+            this.btnMods = new System.Windows.Forms.Button();
             this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
@@ -605,11 +606,22 @@
             this.btnCrafter.UseVisualStyleBackColor = true;
             this.btnCrafter.Click += new System.EventHandler(this.BtnCrafter_Click);
             // 
+            // btnMods
+            // 
+            this.btnMods.Location = new System.Drawing.Point(385, 4);
+            this.btnMods.Name = "btnMods";
+            this.btnMods.Size = new System.Drawing.Size(121, 21);
+            this.btnMods.TabIndex = 20;
+            this.btnMods.Text = "Mods";
+            this.btnMods.UseVisualStyleBackColor = true;
+            this.btnMods.Click += new System.EventHandler(this.BtnMods_Click);
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(900, 961);
+            this.Controls.Add(this.btnMods);
             this.Controls.Add(this.btnCrafter);
             this.Controls.Add(this.ddlInventories);
             this.Controls.Add(this.btnCreateNew);
@@ -695,5 +707,6 @@
         private System.Windows.Forms.ComboBox ddlInventories;
         private System.Windows.Forms.ColumnHeader colLastUpdated;
         private System.Windows.Forms.Button btnCrafter;
+        private System.Windows.Forms.Button btnMods;
     }
 }

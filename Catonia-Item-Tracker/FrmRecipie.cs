@@ -75,7 +75,7 @@ namespace Catonia_Item_Tracker
         {
             InitializeComponent();
 
-            updateLbItemSearch(Program.items);
+            updateLbItemSearch(Program.items.Values);
 
             setProfessionAndLevel();
         }
@@ -89,7 +89,7 @@ namespace Catonia_Item_Tracker
             //setup basic form
             InitializeComponent();
 
-            updateLbItemSearch(Program.items);
+            updateLbItemSearch(Program.items.Values);
 
             setProfessionAndLevel();
 
@@ -107,7 +107,7 @@ namespace Catonia_Item_Tracker
             nudNumProduced.Value = current.resultQty;
 
             lvIngredients.SuspendLayout();
-            foreach (ItemQty iq in current.ingredients)
+            foreach (InventoryItem iq in current.ingredients)
             {
                 addIngredient(iq.item, iq.qty);
             }
@@ -180,12 +180,12 @@ namespace Catonia_Item_Tracker
             string search = txtSearch.Text.ToLower().Replace('-', ' ');
             if (cbSearchDescriptions.Checked)
             {
-                updateLbItemSearch(Program.items.Where(x => (x.name.ToLower().Replace('-', ' ').Contains(search)
+                updateLbItemSearch(Program.items.Values.Where(x => (x.name.ToLower().Replace('-', ' ').Contains(search)
                                                         || x.description.ToLower().Replace('-', ' ').Contains(search))));
             }
             else
             {
-                updateLbItemSearch(Program.items.Where(x => x.name.ToLower().Replace('-', ' ').Contains(search)));
+                updateLbItemSearch(Program.items.Values.Where(x => x.name.ToLower().Replace('-', ' ').Contains(search)));
             }
         }
 
@@ -248,7 +248,7 @@ namespace Catonia_Item_Tracker
         {
             ListViewItem lvi = new ListViewItem(ingredient.name);
             lvi.SubItems.Add(num.ToString());
-            lvi.Tag = new ItemQty()
+            lvi.Tag = new InventoryItem()
             {
                 qty = num,
                 item = ingredient
@@ -384,7 +384,7 @@ namespace Catonia_Item_Tracker
                 //add the ingredients to the recipie
                 foreach (ListViewItem lvi in lvIngredients.Items)
                 {
-                    ItemQty iq = (ItemQty)lvi.Tag;
+                    InventoryItem iq = (InventoryItem)lvi.Tag;
                     curRecipie.ingredients.Add(iq);
                     sql = @"INSERT INTO recipieIngredients
                                             (recipieID,

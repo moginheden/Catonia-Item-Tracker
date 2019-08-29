@@ -92,10 +92,10 @@ namespace Catonia_Item_Tracker
                         subType = ((string)cbSubType.Text)
                     };
 
-                    Program.items.Add(item);
+                    Program.items.Add(item.id, item);
                     foreach (KeyValuePair<string, Inventory> i in Program.inventories)
                     {
-                        i.Value.loot.Add(new ItemQty()
+                        i.Value.loot.Add(item.id *-1, new InventoryItem()
                         {
                             item = item,
                             qty = 0
@@ -106,7 +106,7 @@ namespace Catonia_Item_Tracker
                 }
                 else
                 {
-                    Item item = Program.findLootByID(itemNum);
+                    Item item = Program.items[itemNum];
                     item.name = txtItemName.Text;
                     item.description = txtDescription.Text;
                     item.cost = (int)nudGoldValue.Value;
