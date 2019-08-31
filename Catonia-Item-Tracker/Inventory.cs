@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -59,6 +60,17 @@ namespace Catonia_Item_Tracker
             {
                 dataConnection.Open();
 
+                //load mod lookup table
+                DataSet mods = new DataSet();
+                string selectMods = @"SELECT inventoryId, subItemId
+                                      FROM mods
+                                      ORDER BY inventoryId";
+                using(SqlDataAdapter da = new SqlDataAdapter(selectMods, dataConnection))
+                {
+                    da.Fill(mods);
+                }
+                int modLine = 0;
+
                 //load loot
                 string selectLoot = @"SELECT *
 								      FROM inventory
@@ -70,11 +82,25 @@ namespace Catonia_Item_Tracker
                     {
                         while (reader.Read())
                         {
-                            InventoryItem iq = new InventoryItem();
-                            iq.id = (int)reader["id"];
-                            iq.qty = (int)reader["qty"];
-                            iq.item = Program.items[(int)reader["itemId"]];
-                            loot.Add(iq.id, iq);
+                            InventoryItem ii = new InventoryItem();
+                            ii.id = (int)reader["id"];
+                            ii.qty = (int)reader["qty"];
+                            ii.item = Program.items[(int)reader["itemId"]];
+
+                            while(modLine < mods.Tables[0].Rows.Count)
+                            {
+                                if(((int)mods.Tables[0].Rows[modLine]["inventoryId"]) == ii.id)
+                                {
+                                    ii.modsAttached.Add((int)mods.Tables[0].Rows[modLine]["subItemId"]);
+                                }
+                                else if (((int)mods.Tables[0].Rows[modLine]["inventoryId"]) > ii.id)
+                                {
+                                    break;
+                                }
+                                modLine++;
+                            }
+
+                            loot.Add(ii.id, ii);
                         }
                     }
                 }
@@ -102,25 +128,27 @@ namespace Catonia_Item_Tracker
                 }
 
                 //load history
+                //maybe limit this to top 1000?
+                DataSet dsHistory = new DataSet();
                 string selectHistory = @"SELECT *
 								         FROM inventoryHistory
                                          WHERE location = '" + loc.Replace("'", "''") + @"'
-								         ORDER BY modificationDate";
-                using (SqlCommand comm = new SqlCommand(selectHistory, dataConnection))
+								         ORDER BY modificationDate desc";
+                using(SqlDataAdapter da = new SqlDataAdapter(selectHistory, dataConnection))
                 {
-                    using (SqlDataReader reader = comm.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            HistoryRecord hr = new HistoryRecord();
-                            hr.dateTime = ((DateTime)reader["modificationDate"]).ToLocalTime();
-                            hr.ii = loot[(int)reader["inventoryID"]];
-                            hr.note = (string)reader["note"];
-                            hr.qtyChanged = (int)reader["qty"];
-                            
-                            history.Push(hr);
-                        }
-                    }
+                    da.Fill(dsHistory);
+                }
+
+                for (int i = dsHistory.Tables[0].Rows.Count - 1; i >= 0; i--)
+                {
+                    DataRow row = dsHistory.Tables[0].Rows[i];
+                    HistoryRecord hr = new HistoryRecord();
+                    hr.dateTime = ((DateTime)row["modificationDate"]).ToLocalTime();
+                    hr.ii = loot[(int)row["inventoryID"]];
+                    hr.note = (string)row["note"];
+                    hr.qtyChanged = (int)row["qty"];
+
+                    history.Push(hr);
                 }
             }
 
@@ -169,6 +197,10 @@ namespace Catonia_Item_Tracker
                                     while (reader.Read())
                                     {
                                         /// TODO: check into quick changes using up/down arrows being overwritten by old values
+
+                                        /// TODO: deal with other clients adding an inventory id that this client doesn't have yet
+
+                                        /// TODO: deal with other clients adding a mod that this client doesn't have yet (qty 0)
 
                                         //look for a HistoryRecord that matches, but allow a 10 millisecond variance due to SQL truncating dates
                                         HistoryRecord hrToUpdate = history.SingleOrDefault(x =>
@@ -376,7 +408,7 @@ namespace Catonia_Item_Tracker
         /// <exception cref="IndexOutOfRangeException">If the id isn't found</exception>
         public InventoryItem findLoot(Item toFind)
         {
-            return loot.First(x => (x.Value.item.id == toFind.id) && (x.Value.attachedTo == int.MinValue) && (x.Value.modsAttached.Count == 0)).Value;
+            return loot.First(x => (x.Value.item.id == toFind.id) && (x.Value.modsAttached.Count == 0)).Value;
         }
 
         /// <summary>

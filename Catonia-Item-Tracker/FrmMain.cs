@@ -205,7 +205,7 @@ namespace Catonia_Item_Tracker
                     if (((InventoryItem)row.Tag).item.id == item.id)
                     {
                         //update row
-                        row.SubItems[0].Text = item.name;
+                        row.SubItems[0].Text = ((InventoryItem)row.Tag).ToString();
                         row.SubItems[1].Text = ((InventoryItem)row.Tag).qty.ToString();
                         row.SubItems[2].Text = item.cost.ToString();
                         row.SubItems[3].Text = (item.cost * ((InventoryItem)row.Tag).qty).ToString();
@@ -230,7 +230,7 @@ namespace Catonia_Item_Tracker
 
                     //create new row
                     DateTime lastMod = inventory.getLatestModification(iq.item.id);
-                    ListViewItem row = new ListViewItem(new string[] { item.name,
+                    ListViewItem row = new ListViewItem(new string[] { iq.ToString(),
                                                                    iq.qty.ToString(),
                                                                    item.cost.ToString(),
                                                                    (item.cost * iq.qty).ToString(),
@@ -372,7 +372,7 @@ namespace Catonia_Item_Tracker
                     if(iq.item.id != 0) //don't add gold to the list
                     {
                         DateTime lastMod = inventory.getLatestModification(iq.item.id);
-                        ListViewItem row = new ListViewItem(new string[] { iq.item.name,
+                        ListViewItem row = new ListViewItem(new string[] { iq.ToString(),
                                                                        iq.qty.ToString(),
                                                                        iq.item.cost.ToString(),
                                                                        (iq.item.cost * iq.qty).ToString(),
@@ -468,14 +468,14 @@ namespace Catonia_Item_Tracker
             oldSearch = search;
 
             //otherwise setup the dropdown options
-            List<Item> results = new List<Item>();
+            List<InventoryItem> results = new List<InventoryItem>();
             for (int i = 0; results.Count < 20 && i < lvItems.Items.Count; i++)
             {
                 ListViewItem row = lvItems.Items[i];
-                if ((((InventoryItem)row.Tag).item.name.ToLower().Contains(search.ToLower()))
+                if ((row.SubItems[0].Text.ToLower().Contains(search.ToLower()))
                     || (cbSearchDescriptions.Checked && (((InventoryItem)row.Tag).item.description.ToLower().Contains(search.ToLower()))))
                 {
-                    results.Add(((InventoryItem)row.Tag).item);
+                    results.Add(((InventoryItem)row.Tag));
                 }
             }
 
@@ -512,7 +512,7 @@ namespace Catonia_Item_Tracker
             {
                 foreach (ListViewItem row in lvItems.Items)
                 {
-                    if (((InventoryItem)row.Tag).item.id == ((Item)txtSearch.SelectedItem).id)
+                    if (((InventoryItem)row.Tag).id == ((InventoryItem)txtSearch.SelectedItem).id)
                     {
                         lvItems.SelectedItems.Clear();
                         row.Selected = true;
@@ -523,6 +523,9 @@ namespace Catonia_Item_Tracker
 
             //update the right panel
             lvItems_SelectedIndexChanged(null, null);
+
+            //scroll into view
+            lvItems.SelectedItems[0].EnsureVisible();
         }
 
         /// <summary>
@@ -553,14 +556,21 @@ namespace Catonia_Item_Tracker
                 }
                 else
                 {
-                    InventoryItem iq = (InventoryItem)lvItems.SelectedItems[0].Tag;
+                    InventoryItem ii = (InventoryItem)lvItems.SelectedItems[0].Tag;
                     using (new TriggerLock())
                     {
-                        nudOwned.Value = iq.qty;
+                        nudOwned.Value = ii.qty;
                     }
-                    txtDescription.Text = iq.item.description;
-                    updateCreationPaths(iq.item);
-                    generateHistory(iq.item.id);
+                    txtDescription.Text = ii.item.description;
+
+                    //read mods
+                    foreach (int mod in ii.modsAttached)
+                    {
+                        txtDescription.Text += "\r\n\r\n***" + Program.items[mod].name + "***\r\n" + Program.items[mod].description;
+                    }
+
+                    updateCreationPaths(ii.item);
+                    generateHistory(ii.id);
                 }
             }
             finally
@@ -707,7 +717,7 @@ namespace Catonia_Item_Tracker
             {
                 HistoryRecord hr = rows.Current;
 
-                if ((itemToSearch == -1) || (hr.ii.item.id == itemToSearch))
+                if ((itemToSearch == -1) || (hr.ii.id == itemToSearch))
                 {
                     ListViewItem row = new ListViewItem(hr.dateTime.ToString("MMMM dd, yyyy h:mm tt"));
                     row.SubItems.Add(hr.qtyChanged.ToString());
@@ -989,17 +999,17 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// Updates the gui fields related to a given ItemQty, (all the cases where it's quantity is used, and history)
         /// </summary>
-        /// <param name="iq"></param>
-        internal void updateItemQty(InventoryItem iq)
+        /// <param name="ii"></param>
+        internal void updateItemQty(InventoryItem ii)
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action(() => updateItemQty(iq)));  // do stuff on UI thread, not here
+                this.Invoke(new Action(() => updateItemQty(ii)));  // do stuff on UI thread, not here
                 return;
             }
             
             //if it's the gold item, update it's numeric up down field
-            if (iq == iiGold)
+            if (ii == iiGold)
             {
                 using (new TriggerLock())
                 {
@@ -1008,18 +1018,18 @@ namespace Catonia_Item_Tracker
             }
 
             //if it's the current item update other related fields
-            if ((lvItems.SelectedItems.Count > 0) && ((InventoryItem)lvItems.SelectedItems[0].Tag == iq))
+            if ((lvItems.SelectedItems.Count > 0) && ((InventoryItem)lvItems.SelectedItems[0].Tag == ii))
             {
                 using (new TriggerLock())
                 {
-                    nudOwned.Value = iq.qty;
+                    nudOwned.Value = ii.qty;
                 }
 
                 try
                 {
                     lvItemHistory.BeginUpdate();
                     lvItemHistory.Items.Clear();
-                    generateHistory(iq.item.id);
+                    generateHistory(ii.id);
                 }
                 finally
                 {
@@ -1045,13 +1055,13 @@ namespace Catonia_Item_Tracker
             //if it's in the list of items, update that
             foreach (ListViewItem lvi in lvItems.Items)
             {
-                if ((InventoryItem)lvi.Tag == iq)
+                if ((InventoryItem)lvi.Tag == ii)
                 {
                     try
                     {
                         lvItems.BeginUpdate();
-                        lvi.SubItems[1].Text = iq.qty.ToString();
-                        lvi.SubItems[3].Text = (iq.item.cost * iq.qty).ToString();
+                        lvi.SubItems[1].Text = ii.qty.ToString();
+                        lvi.SubItems[3].Text = (ii.item.cost * ii.qty).ToString();
                         lvi.SubItems[6].Text = DateTime.Now.ToString("yyyy-MM-dd, h:mm tt");
                         lvi.SubItems[6].Tag = DateTime.Now;
                         lvItems.Sort();
@@ -1481,6 +1491,36 @@ namespace Catonia_Item_Tracker
         private void BtnMods_Click(object sender, EventArgs e)
         {
             ///TODO: implement the mods sub-form
+            
+            string sql = @"
+update inventory
+set qty = qty-1
+where id = '475'
+
+insert into inventoryHistory
+select '475' as inventoryId, '1518' as itemId, GETDATE() as modificationDate, 'On Hand' as location, -1 as qty, 'Split into modded inventory id 476' as note, 'DESKTOP-586K34K' as clientName
+
+insert into inventory (itemid, location, qty)
+			   values ('1518', 'On Hand', 1)
+
+select max(id) from inventory where itemId = '1518'
+
+insert into inventoryHistory
+select '476' as inventoryId, '1518' as itemId, GETDATE() as modificationDate, 'On Hand' as location, 1 as qty, 'Created from inventory id 475' as note, 'DESKTOP-586K34K' as clientName
+
+update inventory
+set qty = qty-1
+where id = '474'
+
+insert into mods (inventoryId, subItemId)
+		  values ('476', '1919')
+
+insert into inventoryHistory
+select '474' as inventoryId, '1919' as itemId, GETDATE() as modificationDate, 'On Hand' as location, -1 as qty, 'Applied to inventory id 476' as note, 'DESKTOP-586K34K' as clientName
+
+insert into inventoryHistory
+select '476' as inventoryId, '1518' as itemId, GETDATE() as modificationDate, 'On Hand' as location, 0 as qty, 'Mod 1919 Applied' as note, 'DESKTOP-586K34K' as clientName
+";
         }
     }
 }

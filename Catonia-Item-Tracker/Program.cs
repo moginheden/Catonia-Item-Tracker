@@ -98,26 +98,26 @@ namespace Catonia_Item_Tracker
 
                 FrmLoading.setText("Loading Items from DB...");
                 //load loot
+                DataSet dsItems = new DataSet();
                 string selectLoot = @"SELECT *
 								  FROM items
 								  ORDER BY id";
-                using (SqlCommand comm = new SqlCommand(selectLoot, dataConnection))
+                using (SqlDataAdapter da = new SqlDataAdapter(selectLoot, dataConnection))
                 {
-                    using (SqlDataReader reader = comm.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            Item item = new Item();
-                            item.id = (int)reader["id"];
-                            item.name = (string)reader["name"];
-                            item.cost = (int)reader["cost"];
-                            item.description = (string)reader["description"];
-                            item.type = (string)reader["type"];
-                            item.subType = (string)reader["subType"];
+                    da.Fill(dsItems);
+                }
 
-                            items.Add(item.id, item);
-                        }
-                    }
+                foreach (DataRow row in dsItems.Tables[0].Rows)
+                {
+                    Item item = new Item();
+                    item.id = (int)row["id"];
+                    item.name = (string)row["name"];
+                    item.cost = (int)row["cost"];
+                    item.description = (string)row["description"];
+                    item.type = (string)row["type"];
+                    item.subType = (string)row["subType"];
+
+                    items.Add(item.id, item);
                 }
 
                 FrmLoading.setText("Loading Recipies from DB...");
@@ -132,7 +132,17 @@ namespace Catonia_Item_Tracker
                     da.Fill(dsRecipies);
                 }
 
-                foreach(DataRow row in dsRecipies.Tables[0].Rows)
+                DataSet dsRecipieIngredients = new DataSet();
+                string selectIngredients = @"SELECT *
+											 FROM recipieIngredients
+                                             ORDER BY recipieID";
+                using (SqlDataAdapter da = new SqlDataAdapter(selectIngredients, dataConnection))
+                {
+                    da.Fill(dsRecipieIngredients);
+                }
+
+                int iLine = 0;
+                foreach (DataRow row in dsRecipies.Tables[0].Rows)
                 { 
                     Recipie r = new Recipie();
                     r.id = (int)row["id"];
@@ -141,21 +151,20 @@ namespace Catonia_Item_Tracker
                     r.profession = (string)row["profession"];
                     r.crafterLevel = (string)row["crafterLevel"];
 
-                    string selectIngredients = @"SELECT *
-												FROM recipieIngredients
-												WHERE recipieID = '" + r.id + "'";
-                    using (SqlCommand commIngredients = new SqlCommand(selectIngredients, dataConnection))
+                    while(iLine < dsRecipieIngredients.Tables[0].Rows.Count)
                     {
-                        using (SqlDataReader reader = commIngredients.ExecuteReader())
+                        if(((int)dsRecipieIngredients.Tables[0].Rows[iLine]["recipieID"]) == r.id)
                         {
-                            while (reader.Read())
-                            {
-                                InventoryItem iq = new InventoryItem();
-                                iq.item = Program.items[(int)reader["ingredient"]];
-                                iq.qty = (int)reader["qty"];
-                                r.ingredients.Add(iq);
-                            }
+                            InventoryItem iq = new InventoryItem();
+                            iq.item = Program.items[(int)dsRecipieIngredients.Tables[0].Rows[iLine]["ingredient"]];
+                            iq.qty = (int)dsRecipieIngredients.Tables[0].Rows[iLine]["qty"];
+                            r.ingredients.Add(iq);
                         }
+                        else if(((int)dsRecipieIngredients.Tables[0].Rows[iLine]["recipieID"]) > r.id)
+                        {
+                            break;
+                        }
+                        iLine++;
                     }
 
                     recipies.Add(r);

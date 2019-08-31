@@ -12,7 +12,6 @@ namespace Catonia_Item_Tracker
         public Item item = null;
         public int qty = 0;
         public List<int> modsAttached = new List<int>();
-        public int attachedTo = int.MinValue;
 
         public override bool Equals(object a)
         {
@@ -59,8 +58,7 @@ namespace Catonia_Item_Tracker
             {
                 id = this.id,
                 item = this.item,
-                qty = this.qty,
-                attachedTo = this.attachedTo
+                qty = this.qty
             };
             newII.modsAttached = new List<int>(this.modsAttached);
             foreach (int i in this.modsAttached)
@@ -69,6 +67,18 @@ namespace Catonia_Item_Tracker
             }
 
             return newII;
+        }
+
+        public override string ToString()
+        {
+            //read mods
+            string mods = "";
+            foreach (int mod in this.modsAttached)
+            {
+                mods += " - " + Program.items[mod].name.Split(new string[] { " - " }, StringSplitOptions.RemoveEmptyEntries)[0];
+            }
+            
+            return this.item.ToString() + mods;
         }
     }
 }
