@@ -32,9 +32,10 @@ namespace Catonia_Item_Tracker
             txtDescription.Text = item.description;
             nudGoldValue.Value = item.cost;
             cbType.SelectedItem = item.type;
-            cbSubType.Text = item.subType;
 
             CbType_SelectedIndexChanged(null, null);
+
+            cbSubType.Text = item.subType;
         }
 
         private void btnSave_Click(object sender, EventArgs e)

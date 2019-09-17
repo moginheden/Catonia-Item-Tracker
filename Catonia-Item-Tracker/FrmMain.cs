@@ -1490,37 +1490,18 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void BtnMods_Click(object sender, EventArgs e)
         {
-            ///TODO: implement the mods sub-form
-            
-            string sql = @"
-update inventory
-set qty = qty-1
-where id = '475'
-
-insert into inventoryHistory
-select '475' as inventoryId, '1518' as itemId, GETDATE() as modificationDate, 'On Hand' as location, -1 as qty, 'Split into modded inventory id 476' as note, 'DESKTOP-586K34K' as clientName
-
-insert into inventory (itemid, location, qty)
-			   values ('1518', 'On Hand', 1)
-
-select max(id) from inventory where itemId = '1518'
-
-insert into inventoryHistory
-select '476' as inventoryId, '1518' as itemId, GETDATE() as modificationDate, 'On Hand' as location, 1 as qty, 'Created from inventory id 475' as note, 'DESKTOP-586K34K' as clientName
-
-update inventory
-set qty = qty-1
-where id = '474'
-
-insert into mods (inventoryId, subItemId)
-		  values ('476', '1919')
-
-insert into inventoryHistory
-select '474' as inventoryId, '1919' as itemId, GETDATE() as modificationDate, 'On Hand' as location, -1 as qty, 'Applied to inventory id 476' as note, 'DESKTOP-586K34K' as clientName
-
-insert into inventoryHistory
-select '476' as inventoryId, '1518' as itemId, GETDATE() as modificationDate, 'On Hand' as location, 0 as qty, 'Mod 1919 Applied' as note, 'DESKTOP-586K34K' as clientName
-";
+            if (lvItems.SelectedIndices.Count == 1)
+            {
+                FrmMods modForm = new FrmMods(((InventoryItem)lvItems.SelectedItems[0].Tag));
+                if (modForm.valid)
+                {
+                    modForm.Show();
+                }
+            }
+            else
+            {
+                MessageBox.Show("No item selected to mod", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
