@@ -161,5 +161,13 @@ namespace Catonia_Item_Tracker
                 Program.mainForm.selectInventoryItem(Program.mainForm.inventory.findLoot(((Recipie)lvRecipies.SelectedItems[0].Tag).result));
             }
         }
+
+        private void LvRecipies_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lvRecipies.SelectedItems.Count > 0)
+            {
+                txtDescription.Text = ((Recipie)lvRecipies.SelectedItems[0].Tag).result.description;
+            }
+        }
     }
 }

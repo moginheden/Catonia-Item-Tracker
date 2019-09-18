@@ -105,6 +105,11 @@ namespace Catonia_Item_Tracker
         private string oldSearch = "";
 
         /// <summary>
+        /// the previous value of the add items numeric up-down control
+        /// </summary>
+        private decimal oldNudAddItemsValue;
+
+        /// <summary>
         /// entry point
         /// </summary>
         public FrmMain()
@@ -963,6 +968,25 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
+        /// event handler for when the number to add has been changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NudAddItems_ValueChanged(object sender, EventArgs e)
+        {
+            if ((nudAddItems.Value < 0) && (oldNudAddItemsValue <= 0))
+            {
+                nudDeal.Value = 50;
+            }
+            else if ((nudAddItems.Value >= 0) && (oldNudAddItemsValue < 0))
+            {
+                nudDeal.Value = 100;
+            }
+            oldNudAddItemsValue = nudAddItems.Value;
+        }
+
+
+        /// <summary>
         /// event handler for the add items button
         /// </summary>
         /// <param name="sender"></param>
@@ -1023,7 +1047,7 @@ namespace Catonia_Item_Tracker
             int valuePerItem = (int)nudAddGold.Value;
             if (valuePerItem == 0)
             {
-                valuePerItem = iq.item.cost;
+                valuePerItem = (int)(iq.item.cost * nudDeal.Value / 100);
             }
             iiGold.qty -= valuePerItem * (int)nudAddItems.Value;
 

@@ -83,6 +83,8 @@
             this.btnCrafter = new System.Windows.Forms.Button();
             this.btnMods = new System.Windows.Forms.Button();
             this.addOrRemoveModToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nudDeal = new System.Windows.Forms.NumericUpDown();
+            this.lblDeal = new System.Windows.Forms.Label();
             this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
@@ -91,6 +93,7 @@
             this.gbItemManagment.SuspendLayout();
             this.cmsRecipieList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddItems)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDeal)).BeginInit();
             this.SuspendLayout();
             // 
             // txtSearch
@@ -182,7 +185,7 @@
             this.addOrRemoveModToolStripMenuItem});
             this.cmsItemList.Name = "cmsItemList";
             this.cmsItemList.ShowImageMargin = false;
-            this.cmsItemList.Size = new System.Drawing.Size(160, 92);
+            this.cmsItemList.Size = new System.Drawing.Size(160, 70);
             this.cmsItemList.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.CmsItemList_Closing);
             this.cmsItemList.Opening += new System.ComponentModel.CancelEventHandler(this.cmsItemList_Opening);
             // 
@@ -301,6 +304,8 @@
             // 
             this.gbItemManagment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbItemManagment.Controls.Add(this.lblDeal);
+            this.gbItemManagment.Controls.Add(this.nudDeal);
             this.gbItemManagment.Controls.Add(this.lvRecipiesUsingItem);
             this.gbItemManagment.Controls.Add(this.lblUsingItem);
             this.gbItemManagment.Controls.Add(this.btnBuy);
@@ -332,10 +337,10 @@
             this.lvRecipiesUsingItem.ContextMenuStrip = this.cmsRecipieList;
             this.lvRecipiesUsingItem.FullRowSelect = true;
             this.lvRecipiesUsingItem.HideSelection = false;
-            this.lvRecipiesUsingItem.Location = new System.Drawing.Point(9, 296);
+            this.lvRecipiesUsingItem.Location = new System.Drawing.Point(9, 346);
             this.lvRecipiesUsingItem.MultiSelect = false;
             this.lvRecipiesUsingItem.Name = "lvRecipiesUsingItem";
-            this.lvRecipiesUsingItem.Size = new System.Drawing.Size(369, 272);
+            this.lvRecipiesUsingItem.Size = new System.Drawing.Size(369, 237);
             this.lvRecipiesUsingItem.TabIndex = 15;
             this.lvRecipiesUsingItem.UseCompatibleStateImageBehavior = false;
             this.lvRecipiesUsingItem.View = System.Windows.Forms.View.Details;
@@ -392,7 +397,7 @@
             // 
             this.lblUsingItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblUsingItem.AutoSize = true;
-            this.lblUsingItem.Location = new System.Drawing.Point(6, 280);
+            this.lblUsingItem.Location = new System.Drawing.Point(6, 330);
             this.lblUsingItem.Name = "lblUsingItem";
             this.lblUsingItem.Size = new System.Drawing.Size(124, 13);
             this.lblUsingItem.TabIndex = 16;
@@ -402,7 +407,7 @@
             // 
             this.btnBuy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnBuy.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnBuy.Location = new System.Drawing.Point(88, 82);
+            this.btnBuy.Location = new System.Drawing.Point(88, 78);
             this.btnBuy.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
             this.btnBuy.Name = "btnBuy";
             this.btnBuy.Size = new System.Drawing.Size(65, 53);
@@ -415,7 +420,7 @@
             // 
             this.nudAddItems.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.nudAddItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudAddItems.Location = new System.Drawing.Point(159, 82);
+            this.nudAddItems.Location = new System.Drawing.Point(159, 78);
             this.nudAddItems.Maximum = new decimal(new int[] {
             -559939585,
             902409669,
@@ -430,12 +435,13 @@
             this.nudAddItems.Size = new System.Drawing.Size(219, 53);
             this.nudAddItems.TabIndex = 11;
             this.nudAddItems.ThousandsSeparator = true;
+            this.nudAddItems.ValueChanged += new System.EventHandler(this.NudAddItems_ValueChanged);
             // 
             // btnAddItems
             // 
             this.btnAddItems.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAddItems.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAddItems.Location = new System.Drawing.Point(9, 82);
+            this.btnAddItems.Location = new System.Drawing.Point(9, 78);
             this.btnAddItems.Name = "btnAddItems";
             this.btnAddItems.Size = new System.Drawing.Size(73, 53);
             this.btnAddItems.TabIndex = 10;
@@ -447,7 +453,7 @@
             // 
             this.btnMake.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnMake.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnMake.Location = new System.Drawing.Point(318, 264);
+            this.btnMake.Location = new System.Drawing.Point(318, 314);
             this.btnMake.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.btnMake.Name = "btnMake";
             this.btnMake.Size = new System.Drawing.Size(63, 28);
@@ -468,7 +474,7 @@
             this.lvRecipiesMakingItem.ContextMenuStrip = this.cmsRecipieList;
             this.lvRecipiesMakingItem.FullRowSelect = true;
             this.lvRecipiesMakingItem.HideSelection = false;
-            this.lvRecipiesMakingItem.Location = new System.Drawing.Point(9, 167);
+            this.lvRecipiesMakingItem.Location = new System.Drawing.Point(9, 217);
             this.lvRecipiesMakingItem.MultiSelect = false;
             this.lvRecipiesMakingItem.Name = "lvRecipiesMakingItem";
             this.lvRecipiesMakingItem.Size = new System.Drawing.Size(369, 94);
@@ -547,7 +553,7 @@
             // 
             this.lblMakingItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblMakingItem.AutoSize = true;
-            this.lblMakingItem.Location = new System.Drawing.Point(6, 151);
+            this.lblMakingItem.Location = new System.Drawing.Point(6, 201);
             this.lblMakingItem.Name = "lblMakingItem";
             this.lblMakingItem.Size = new System.Drawing.Size(132, 13);
             this.lblMakingItem.TabIndex = 7;
@@ -625,6 +631,37 @@
             this.addOrRemoveModToolStripMenuItem.Text = "Add or Remove Mod";
             this.addOrRemoveModToolStripMenuItem.Click += new System.EventHandler(this.AddOrRemoveModToolStripMenuItem_Click);
             // 
+            // nudDeal
+            // 
+            this.nudDeal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.nudDeal.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.nudDeal.Location = new System.Drawing.Point(159, 137);
+            this.nudDeal.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+            this.nudDeal.Name = "nudDeal";
+            this.nudDeal.Size = new System.Drawing.Size(219, 53);
+            this.nudDeal.TabIndex = 17;
+            this.nudDeal.ThousandsSeparator = true;
+            this.nudDeal.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // lblDeal
+            // 
+            this.lblDeal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblDeal.AutoSize = true;
+            this.lblDeal.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDeal.Location = new System.Drawing.Point(19, 150);
+            this.lblDeal.Name = "lblDeal";
+            this.lblDeal.Size = new System.Drawing.Size(134, 31);
+            this.lblDeal.TabIndex = 18;
+            this.lblDeal.Text = "% of price";
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -657,6 +694,7 @@
             this.gbItemManagment.PerformLayout();
             this.cmsRecipieList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudAddItems)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDeal)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -718,5 +756,7 @@
         private System.Windows.Forms.Button btnCrafter;
         private System.Windows.Forms.Button btnMods;
         private System.Windows.Forms.ToolStripMenuItem addOrRemoveModToolStripMenuItem;
+        private System.Windows.Forms.Label lblDeal;
+        private System.Windows.Forms.NumericUpDown nudDeal;
     }
 }

@@ -37,6 +37,8 @@
             this.numMade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numCanMake = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblRecipies = new System.Windows.Forms.Label();
+            this.txtDescription = new System.Windows.Forms.TextBox();
+            this.lblDescription = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblCrafterLevel
@@ -95,10 +97,11 @@
             this.lvRecipies.Location = new System.Drawing.Point(16, 60);
             this.lvRecipies.MultiSelect = false;
             this.lvRecipies.Name = "lvRecipies";
-            this.lvRecipies.Size = new System.Drawing.Size(774, 378);
+            this.lvRecipies.Size = new System.Drawing.Size(774, 354);
             this.lvRecipies.TabIndex = 45;
             this.lvRecipies.UseCompatibleStateImageBehavior = false;
             this.lvRecipies.View = System.Windows.Forms.View.Details;
+            this.lvRecipies.SelectedIndexChanged += new System.EventHandler(this.LvRecipies_SelectedIndexChanged);
             this.lvRecipies.DoubleClick += new System.EventHandler(this.LvRecipies_DoubleClick);
             // 
             // result
@@ -123,11 +126,33 @@
             this.lblRecipies.TabIndex = 46;
             this.lblRecipies.Text = "Recipies:";
             // 
+            // txtDescription
+            // 
+            this.txtDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtDescription.Location = new System.Drawing.Point(16, 433);
+            this.txtDescription.Multiline = true;
+            this.txtDescription.Name = "txtDescription";
+            this.txtDescription.Size = new System.Drawing.Size(774, 95);
+            this.txtDescription.TabIndex = 47;
+            // 
+            // lblDescription
+            // 
+            this.lblDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblDescription.AutoSize = true;
+            this.lblDescription.Location = new System.Drawing.Point(13, 417);
+            this.lblDescription.Name = "lblDescription";
+            this.lblDescription.Size = new System.Drawing.Size(105, 13);
+            this.lblDescription.TabIndex = 48;
+            this.lblDescription.Text = "Description of Result";
+            // 
             // FrmCrafter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(802, 450);
+            this.ClientSize = new System.Drawing.Size(802, 540);
+            this.Controls.Add(this.lblDescription);
+            this.Controls.Add(this.txtDescription);
             this.Controls.Add(this.lvRecipies);
             this.Controls.Add(this.lblRecipies);
             this.Controls.Add(this.lblCrafterLevel);
@@ -152,5 +177,7 @@
         private System.Windows.Forms.ColumnHeader numMade;
         private System.Windows.Forms.ColumnHeader numCanMake;
         private System.Windows.Forms.Label lblRecipies;
+        private System.Windows.Forms.TextBox txtDescription;
+        private System.Windows.Forms.Label lblDescription;
     }
 }
