@@ -200,7 +200,7 @@ namespace Catonia_Item_Tracker
 
                                         /// TODO: deal with other clients adding an inventory id that this client doesn't have yet
 
-                                        /// TODO: deal with other clients adding a mod that this client doesn't have yet (qty 0)
+                                        /// TODO: deal with other clients adding/editing a mod/item/inventoryItem that this client doesn't have yet (qty 0, reload everything related to the item)
 
                                         //look for a HistoryRecord that matches, but allow a 10 millisecond variance due to SQL truncating dates
                                         HistoryRecord hrToUpdate = history.SingleOrDefault(x =>
@@ -402,10 +402,9 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
-        /// Finds the non-modded version of an InventoryItem in the loot list based on it's item's id, (likley way off it's list index due to add/delete.)
+        /// Finds the non-modded version of an InventoryItem in the loot list
         /// </summary>
-        /// <param name="lootID">the DB id of the loot item</param>
-        /// <exception cref="IndexOutOfRangeException">If the id isn't found</exception>
+        /// <param name="toFind">the Item to find</param>
         public InventoryItem findLoot(Item toFind)
         {
             return loot.First(x => (x.Value.item.id == toFind.id) && (x.Value.modsAttached.Count == 0)).Value;

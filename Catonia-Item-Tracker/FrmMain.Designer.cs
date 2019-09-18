@@ -82,6 +82,7 @@
             this.ddlInventories = new System.Windows.Forms.ComboBox();
             this.btnCrafter = new System.Windows.Forms.Button();
             this.btnMods = new System.Windows.Forms.Button();
+            this.addOrRemoveModToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
@@ -177,24 +178,25 @@
             // 
             this.cmsItemList.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.editItemToolStripMenuItem,
-            this.createNewItemToolStripMenuItem});
+            this.createNewItemToolStripMenuItem,
+            this.addOrRemoveModToolStripMenuItem});
             this.cmsItemList.Name = "cmsItemList";
             this.cmsItemList.ShowImageMargin = false;
-            this.cmsItemList.Size = new System.Drawing.Size(138, 48);
+            this.cmsItemList.Size = new System.Drawing.Size(160, 92);
             this.cmsItemList.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.CmsItemList_Closing);
             this.cmsItemList.Opening += new System.ComponentModel.CancelEventHandler(this.cmsItemList_Opening);
             // 
             // editItemToolStripMenuItem
             // 
             this.editItemToolStripMenuItem.Name = "editItemToolStripMenuItem";
-            this.editItemToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.editItemToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             this.editItemToolStripMenuItem.Text = "Edit Item";
             this.editItemToolStripMenuItem.Click += new System.EventHandler(this.editItemToolStripMenuItem_Click);
             // 
             // createNewItemToolStripMenuItem
             // 
             this.createNewItemToolStripMenuItem.Name = "createNewItemToolStripMenuItem";
-            this.createNewItemToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.createNewItemToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             this.createNewItemToolStripMenuItem.Text = "Create New Item";
             this.createNewItemToolStripMenuItem.Click += new System.EventHandler(this.createNewItemToolStripMenuItem_Click);
             // 
@@ -616,6 +618,13 @@
             this.btnMods.UseVisualStyleBackColor = true;
             this.btnMods.Click += new System.EventHandler(this.BtnMods_Click);
             // 
+            // addOrRemoveModToolStripMenuItem
+            // 
+            this.addOrRemoveModToolStripMenuItem.Name = "addOrRemoveModToolStripMenuItem";
+            this.addOrRemoveModToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.addOrRemoveModToolStripMenuItem.Text = "Add or Remove Mod";
+            this.addOrRemoveModToolStripMenuItem.Click += new System.EventHandler(this.AddOrRemoveModToolStripMenuItem_Click);
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -708,5 +717,6 @@
         private System.Windows.Forms.ColumnHeader colLastUpdated;
         private System.Windows.Forms.Button btnCrafter;
         private System.Windows.Forms.Button btnMods;
+        private System.Windows.Forms.ToolStripMenuItem addOrRemoveModToolStripMenuItem;
     }
 }

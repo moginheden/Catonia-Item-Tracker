@@ -195,25 +195,38 @@ namespace Catonia_Item_Tracker
         {
             try
             {
+                //a difference of 0 is used to specify a full re-read of all items, recipies, and inventoryitems for a given item.
+                updateItemQtyWithHistory(inventory.findLoot(item), 0);
+
                 //update main item list
                 lvItems.BeginUpdate();
 
-                //try to update an existing row
-                bool found = false;
+                //find all rows that should be updated
+                List<InventoryItem> found = new List<InventoryItem>();
+                foreach (KeyValuePair<int, InventoryItem> kvp in inventory.loot)
+                {
+                    if(kvp.Value.item.id == item.id)
+                    {
+                        found.Add(kvp.Value);
+                    }
+                }
+
+                //try to update existing rows
                 foreach (ListViewItem row in lvItems.Items)
                 {
-                    if (((InventoryItem)row.Tag).item.id == item.id)
+                    InventoryItem tag = (InventoryItem)row.Tag;
+                    if (tag.item.id == item.id)
                     {
                         //update row
-                        row.SubItems[0].Text = ((InventoryItem)row.Tag).ToString();
-                        row.SubItems[1].Text = ((InventoryItem)row.Tag).qty.ToString();
+                        row.SubItems[0].Text = tag.ToString();
+                        row.SubItems[1].Text = tag.qty.ToString();
                         row.SubItems[2].Text = item.cost.ToString();
-                        row.SubItems[3].Text = (item.cost * ((InventoryItem)row.Tag).qty).ToString();
+                        row.SubItems[3].Text = (item.cost * tag.qty).ToString();
                         row.SubItems[4].Text = getProfessionsForItem(item);
                         row.SubItems[5].Text = item.TypeAbbreviation();
                         row.SubItems[6].Text = DateTime.Now.ToString("yyyy-MM-dd, h:mm tt");
                         row.SubItems[6].Tag = DateTime.Now;
-                        found = true;
+                        found.Remove(tag);
 
                         //select new item
                         lvItems.SelectedItems.Clear();
@@ -223,11 +236,9 @@ namespace Catonia_Item_Tracker
                     }
                 }
 
-                //if no row is found, add a new one at the bottom
-                if (!found)
+                //if an InventoryItem wasn't found yet, add a new row for it at the bottom
+                foreach (InventoryItem iq in found)
                 {
-                    InventoryItem iq = inventory.findLoot(item);
-
                     //create new row
                     DateTime lastMod = inventory.getLatestModification(iq.item.id);
                     ListViewItem row = new ListViewItem(new string[] { iq.ToString(),
@@ -292,12 +303,12 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// selects a specific item
         /// </summary>
-        /// <param name="item"></param>
-        internal void selectItem(Item item)
+        /// <param name="ii"></param>
+        internal void selectInventoryItem(InventoryItem ii)
         {
             foreach (ListViewItem row in lvItems.Items)
             {
-                if (((InventoryItem)row.Tag).item.id == item.id)
+                if (((InventoryItem)row.Tag).id == ii.id)
                 {
                     lvItems.SelectedItems.Clear();
                     row.Selected = true;
@@ -709,7 +720,6 @@ namespace Catonia_Item_Tracker
         /// <param name="itemToSearch">the id of the item to limit the history to, (use the default of -1 for all)</param>
         private void generateHistory(int itemToSearch = -1)
         {
-            /// TODO: limit this generation to only updating the top couple of rows instead of re-generating everything every time
             IEnumerator<HistoryRecord> rows = inventory.getHistory();
 
             List<ListViewItem> rowsToAdd = new List<ListViewItem>(inventory.countHistory());
@@ -749,38 +759,61 @@ namespace Catonia_Item_Tracker
                 r = (Recipie)lvRecipiesUsingItem.SelectedItems[0].Tag;
             }
 
-            if(r != null)
+            if (r != null)
             {
-                InventoryItem result = inventory.findLoot(r.result);
-                using (new TriggerLock())
+                if (craftRecipie(r))
                 {
-                    //check we have enough ingredients
-                    foreach (InventoryItem i in r.ingredients)
-                    {
-                        InventoryItem ingredient = inventory.findLoot(i.item);
-                        if(ingredient.qty < i.qty)
-                        {
-                            MessageBox.Show("Unable to craft " + result.item.name + ". Not enough " + i.item.name + " " + inventory.location, "Crafting", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-                    }
+                    MessageBox.Show("Crafted " + r.resultQty + " " + r.result.name + " using " + r.crafterLevel.Substring(2) + " " + r.profession, "Crafting", MessageBoxButtons.OK, MessageBoxIcon.None);
+                }
+            }
+        }
 
-                    //remove the ingredients used
-                    foreach (InventoryItem i in r.ingredients)
-                    {
-                        InventoryItem ingredient = inventory.findLoot(i.item);
-                        updateItemQtyWithHistory(ingredient, i.qty * -1);
-                    }
+        /// <summary>
+        /// removes the ingredients of a recipie and creates it's result
+        /// </summary>
+        /// <param name="r">The recipie to follow</param>
+        /// <returns>If crafting was successful</returns>
+        public bool craftRecipie(Recipie r)
+        {
+            InventoryItem result = inventory.findLoot(r.result);
+            using (new TriggerLock())
+            {
+                //check we have enough ingredients
+                foreach (InventoryItem i in r.ingredients)
+                {
+                    InventoryItem ingredientInInventory = inventory.findLoot(i.item);
 
-                    //create item
-                    updateItemQtyWithHistory(result, r.resultQty);
+                    if (ingredientInInventory.qty < i.qty)
+                    {
+                        MessageBox.Show("Unable to craft " + result.item.name 
+                                                           + ". You need " 
+                                                           + (i.qty - ingredientInInventory.qty) 
+                                                           + " more " 
+                                                           + i.item.name 
+                                                           + " " 
+                                                           + inventory.location, 
+                                        "Crafting", 
+                                        MessageBoxButtons.OK, 
+                                        MessageBoxIcon.Error);
+                        return false;
+                    }
                 }
 
-                //update the right panel
-                lvItems_SelectedIndexChanged(null, null);
+                //remove the ingredients used
+                foreach (InventoryItem i in r.ingredients)
+                {
+                    InventoryItem ingredient = inventory.findLoot(i.item);
+                    updateItemQtyWithHistory(ingredient, i.qty * -1);
+                }
 
-                MessageBox.Show("Crafted " + r.resultQty + " " + result.item.name + " using " + r.crafterLevel.Substring(2) + " " + r.profession, "Crafting", MessageBoxButtons.OK, MessageBoxIcon.None);
+                //create item
+                updateItemQtyWithHistory(result, r.resultQty);
             }
+
+            //update the right panel
+            lvItems_SelectedIndexChanged(null, null);
+
+            return true;
         }
 
         /// <summary>
@@ -788,8 +821,17 @@ namespace Catonia_Item_Tracker
         /// </summary>
         /// <param name="iq"></param>
         /// <param name="difference"></param>
-        private void updateItemQtyWithHistory(InventoryItem iq, int difference)
+        /// <returns>If the quantity can be changed, (negatives arn't allowed.)</returns>
+        public bool updateItemQtyWithHistory(InventoryItem iq, int difference)
         {
+            if((iq.qty + difference) < 0)
+            {
+                MessageBox.Show("Error: negative quantity for " + iq.item.name + " in " + inventory.location,
+                                        "Crafting",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error);
+                return false;
+            }
             HistoryRecord hr = new HistoryRecord();
             hr.ii = iq;
             hr.qtyChanged = difference;
@@ -799,6 +841,8 @@ namespace Catonia_Item_Tracker
             iq.qty += difference;
 
             updateItemQty(iq);
+
+            return true;
         }
 
         /// <summary>
@@ -873,7 +917,6 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void nudOwned_ValueChanged(object sender, EventArgs e)
         {
-            /// TODO: look into 2nd window not always capturing a change soon after another one
             if (TriggerLock.IsLocked)
             {
                 return;
@@ -914,6 +957,9 @@ namespace Catonia_Item_Tracker
 
             //update the right panel
             lvItems_SelectedIndexChanged(null, null);
+
+            //scroll into view
+            lvItems.SelectedItems[0].EnsureVisible();
         }
 
         /// <summary>
@@ -1180,7 +1226,7 @@ namespace Catonia_Item_Tracker
             else if (lvItems.SelectedItems.Count == 1)
             {
                 cmsItemList.ShowCheckMargin = false;
-                cmsItemList.Items.AddRange(new ToolStripItem[] { editItemToolStripMenuItem, createNewRecipieToolStripMenuItem });
+                cmsItemList.Items.AddRange(new ToolStripItem[] { editItemToolStripMenuItem, createNewRecipieToolStripMenuItem, addOrRemoveModToolStripMenuItem });
             }
             else
             {
@@ -1340,6 +1386,20 @@ namespace Catonia_Item_Tracker
         {
             FrmRecipie recipieForm = new FrmRecipie();
             recipieForm.Show();
+        }
+
+        /// <summary>
+        /// event handfler for the context menu right click option of add or remove mods
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddOrRemoveModToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmMods modForm = new FrmMods(((InventoryItem)lvItems.SelectedItems[0].Tag));
+            if (modForm.valid)
+            {
+                modForm.Show();
+            }
         }
 
         /// <summary>

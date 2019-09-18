@@ -129,6 +129,8 @@ namespace Catonia_Item_Tracker
             }
             
             lbItemSearch.ResumeLayout();
+
+            lbItemSearch_SelectedIndexChanged(null, null);
         }
 
         /// <summary>
@@ -196,7 +198,6 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void lbItemSearch_SelectedIndexChanged(object sender, EventArgs e)
         {
-            /// TODO: check why this isn't called when the search eliminates the current item
             if (lbItemSearch.SelectedItems.Count == 0)
             {
                 txtDescription.Text = "";

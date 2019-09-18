@@ -158,7 +158,7 @@ namespace Catonia_Item_Tracker
         {
             if(lvRecipies.SelectedItems.Count > 0)
             {
-                Program.mainForm.selectItem(((Recipie)lvRecipies.SelectedItems[0].Tag).result);
+                Program.mainForm.selectInventoryItem(Program.mainForm.inventory.findLoot(((Recipie)lvRecipies.SelectedItems[0].Tag).result));
             }
         }
     }

@@ -136,8 +136,6 @@ namespace Catonia_Item_Tracker
                 {
                     dataConnection.Open();
 
-                    ///TODO: look into why stonemason subtype isn't saving on ash granite light armour mod
-
                     string selectSql = @"SELECT DISTINCT subType
                                          FROM items
                                          WHERE type = '" + type.Replace("'", "") + @"'";

@@ -13,7 +13,7 @@ namespace Catonia_Item_Tracker
 {
     public partial class FrmMods : Form
     {
-        private readonly InventoryItem ii = null;
+        private InventoryItem ii = null;
         private readonly int defaultSkillRight;
 
         public readonly bool valid;
@@ -53,6 +53,7 @@ namespace Catonia_Item_Tracker
             {
                 string[] columns = { Program.items[mod].name, Program.items[mod].type, Program.items[mod].subType };
                 ListViewItem lvi = new ListViewItem(columns);
+                lvi.Tag = Program.items[mod];
                 lvCurrentMods.Items.Add(lvi);
             }
 
@@ -149,7 +150,6 @@ namespace Catonia_Item_Tracker
             lvMaterials.BeginUpdate();
             lvMaterials.Items.Clear();
 
-            ///TODO: check what happens if there has never been any of the mod in the current inventory
             InventoryItem mod = Program.mainForm.inventory.findLoot(modItem);
             foreach (Recipie r in Program.recipies)
             {
@@ -190,6 +190,21 @@ namespace Catonia_Item_Tracker
         {
             Item modItem = (Item)cbMod.SelectedItem;
 
+            //check for pre-existing mods
+            foreach(int currModId in ii.modsAttached)
+            {
+                Item currMod = Program.items[currModId];
+                if (modItem.subType == currMod.subType)
+                {
+                    MessageBox.Show("Error: item already has a mod of type " + currMod.subType + ".\r\nRecover materials first before applying a new mod",
+                                   "Crafting",
+                                   MessageBoxButtons.OK,
+                                   MessageBoxIcon.Error);
+                    return;
+                }
+            }
+            
+
             //make the mod, (if we are applying the mod the button will say "Apply")
             if (btnCraft.Text == "Craft")
             {
@@ -197,82 +212,205 @@ namespace Catonia_Item_Tracker
                 {
                     if (r.result.id == modItem.id)
                     {
-                        //make sure we have enough
-                        foreach (InventoryItem ingredient in r.ingredients)
+                        if(!Program.mainForm.craftRecipie(r))
                         {
-                            InventoryItem ingredientInInventory = Program.mainForm.inventory.findLoot(ingredient.item);
-                            if(ingredientInInventory.qty < ingredient.qty)
-                            {
-                                MessageBox.Show("You need " + (ingredient.qty - ingredientInInventory.qty) + " more " + ingredient.item.name, 
-                                                "Error", 
-                                                MessageBoxButtons.OK, 
-                                                MessageBoxIcon.Error);
-                                return;
-                            }
-                        }
-
-                        //reduce qty of materials
-                        foreach (InventoryItem ingredient in r.ingredients)
-                        {
-                            InventoryItem ingredientInInventory = Program.mainForm.inventory.findLoot(ingredient.item);
-                            
-                            ///TODO: implement this
+                            return;
                         }
                         break;
                     }
                 }
             }
 
-
-
-            string sql;
-            sql = @"
-update inventory
-set qty = qty-1
-where id = '475'
-
-insert into inventoryHistory
-select '475' as inventoryId, '1518' as itemId, GETDATE() as modificationDate, 'On Hand' as location, -1 as qty, 'Split into modded inventory id 476' as note, 'DESKTOP-586K34K' as clientName
-
-insert into inventory (itemid, location, qty)
-			   values ('1518', 'On Hand', 1)
-
-select max(id) from inventory where itemId = '1518'
-
-insert into inventoryHistory
-select '476' as inventoryId, '1518' as itemId, GETDATE() as modificationDate, 'On Hand' as location, 1 as qty, 'Created from inventory id 475' as note, 'DESKTOP-586K34K' as clientName
-
-update inventory
-set qty = qty-1
-where id = '474'
-
-insert into mods (inventoryId, subItemId)
-		  values ('476', '1919')
-
-insert into inventoryHistory
-select '474' as inventoryId, '1919' as itemId, GETDATE() as modificationDate, 'On Hand' as location, -1 as qty, 'Applied to inventory id 476' as note, 'DESKTOP-586K34K' as clientName
-
-insert into inventoryHistory
-select '476' as inventoryId, '1518' as itemId, GETDATE() as modificationDate, 'On Hand' as location, 0 as qty, 'Mod 1919 Applied' as note, 'DESKTOP-586K34K' as clientName
-";
-
-            using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
+            using (new TriggerLock())
             {
-                dataConnection.Open();
-                using (SqlCommand comm = new SqlCommand(sql, dataConnection))
+                if (ii.qty <= 0)
                 {
-                    //comm.ExecuteNonQuery();
+                    MessageBox.Show("Error: no " + ii.item.name + " in " + Program.mainForm.inventory.location,
+                                    "Crafting",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                    return;
                 }
 
-                //Program.mainForm.updateItem(item);
-            }
+                InventoryItem mod = Program.mainForm.inventory.findLoot(modItem);
+                if (Program.mainForm.updateItemQtyWithHistory(mod, -1))
+                {
+                    Program.mainForm.updateItemQtyWithHistory(ii, -1);
 
-            this.Close();
+                    //look for an exact match in existing items
+                    foreach(KeyValuePair<int, InventoryItem> currII in Program.mainForm.inventory.loot)
+                    {
+                        if((currII.Value.item.id == ii.item.id) && (currII.Value.modsAttached.Count == (ii.modsAttached.Count + 1)))
+                        {
+                            bool good = true;
+                            foreach(int currMod in ii.modsAttached)
+                            {
+                                if(!currII.Value.modsAttached.Contains(currMod))
+                                {
+                                    good = false;
+                                }
+                            }
+
+                            //we found an exact match to what we are trying to produce, use it
+                            if(good)
+                            {
+                                //add one of the fully modded version
+                                Program.mainForm.updateItemQtyWithHistory(currII.Value, 1);
+
+                                //select the fully modded version
+                                Program.mainForm.selectInventoryItem(currII.Value);
+
+                                //update the form to use the fully modded item in the main window
+                                ii = currII.Value;
+                                loadCurrentMods();
+
+                                return;
+                            }
+                        }
+                    }
+
+                    //no exact match found, make a new one
+                    string sqlMakeInventoryItem = @"insert into inventory (itemid, location, qty)
+			                                                       values ('" + ii.item.id + "', '" + Program.mainForm.inventory.location.Replace("'", "''") + "', 1)";
+                    string sqlFindInventoryItem = @"select max(id) 
+                                                    from inventory 
+                                                    where itemId = '" + ii.item.id + @"'
+                                                      and location = '" + Program.mainForm.inventory.location.Replace("'", "''") + "'";
+                    using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
+                    {
+                        dataConnection.Open();
+
+                        //create the inventory item
+                        using(SqlCommand comm = new SqlCommand(sqlMakeInventoryItem, dataConnection))
+                        {
+                            comm.ExecuteNonQuery();
+                        }
+
+                        //find the id of the inventory item
+                        int newIIid = -1;
+                        using(SqlCommand comm = new SqlCommand(sqlFindInventoryItem, dataConnection))
+                        {
+                            newIIid = (int)comm.ExecuteScalar();
+                        }
+
+                        //apply the new mod to the new item
+                        string sqlApplyMod = @"insert into mods (inventoryId, subItemId)
+		                                                 values ('" + newIIid + "', '" + modItem.id + "')";
+                        using (SqlCommand comm = new SqlCommand(sqlApplyMod, dataConnection))
+                        {
+                            comm.ExecuteNonQuery();
+                        }
+
+                        InventoryItem iiNewItem = new InventoryItem();
+                        iiNewItem.id = newIIid;
+                        iiNewItem.item = ii.item;
+                        iiNewItem.qty = 1;
+                        iiNewItem.modsAttached.Add(modItem.id);
+
+                        foreach(int oldMod in ii.modsAttached)
+                        {
+                            iiNewItem.modsAttached.Add(oldMod);
+                            sqlApplyMod = @"insert into mods (inventoryId, subItemId)
+		                                              values ('" + newIIid + "', '" + oldMod + "')";
+                            using (SqlCommand comm = new SqlCommand(sqlApplyMod, dataConnection))
+                            {
+                                comm.ExecuteNonQuery();
+                            }
+                        }
+
+                        Program.mainForm.inventory.loot.Add(newIIid, iiNewItem);
+
+                        //update UI and 0 change history record to force change through to other clients
+                        Program.mainForm.updateItem(ii.item);
+
+                        //select the newly modded version in the main window
+                        Program.mainForm.selectInventoryItem(iiNewItem);
+
+                        //update the form to use the newly modded item
+                        ii = iiNewItem;
+                        loadCurrentMods();
+                    }
+                }
+            }
         }
 
         private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void BtnRecover_Click(object sender, EventArgs e)
+        {
+            if(lvCurrentMods.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Error: no mod selected to recover from",
+                                "Crafting",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return;
+            }
+
+            using (new TriggerLock())
+            {
+                //find the mod we are removing
+                Item modItem = (Item)lvCurrentMods.SelectedItems[0].Tag;
+
+                //reduce the quantity of the fully modded version
+                Program.mainForm.updateItemQtyWithHistory(ii, -1);
+
+                //add the ingredients back
+                foreach (Recipie r in Program.recipies)
+                {
+                    if (r.result.id == modItem.id)
+                    {
+                        foreach (InventoryItem i in r.ingredients)
+                        {
+                            InventoryItem ingredient = Program.mainForm.inventory.findLoot(i.item);
+                            Program.mainForm.updateItemQtyWithHistory(ingredient, i.qty);
+                        }
+
+                        //only undo the first recipie that could have made this mod
+                        break;
+                    }
+                }
+
+                //find the version of this item without the given mod
+                foreach (KeyValuePair<int, InventoryItem> currII in Program.mainForm.inventory.loot)
+                {
+                    if ((currII.Value.item.id == ii.item.id) && (currII.Value.modsAttached.Count == (ii.modsAttached.Count - 1)))
+                    {
+                        bool good = true;
+                        foreach (int currMod in ii.modsAttached)
+                        {
+                            if ((currMod != modItem.id) && (!currII.Value.modsAttached.Contains(currMod)))
+                            {
+                                good = false;
+                            }
+                        }
+
+                        //we found an exact match to what we are trying to produce, use it
+                        if (good)
+                        {
+                            //add one of the less modded version
+                            Program.mainForm.updateItemQtyWithHistory(currII.Value, 1);
+
+                            //select the less modded version
+                            Program.mainForm.selectInventoryItem(currII.Value);
+
+                            //update the form to use the fully modded item in the main window
+                            ii = currII.Value;
+                            loadCurrentMods();
+
+                            return;
+                        }
+                    }
+                }
+
+
+                ///TODO: implement the removal of mods in a combo that doesn't match the order we added them
+                //if we got here then no version of the item has the given combination of mods.  We need to make it
+                throw new NotImplementedException();
+            }
         }
     }
 }

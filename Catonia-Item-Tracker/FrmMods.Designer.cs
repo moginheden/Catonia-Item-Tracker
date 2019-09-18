@@ -47,9 +47,9 @@
             this.lvMaterials = new System.Windows.Forms.ListView();
             this.chNewName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chNewQtyNeeded = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.chNewQtyAvailable = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label1 = new System.Windows.Forms.Label();
             this.lblSkill = new System.Windows.Forms.Label();
-            this.chNewQtyAvailable = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // txtItemName
@@ -230,6 +230,7 @@
             this.btnRecover.TabIndex = 16;
             this.btnRecover.Text = "Recover Materials";
             this.btnRecover.UseVisualStyleBackColor = true;
+            this.btnRecover.Click += new System.EventHandler(this.BtnRecover_Click);
             // 
             // lvMaterials
             // 
@@ -256,6 +257,11 @@
             this.chNewQtyNeeded.Text = "# Needed";
             this.chNewQtyNeeded.Width = 65;
             // 
+            // chNewQtyAvailable
+            // 
+            this.chNewQtyAvailable.Text = "# Available";
+            this.chNewQtyAvailable.Width = 71;
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -277,11 +283,6 @@
             this.lblSkill.TabIndex = 19;
             this.lblSkill.Text = "Requires Apprentice (2) Stonemason";
             this.lblSkill.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // chNewQtyAvailable
-            // 
-            this.chNewQtyAvailable.Text = "# Available";
-            this.chNewQtyAvailable.Width = 71;
             // 
             // FrmMods
             // 
