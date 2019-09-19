@@ -92,7 +92,7 @@ namespace Catonia_Item_Tracker
         /// <summary>
         /// reference to the loot item "Gold" for use in the numeric up/down field
         /// </summary>
-        private InventoryItem iiGold = Program.inventories["On Hand"].loot[0];
+        private InventoryItem iiGold = Program.inventories["On Hand"].loot.First().Value;
 
         /// <summary>
         /// The inventory list this form is currently using
@@ -222,11 +222,12 @@ namespace Catonia_Item_Tracker
                     InventoryItem tag = (InventoryItem)row.Tag;
                     if (tag.item.id == item.id)
                     {
+                        
                         //update row
                         row.SubItems[0].Text = tag.ToString();
                         row.SubItems[1].Text = tag.qty.ToString();
-                        row.SubItems[2].Text = item.cost.ToString();
-                        row.SubItems[3].Text = (item.cost * tag.qty).ToString();
+                        row.SubItems[2].Text = tag.value().ToString();
+                        row.SubItems[3].Text = (tag.value() * tag.qty).ToString();
                         row.SubItems[4].Text = getProfessionsForItem(item);
                         row.SubItems[5].Text = item.TypeAbbreviation();
                         row.SubItems[6].Text = DateTime.Now.ToString("yyyy-MM-dd, h:mm tt");
@@ -248,8 +249,8 @@ namespace Catonia_Item_Tracker
                     DateTime lastMod = inventory.getLatestModification(iq.item.id);
                     ListViewItem row = new ListViewItem(new string[] { iq.ToString(),
                                                                    iq.qty.ToString(),
-                                                                   item.cost.ToString(),
-                                                                   (item.cost * iq.qty).ToString(),
+                                                                   iq.value().ToString(),
+                                                                   (iq.value() * iq.qty).ToString(),
                                                                    getProfessionsForItem(item),
                                                                    item.TypeAbbreviation(),
                                                                    lastMod.ToString("yyyy-MM-dd, h:mm tt") });
@@ -390,8 +391,8 @@ namespace Catonia_Item_Tracker
                         DateTime lastMod = inventory.getLatestModification(iq.item.id);
                         ListViewItem row = new ListViewItem(new string[] { iq.ToString(),
                                                                        iq.qty.ToString(),
-                                                                       iq.item.cost.ToString(),
-                                                                       (iq.item.cost * iq.qty).ToString(),
+                                                                       iq.value().ToString(),
+                                                                       (iq.value() * iq.qty).ToString(),
                                                                        getProfessionsForItem(iq.item),
                                                                        iq.item.TypeAbbreviation(),
                                                                        lastMod.ToString("yyyy-MM-dd, h:mm tt")});
@@ -1047,7 +1048,7 @@ namespace Catonia_Item_Tracker
             int valuePerItem = (int)nudAddGold.Value;
             if (valuePerItem == 0)
             {
-                valuePerItem = (int)(iq.item.cost * nudDeal.Value / 100);
+                valuePerItem = (int)(iq.value() * nudDeal.Value / 100);
             }
             iiGold.qty -= valuePerItem * (int)nudAddItems.Value;
 
@@ -1131,7 +1132,7 @@ namespace Catonia_Item_Tracker
                     {
                         lvItems.BeginUpdate();
                         lvi.SubItems[1].Text = ii.qty.ToString();
-                        lvi.SubItems[3].Text = (ii.item.cost * ii.qty).ToString();
+                        lvi.SubItems[3].Text = (ii.value() * ii.qty).ToString();
                         lvi.SubItems[6].Text = DateTime.Now.ToString("yyyy-MM-dd, h:mm tt");
                         lvi.SubItems[6].Tag = DateTime.Now;
                         lvItems.Sort();

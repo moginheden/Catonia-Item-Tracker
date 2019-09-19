@@ -329,6 +329,7 @@ namespace Catonia_Item_Tracker
                         //update the form to use the newly modded item
                         ii = iiNewItem;
                         loadCurrentMods();
+                        CbMod_SelectedIndexChanged(null, null);
                     }
                 }
             }
@@ -400,6 +401,7 @@ namespace Catonia_Item_Tracker
                             //update the form to use the fully modded item in the main window
                             ii = currII.Value;
                             loadCurrentMods();
+                            CbMod_SelectedIndexChanged(null, null);
 
                             return;
                         }
@@ -407,9 +409,65 @@ namespace Catonia_Item_Tracker
                 }
 
 
-                ///TODO: implement the removal of mods in a combo that doesn't match the order we added them
                 //if we got here then no version of the item has the given combination of mods.  We need to make it
-                throw new NotImplementedException();
+                string sqlMakeInventoryItem = @"insert into inventory (itemid, location, qty)
+			                                                       values ('" + ii.item.id + "', '" + Program.mainForm.inventory.location.Replace("'", "''") + "', 1)";
+                string sqlFindInventoryItem = @"select max(id) 
+                                                    from inventory 
+                                                    where itemId = '" + ii.item.id + @"'
+                                                      and location = '" + Program.mainForm.inventory.location.Replace("'", "''") + "'";
+                using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
+                {
+                    dataConnection.Open();
+
+                    //create the inventory item
+                    using (SqlCommand comm = new SqlCommand(sqlMakeInventoryItem, dataConnection))
+                    {
+                        comm.ExecuteNonQuery();
+                    }
+
+                    //find the id of the inventory item
+                    int newIIid = -1;
+                    using (SqlCommand comm = new SqlCommand(sqlFindInventoryItem, dataConnection))
+                    {
+                        newIIid = (int)comm.ExecuteScalar();
+                    }
+
+                    //make the item in local classes
+                    InventoryItem iiNewItem = new InventoryItem();
+                    iiNewItem.id = newIIid;
+                    iiNewItem.item = ii.item;
+                    iiNewItem.qty = 1;
+
+                    //apply the other mods
+                    foreach (int oldMod in ii.modsAttached)
+                    {
+                        if (oldMod != modItem.id)
+                        {
+                            iiNewItem.modsAttached.Add(oldMod);
+                            string sqlApplyMod = @"insert into mods (inventoryId, subItemId)
+		                                                 values ('" + newIIid + "', '" + oldMod + "')";
+                            using (SqlCommand comm = new SqlCommand(sqlApplyMod, dataConnection))
+                            {
+                                comm.ExecuteNonQuery();
+                            }
+                        }
+                    }
+
+                    //add the item to the list
+                    Program.mainForm.inventory.loot.Add(newIIid, iiNewItem);
+
+                    //update UI and 0 change history record to force change through to other clients
+                    Program.mainForm.updateItem(ii.item);
+
+                    //select the newly modded version in the main window
+                    Program.mainForm.selectInventoryItem(iiNewItem);
+
+                    //update the form to use the newly modded item
+                    ii = iiNewItem;
+                    loadCurrentMods();
+                    CbMod_SelectedIndexChanged(null, null);
+                }
             }
         }
     }

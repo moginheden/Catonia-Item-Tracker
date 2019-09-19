@@ -80,5 +80,23 @@ namespace Catonia_Item_Tracker
             
             return this.item.ToString() + mods;
         }
+
+        public int value()
+        {
+            int returnValue = 0;
+
+            foreach(int mod in this.modsAttached)
+            {
+                returnValue += Program.items[mod].cost;
+            }
+
+            //if no mods, use the base item cost
+            if (returnValue == 0)
+            {
+                return item.cost;
+            }
+
+            return returnValue;
+        }
     }
 }

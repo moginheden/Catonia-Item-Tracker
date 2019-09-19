@@ -55,6 +55,7 @@ namespace Catonia_Item_Tracker
         [STAThread]
         static void Main()
         {
+            ///TODO: clean up duplicate entries in inventory sql table caused by multiple recipies using an item
             try
             {
                 Application.EnableVisualStyles();
@@ -174,7 +175,7 @@ namespace Catonia_Item_Tracker
                 FrmLoading.setText("Generating Local Inventory Lists...");
                 inventories = new Dictionary<string, Inventory>();
                 inventories.Add("On Hand", new Inventory("On Hand"));
-                string selectLootLocations = @"select distinct location from lootByLocation where location != 'On Hand'";
+                string selectLootLocations = @"select distinct location from inventory where location != 'On Hand'";
                 using (SqlCommand commIngredients = new SqlCommand(selectLootLocations, dataConnection))
                 {
                     using (SqlDataReader reader = commIngredients.ExecuteReader())
