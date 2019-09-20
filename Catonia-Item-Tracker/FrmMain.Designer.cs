@@ -41,7 +41,7 @@
             this.colLastUpdated = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmsItemList = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.createNewItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createNewRecipieItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nudOwned = new System.Windows.Forms.NumericUpDown();
             this.lblNumOwned = new System.Windows.Forms.Label();
             this.lblGold = new System.Windows.Forms.Label();
@@ -181,11 +181,11 @@
             // 
             this.cmsItemList.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.editItemToolStripMenuItem,
-            this.createNewItemToolStripMenuItem,
+            this.createNewRecipieItemToolStripMenuItem,
             this.addOrRemoveModToolStripMenuItem});
             this.cmsItemList.Name = "cmsItemList";
             this.cmsItemList.ShowImageMargin = false;
-            this.cmsItemList.Size = new System.Drawing.Size(160, 70);
+            this.cmsItemList.Size = new System.Drawing.Size(160, 92);
             this.cmsItemList.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.CmsItemList_Closing);
             this.cmsItemList.Opening += new System.ComponentModel.CancelEventHandler(this.cmsItemList_Opening);
             // 
@@ -196,12 +196,12 @@
             this.editItemToolStripMenuItem.Text = "Edit Item";
             this.editItemToolStripMenuItem.Click += new System.EventHandler(this.editItemToolStripMenuItem_Click);
             // 
-            // createNewItemToolStripMenuItem
+            // createNewRecipieItemToolStripMenuItem
             // 
-            this.createNewItemToolStripMenuItem.Name = "createNewItemToolStripMenuItem";
-            this.createNewItemToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
-            this.createNewItemToolStripMenuItem.Text = "Create New Item";
-            this.createNewItemToolStripMenuItem.Click += new System.EventHandler(this.createNewItemToolStripMenuItem_Click);
+            this.createNewRecipieItemToolStripMenuItem.Name = "createNewRecipieItemToolStripMenuItem";
+            this.createNewRecipieItemToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.createNewRecipieItemToolStripMenuItem.Text = "Create New Recipie";
+            this.createNewRecipieItemToolStripMenuItem.Click += new System.EventHandler(this.createNewRecipieItemToolStripMenuItem_Click);
             // 
             // nudOwned
             // 
@@ -743,7 +743,7 @@
         private System.Windows.Forms.CheckBox cbSearchDescriptions;
         private System.Windows.Forms.ContextMenuStrip cmsItemList;
         private System.Windows.Forms.ToolStripMenuItem editItemToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem createNewItemToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createNewRecipieItemToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip cmsRecipieList;
         private System.Windows.Forms.ToolStripMenuItem editRecipieToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createNewRecipieToolStripMenuItem;

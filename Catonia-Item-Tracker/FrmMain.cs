@@ -1251,12 +1251,11 @@ namespace Catonia_Item_Tracker
             else if (lvItems.SelectedItems.Count == 1)
             {
                 cmsItemList.ShowCheckMargin = false;
-                cmsItemList.Items.AddRange(new ToolStripItem[] { editItemToolStripMenuItem, createNewRecipieToolStripMenuItem, addOrRemoveModToolStripMenuItem });
+                cmsItemList.Items.AddRange(new ToolStripItem[] { editItemToolStripMenuItem, createNewRecipieItemToolStripMenuItem, addOrRemoveModToolStripMenuItem });
             }
             else
             {
-                cmsItemList.ShowCheckMargin = false;
-                cmsItemList.Items.AddRange(new ToolStripItem[] { createNewRecipieToolStripMenuItem });
+                e.Cancel = true;
             }
 
             cmsItemList.ResumeLayout();
@@ -1269,7 +1268,7 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void CmsItemList_Closing(object sender, ToolStripDropDownClosingEventArgs e)
         {
-            if ((!cmsItemList.Items.Contains(createNewItemToolStripMenuItem)) && (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked))
+            if ((!cmsItemList.Items.Contains(createNewRecipieItemToolStripMenuItem)) && (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked))
             {
                 e.Cancel = true;
             }
@@ -1377,10 +1376,10 @@ namespace Catonia_Item_Tracker
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void createNewItemToolStripMenuItem_Click(object sender, EventArgs e)
+        private void createNewRecipieItemToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FrmItem itemForm = new FrmItem();
-            itemForm.Show();
+            FrmRecipie recipieForm = new FrmRecipie(((InventoryItem)lvItems.SelectedItems[0].Tag).item);
+            recipieForm.Show();
         }
 
         /// <summary>

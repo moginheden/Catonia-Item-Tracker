@@ -81,6 +81,23 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
+        /// constructor for making a new recipe from a given item's context menu
+        /// </summary>
+        /// <param name="current"></param>
+        public FrmRecipie(Item i)
+        {
+            //setup basic form
+            InitializeComponent();
+
+            updateLbItemSearch(Program.items.Values);
+
+            setProfessionAndLevel();
+
+            result = i;
+            txtResultName.Text = result.name;
+        }
+
+        /// <summary>
         /// constructor for loading an existing recipie
         /// </summary>
         /// <param name="current"></param>
