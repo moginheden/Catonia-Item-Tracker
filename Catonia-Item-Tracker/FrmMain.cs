@@ -542,7 +542,10 @@ namespace Catonia_Item_Tracker
             lvItems_SelectedIndexChanged(null, null);
 
             //scroll into view
-            lvItems.SelectedItems[0].EnsureVisible();
+            if (lvItems.SelectedItems.Count > 0)
+            {
+                lvItems.SelectedItems[0].EnsureVisible();
+            }
         }
 
         /// <summary>
@@ -1468,15 +1471,22 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void btnCreateNew_Click(object sender, EventArgs e)
         {
-            if (txtSearch.Text.Replace("'", "").Length == 0)
+            string toAddName = txtSearch.Text.Trim();
+            if (toAddName.Length == 0)
             {
+                FrmItem itemForm = new FrmItem();
+                itemForm.Show();
                 return;
             }
 
             //check if the item already exists
-            if(Program.items.Count(x => x.Value.name == txtSearch.Text) > 0)
+            foreach(KeyValuePair<int, Item> i in Program.items)
             {
-                return;
+                if (i.Value.name == toAddName)
+                {
+                    selectInventoryItem(inventory.findLoot(i.Value));
+                    return;
+                }
             }
 
             string insertSql = @"INSERT INTO items (name,
@@ -1484,7 +1494,7 @@ namespace Catonia_Item_Tracker
                                                     cost,
                                                     type,
                                                     subType)
-                                             VALUES ('" + txtSearch.Text.Replace("'", "") + @"',
+                                             VALUES ('" + toAddName.Replace("'", "''") + @"',
                                                      '',
                                                      '0',
                                                      '',
@@ -1496,7 +1506,7 @@ namespace Catonia_Item_Tracker
                 int itemNum = -1;
                 string selectSql = @"SELECT id
                                      FROM items
-                                     WHERE name = '" + txtSearch.Text.Replace("'", "") + @"'";
+                                     WHERE name = '" + toAddName.Replace("'", "''") + @"'";
                 using (SqlCommand comm = new SqlCommand(selectSql, dataConnection))
                 {
                     var result = comm.ExecuteScalar();
@@ -1526,7 +1536,7 @@ namespace Catonia_Item_Tracker
                 {
                     cost = 0,
                     description = "",
-                    name = txtSearch.Text,
+                    name = toAddName,
                     id = itemNum,
                     type = "",
                     subType = ""
@@ -1535,11 +1545,12 @@ namespace Catonia_Item_Tracker
                 Program.items.Add(item.id, item);
                 foreach (KeyValuePair<string, Inventory> i in Program.inventories)
                 {
-                    i.Value.loot.Add(item.id, new InventoryItem()
+                    i.Value.loot.Add(item.id * -1, new InventoryItem()
                     {
+                        id = item.id * -1,
                         item = item,
                         qty = 0
-                    });
+                    }) ;
                 }
 
                 updateItem(item);

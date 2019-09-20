@@ -18,6 +18,9 @@ namespace Catonia_Item_Tracker
         public FrmItem()
         {
             InitializeComponent();
+
+            cbType.SelectedItem = cbType.Items[0];
+
             CbType_SelectedIndexChanged(null, null);
         }
 
@@ -43,26 +46,39 @@ namespace Catonia_Item_Tracker
             string sql;
             if(itemNum == -1)
             {
+                //don't make duplicate items
+                foreach (KeyValuePair<int, Item> i in Program.items)
+                {
+                    if (i.Value.name == txtItemName.Text)
+                    {
+                        MessageBox.Show("Error: Item with name " + txtItemName.Text + " already exists.",
+                                        "Item Creation",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+
                 sql = @"INSERT INTO items
                                     (name,
                                      description,
                                      cost,
                                      type,
                                      subType)
-                        VALUES ('" + txtItemName.Text.Replace("'", "") + @"',
-                                '" + txtDescription.Text.Replace("'", "") + @"',
+                        VALUES ('" + txtItemName.Text.Replace("'", "''") + @"',
+                                '" + txtDescription.Text.Replace("'", "''") + @"',
                                 '" + nudGoldValue.Value.ToString() + @"',
                                 '" + ((string)cbType.SelectedItem).Replace("'", "") + @"',
-                                '" + ((string)cbSubType.Text).Replace("'", "") + @"')";
+                                '" + ((string)cbSubType.Text).Replace("'", "''") + @"')";
             }
             else
             {
                 sql = @"UPDATE items
-                        SET name = '" + txtItemName.Text.Replace("'", "") + @"',
-                            description = '" + txtDescription.Text.Replace("'", "") + @"',
+                        SET name = '" + txtItemName.Text.Replace("'", "''") + @"',
+                            description = '" + txtDescription.Text.Replace("'", "''") + @"',
                             cost = '" + nudGoldValue.Value.ToString() + @"',
                             type = '" + ((string)cbType.SelectedItem).Replace("'", "") + @"',
-                            subType = '" + ((string)cbSubType.Text).Replace("'", "") + @"'
+                            subType = '" + ((string)cbSubType.Text).Replace("'", "''") + @"'
                         WHERE id = '" + itemNum.ToString() + @"'";
             }
             using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
@@ -77,7 +93,7 @@ namespace Catonia_Item_Tracker
                 {
                     sql = @"SELECT id
                             FROM items
-                            WHERE name = '" + txtItemName.Text.Replace("'", "") + @"'";
+                            WHERE name = '" + txtItemName.Text.Replace("'", "''") + @"'";
                     using (SqlCommand comm = new SqlCommand(sql, dataConnection))
                     {
                         itemNum = (int)comm.ExecuteScalar();
@@ -98,6 +114,7 @@ namespace Catonia_Item_Tracker
                     {
                         i.Value.loot.Add(item.id *-1, new InventoryItem()
                         {
+                            id = item.id *-1,
                             item = item,
                             qty = 0
                         });

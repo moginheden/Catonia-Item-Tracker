@@ -91,7 +91,7 @@ namespace Catonia_Item_Tracker
             }
 
             //if no mods, use the base item cost
-            if (returnValue == 0)
+            if ((item.type == "Bomb") || (returnValue == 0))
             {
                 return item.cost;
             }

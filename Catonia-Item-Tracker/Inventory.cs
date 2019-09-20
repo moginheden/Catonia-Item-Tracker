@@ -339,6 +339,7 @@ namespace Catonia_Item_Tracker
                                 //if this was a new item for the inventory, update the local data
                                 if (hr.ii.id != hrClone.ii.id)
                                 {
+                                    ///TODO: look into why making the Bomblet of Necrosis caused this function to have a negative value for hr.ii.id that caused and error
                                     updateID(hr.ii.id, hrClone.ii.id);
                                 }
 

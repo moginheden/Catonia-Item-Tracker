@@ -190,8 +190,18 @@ namespace Catonia_Item_Tracker
         {
             Item modItem = (Item)cbMod.SelectedItem;
 
+            //make sure a mod is selected
+            if (modItem == null)
+            {
+                MessageBox.Show("Error: no mod selected to apply",
+                                "Crafting",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return;
+            }
+
             //check for pre-existing mods
-            foreach(int currModId in ii.modsAttached)
+            foreach (int currModId in ii.modsAttached)
             {
                 Item currMod = Program.items[currModId];
                 if (modItem.subType == currMod.subType)
@@ -203,7 +213,16 @@ namespace Catonia_Item_Tracker
                     return;
                 }
             }
-            
+
+            //make sure we have a base item to mod
+            if (ii.qty <= 0)
+            {
+                MessageBox.Show("Error: no " + ii.item.name + " " + Program.mainForm.inventory.location,
+                                "Crafting",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return;
+            }
 
             //make the mod, (if we are applying the mod the button will say "Apply")
             if (btnCraft.Text == "Craft")
@@ -223,15 +242,6 @@ namespace Catonia_Item_Tracker
 
             using (new TriggerLock())
             {
-                if (ii.qty <= 0)
-                {
-                    MessageBox.Show("Error: no " + ii.item.name + " in " + Program.mainForm.inventory.location,
-                                    "Crafting",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error);
-                    return;
-                }
-
                 InventoryItem mod = Program.mainForm.inventory.findLoot(modItem);
                 if (Program.mainForm.updateItemQtyWithHistory(mod, -1))
                 {

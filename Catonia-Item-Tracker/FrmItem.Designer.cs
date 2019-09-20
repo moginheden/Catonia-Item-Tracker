@@ -121,6 +121,8 @@
             this.cbType.Items.AddRange(new object[] {
             "",
             "Raw Material",
+            "Consumable",
+            "Garments",
             "Armor - Light",
             "Armor - Light - Mod",
             "Armor - Medium",
@@ -137,14 +139,14 @@
             "Shield - Tower - Mod",
             "Ammunition",
             "Ammunition - Mod",
+            "Bomb",
+            "Bomb - Mod",
             "Weapon - Light",
             "Weapon - Light - Mod",
             "Weapon - 1H",
             "Weapon - 1H - Mod",
             "Weapon - 2H",
-            "Weapon - 2H - Mod",
-            "Consumable",
-            "Garments"});
+            "Weapon - 2H - Mod"});
             this.cbType.Location = new System.Drawing.Point(53, 332);
             this.cbType.Name = "cbType";
             this.cbType.Size = new System.Drawing.Size(151, 21);
