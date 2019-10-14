@@ -122,6 +122,7 @@ namespace Catonia_Item_Tracker
             txtResultName.Text = result.name;
 
             nudNumProduced.Value = current.resultQty;
+            nudHours.Value = current.hours;
 
             lvIngredients.SuspendLayout();
             foreach (InventoryItem iq in current.ingredients)
@@ -331,11 +332,13 @@ namespace Catonia_Item_Tracker
                                     (result,
                                      resultQty,
                                      profession,
-                                     crafterLevel)
+                                     crafterLevel,
+                                     hours)
                         VALUES ('-" + result.id + @"',
                                 '" + nudNumProduced.Value + @"',
                                 '" + cbProfession.Text.Replace("'", "''") + @"',
-                                '" + cbCrafterLevel.Text.Replace("'", "''") + @"')";
+                                '" + cbCrafterLevel.Text.Replace("'", "''") + @"',
+                                '" + nudHours.Value + @"')";
                 curRecipie = new Recipie();
             }
             else
@@ -344,7 +347,8 @@ namespace Catonia_Item_Tracker
                         SET result = '" + result.id + @"',
                             resultQty = '" + nudNumProduced.Value + @"',
                             profession = '" + cbProfession.Text.Replace("'", "''") + @"',
-                            crafterLevel = '" + cbCrafterLevel.Text.Replace("'", "''") + @"'
+                            crafterLevel = '" + cbCrafterLevel.Text.Replace("'", "''") + @"',
+                            hours = '" + nudHours.Value + @"'
                         WHERE id = '" + curRecipie.id + @"'";
             }
 
@@ -353,6 +357,7 @@ namespace Catonia_Item_Tracker
             curRecipie.resultQty = (int)nudNumProduced.Value;
             curRecipie.profession = cbProfession.Text;
             curRecipie.crafterLevel = cbCrafterLevel.Text;
+            curRecipie.hours = (byte)nudHours.Value;
 
             using (SqlConnection dataConnection = new SqlConnection(Program.connectionString))
             {

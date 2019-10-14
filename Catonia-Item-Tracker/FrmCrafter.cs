@@ -95,7 +95,7 @@ namespace Catonia_Item_Tracker
             /// TODO: look into multi-step recipies, maybe convert the list views to control to trees
 
             //remove extra ingredient columns
-            for (int i = lvRecipies.Columns.Count - 1; i > 2; i--)
+            for (int i = lvRecipies.Columns.Count - 1; i > 3; i--)
             {
                 lvRecipies.Columns.RemoveAt(i);
             }
@@ -113,6 +113,7 @@ namespace Catonia_Item_Tracker
                     lvRecipies.Columns[0].Width = -2;
                     row.SubItems.Add(r.resultQty.ToString());
                     row.SubItems.Add("");
+                    row.SubItems.Add(r.hours.ToString());
 
                     int numWeCanMake = int.MaxValue;
 
@@ -120,7 +121,7 @@ namespace Catonia_Item_Tracker
                     for (int i = 0; i < r.ingredients.Count; i++)
                     {
                         InventoryItem ingredient = r.ingredients[i];
-                        if (lvRecipies.Columns.Count < (((i + 1) * 3) + 3))
+                        if (lvRecipies.Columns.Count < (((i + 1) * 3) + 4))
                         {
                             lvRecipies.Columns.Add("Ingredient " + (i + 1));
                             lvRecipies.Columns.Add("Uses");

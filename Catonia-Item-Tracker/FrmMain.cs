@@ -613,12 +613,12 @@ namespace Catonia_Item_Tracker
             InventoryItem comparison = new InventoryItem() { item = item, qty = 0 };
             
             //remove extra ingredient columns
-            for (int i = lvRecipiesMakingItem.Columns.Count - 1; i > 3; i--)
+            for (int i = lvRecipiesMakingItem.Columns.Count - 1; i > 4; i--)
             {
                 lvRecipiesMakingItem.Columns.RemoveAt(i);
             }
 
-            for (int i = lvRecipiesUsingItem.Columns.Count - 1; i > 4; i--)
+            for (int i = lvRecipiesUsingItem.Columns.Count - 1; i > 5; i--)
             {
                 lvRecipiesUsingItem.Columns.RemoveAt(i);
             }
@@ -635,13 +635,14 @@ namespace Catonia_Item_Tracker
                     row.SubItems.Add(r.crafterLevel);
                     row.SubItems.Add(r.resultQty.ToString());
                     row.SubItems.Add("");
+                    row.SubItems.Add(r.hours.ToString());
 
                     int numWeCanMake = int.MaxValue;
                     //add columns for each ingredient
                     for (int i = 0; i < r.ingredients.Count; i++)
                     {
                         InventoryItem ingredient = r.ingredients[i];
-                        if (lvRecipiesMakingItem.Columns.Count < (((i+1) * 3) + 4))
+                        if (lvRecipiesMakingItem.Columns.Count < (((i+1) * 3) + 5))
                         {
                             lvRecipiesMakingItem.Columns.Add("Ingredient " + (i+1));
                             lvRecipiesMakingItem.Columns.Add("Uses");
@@ -676,6 +677,7 @@ namespace Catonia_Item_Tracker
                     lvRecipiesUsingItem.Columns[2].Width = -2;
                     row.SubItems.Add(r.resultQty.ToString());
                     row.SubItems.Add("");
+                    row.SubItems.Add(r.hours.ToString());
 
                     int numWeCanMake = int.MaxValue;
 
@@ -683,7 +685,7 @@ namespace Catonia_Item_Tracker
                     for (int i = 0; i < r.ingredients.Count; i++)
                     {
                         InventoryItem ingredient = r.ingredients[i];
-                        if (lvRecipiesUsingItem.Columns.Count < (((i+1) * 3) + 5))
+                        if (lvRecipiesUsingItem.Columns.Count < (((i+1) * 3) + 6))
                         {
                             lvRecipiesUsingItem.Columns.Add("Ingredient " + (i+1));
                             lvRecipiesUsingItem.Columns.Add("Uses");
@@ -772,7 +774,7 @@ namespace Catonia_Item_Tracker
             {
                 if (craftRecipie(r))
                 {
-                    MessageBox.Show("Crafted " + r.resultQty + " " + r.result.name + " using " + r.crafterLevel.Substring(2) + " " + r.profession, "Crafting", MessageBoxButtons.OK, MessageBoxIcon.None);
+                    MessageBox.Show("Crafted " + r.resultQty + " " + r.result.name + " using " + r.crafterLevel.Substring(2) + " " + r.profession + " " + r.hours + " hours pass", "Crafting", MessageBoxButtons.OK, MessageBoxIcon.None);
                 }
             }
         }

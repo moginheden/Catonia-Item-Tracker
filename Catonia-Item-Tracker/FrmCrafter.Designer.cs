@@ -39,6 +39,7 @@
             this.lblRecipies = new System.Windows.Forms.Label();
             this.txtDescription = new System.Windows.Forms.TextBox();
             this.lblDescription = new System.Windows.Forms.Label();
+            this.hours = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // lblCrafterLevel
@@ -91,7 +92,8 @@
             this.lvRecipies.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.result,
             this.numMade,
-            this.numCanMake});
+            this.numCanMake,
+            this.hours});
             this.lvRecipies.FullRowSelect = true;
             this.lvRecipies.HideSelection = false;
             this.lvRecipies.Location = new System.Drawing.Point(16, 60);
@@ -146,6 +148,11 @@
             this.lblDescription.TabIndex = 48;
             this.lblDescription.Text = "Description of Result";
             // 
+            // hours
+            // 
+            this.hours.Text = "Hours";
+            this.hours.Width = 40;
+            // 
             // FrmCrafter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -179,5 +186,6 @@
         private System.Windows.Forms.Label lblRecipies;
         private System.Windows.Forms.TextBox txtDescription;
         private System.Windows.Forms.Label lblDescription;
+        private System.Windows.Forms.ColumnHeader hours;
     }
 }

@@ -85,6 +85,8 @@
             this.ddlInventories = new System.Windows.Forms.ComboBox();
             this.btnCrafter = new System.Windows.Forms.Button();
             this.btnMods = new System.Windows.Forms.Button();
+            this.hoursMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.hoursUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
@@ -371,7 +373,8 @@
             this.crafterLevelUsing,
             this.resultUsing,
             this.numMadeUsing,
-            this.numCanMakeUsing});
+            this.numCanMakeUsing,
+            this.hoursUsing});
             this.lvRecipiesUsingItem.ContextMenuStrip = this.cmsRecipieList;
             this.lvRecipiesUsingItem.FullRowSelect = true;
             this.lvRecipiesUsingItem.HideSelection = false;
@@ -508,7 +511,8 @@
             this.professionMaking,
             this.crafterLevelMaking,
             this.numMadeMaking,
-            this.numCanMakeMaking});
+            this.numCanMakeMaking,
+            this.hoursMaking});
             this.lvRecipiesMakingItem.ContextMenuStrip = this.cmsRecipieList;
             this.lvRecipiesMakingItem.FullRowSelect = true;
             this.lvRecipiesMakingItem.HideSelection = false;
@@ -662,6 +666,16 @@
             this.btnMods.UseVisualStyleBackColor = true;
             this.btnMods.Click += new System.EventHandler(this.BtnMods_Click);
             // 
+            // hoursMaking
+            // 
+            this.hoursMaking.Text = "Hours";
+            this.hoursMaking.Width = 40;
+            // 
+            // hoursUsing
+            // 
+            this.hoursUsing.Text = "Hours";
+            this.hoursUsing.Width = 40;
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -758,5 +772,7 @@
         private System.Windows.Forms.ToolStripMenuItem addOrRemoveModToolStripMenuItem;
         private System.Windows.Forms.Label lblDeal;
         private System.Windows.Forms.NumericUpDown nudDeal;
+        private System.Windows.Forms.ColumnHeader hoursUsing;
+        private System.Windows.Forms.ColumnHeader hoursMaking;
     }
 }

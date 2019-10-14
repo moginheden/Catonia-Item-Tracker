@@ -49,8 +49,11 @@
             this.ItemName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numUsed = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnSave = new System.Windows.Forms.Button();
+            this.nudHours = new System.Windows.Forms.NumericUpDown();
+            this.lblHours = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudNumProduced)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddIngredient)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudHours)).BeginInit();
             this.SuspendLayout();
             // 
             // cbSearchDescriptions
@@ -87,7 +90,7 @@
             this.txtSearch.Location = new System.Drawing.Point(12, 28);
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(367, 44);
-            this.txtSearch.TabIndex = 17;
+            this.txtSearch.TabIndex = 5;
             this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
             // 
             // label1
@@ -108,14 +111,14 @@
             this.lbItemSearch.Location = new System.Drawing.Point(12, 78);
             this.lbItemSearch.Name = "lbItemSearch";
             this.lbItemSearch.Size = new System.Drawing.Size(367, 420);
-            this.lbItemSearch.TabIndex = 24;
+            this.lbItemSearch.TabIndex = 6;
             this.lbItemSearch.SelectedIndexChanged += new System.EventHandler(this.lbItemSearch_SelectedIndexChanged);
             // 
             // nudNumProduced
             // 
             this.nudNumProduced.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.nudNumProduced.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudNumProduced.Location = new System.Drawing.Point(586, 114);
+            this.nudNumProduced.Location = new System.Drawing.Point(586, 164);
             this.nudNumProduced.Maximum = new decimal(new int[] {
             -1593835521,
             466537709,
@@ -123,7 +126,7 @@
             0});
             this.nudNumProduced.Name = "nudNumProduced";
             this.nudNumProduced.Size = new System.Drawing.Size(97, 44);
-            this.nudNumProduced.TabIndex = 28;
+            this.nudNumProduced.TabIndex = 3;
             this.nudNumProduced.Value = new decimal(new int[] {
             1,
             0,
@@ -135,7 +138,7 @@
             this.lblGoldValue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblGoldValue.AutoSize = true;
             this.lblGoldValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblGoldValue.Location = new System.Drawing.Point(399, 116);
+            this.lblGoldValue.Location = new System.Drawing.Point(399, 166);
             this.lblGoldValue.Name = "lblGoldValue";
             this.lblGoldValue.Size = new System.Drawing.Size(181, 37);
             this.lblGoldValue.TabIndex = 27;
@@ -156,7 +159,7 @@
             this.btnSetResult.Location = new System.Drawing.Point(385, 88);
             this.btnSetResult.Name = "btnSetResult";
             this.btnSetResult.Size = new System.Drawing.Size(101, 23);
-            this.btnSetResult.TabIndex = 30;
+            this.btnSetResult.TabIndex = 4;
             this.btnSetResult.Text = "Set Result";
             this.btnSetResult.UseVisualStyleBackColor = true;
             this.btnSetResult.Click += new System.EventHandler(this.btnSetResult_Click);
@@ -164,10 +167,10 @@
             // btnIngredients
             // 
             this.btnIngredients.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnIngredients.Location = new System.Drawing.Point(385, 162);
+            this.btnIngredients.Location = new System.Drawing.Point(385, 212);
             this.btnIngredients.Name = "btnIngredients";
             this.btnIngredients.Size = new System.Drawing.Size(75, 46);
-            this.btnIngredients.TabIndex = 33;
+            this.btnIngredients.TabIndex = 8;
             this.btnIngredients.Text = "Add Ingredient";
             this.btnIngredients.UseVisualStyleBackColor = true;
             this.btnIngredients.Click += new System.EventHandler(this.btnIngredients_Click);
@@ -176,7 +179,7 @@
             // 
             this.nudAddIngredient.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.nudAddIngredient.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudAddIngredient.Location = new System.Drawing.Point(586, 164);
+            this.nudAddIngredient.Location = new System.Drawing.Point(586, 214);
             this.nudAddIngredient.Maximum = new decimal(new int[] {
             -1593835521,
             466537709,
@@ -184,7 +187,7 @@
             0});
             this.nudAddIngredient.Name = "nudAddIngredient";
             this.nudAddIngredient.Size = new System.Drawing.Size(97, 44);
-            this.nudAddIngredient.TabIndex = 34;
+            this.nudAddIngredient.TabIndex = 7;
             this.nudAddIngredient.Value = new decimal(new int[] {
             1,
             0,
@@ -197,7 +200,7 @@
             this.btnRemoveIngredient.Location = new System.Drawing.Point(385, 569);
             this.btnRemoveIngredient.Name = "btnRemoveIngredient";
             this.btnRemoveIngredient.Size = new System.Drawing.Size(75, 44);
-            this.btnRemoveIngredient.TabIndex = 35;
+            this.btnRemoveIngredient.TabIndex = 10;
             this.btnRemoveIngredient.Text = "Remove Ingredient";
             this.btnRemoveIngredient.UseVisualStyleBackColor = true;
             this.btnRemoveIngredient.Click += new System.EventHandler(this.btnRemoveIngredient_Click);
@@ -207,7 +210,7 @@
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(462, 166);
+            this.label2.Location = new System.Drawing.Point(462, 216);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(118, 37);
             this.label2.TabIndex = 36;
@@ -221,7 +224,7 @@
             this.cbProfession.Location = new System.Drawing.Point(508, 12);
             this.cbProfession.Name = "cbProfession";
             this.cbProfession.Size = new System.Drawing.Size(175, 32);
-            this.cbProfession.TabIndex = 37;
+            this.cbProfession.TabIndex = 0;
             // 
             // lblProfession
             // 
@@ -253,7 +256,7 @@
             this.cbCrafterLevel.Location = new System.Drawing.Point(508, 50);
             this.cbCrafterLevel.Name = "cbCrafterLevel";
             this.cbCrafterLevel.Size = new System.Drawing.Size(175, 32);
-            this.cbCrafterLevel.TabIndex = 39;
+            this.cbCrafterLevel.TabIndex = 1;
             // 
             // lvIngredients
             // 
@@ -264,10 +267,10 @@
             this.numUsed});
             this.lvIngredients.FullRowSelect = true;
             this.lvIngredients.HideSelection = false;
-            this.lvIngredients.Location = new System.Drawing.Point(386, 214);
+            this.lvIngredients.Location = new System.Drawing.Point(386, 264);
             this.lvIngredients.Name = "lvIngredients";
-            this.lvIngredients.Size = new System.Drawing.Size(297, 349);
-            this.lvIngredients.TabIndex = 41;
+            this.lvIngredients.Size = new System.Drawing.Size(297, 299);
+            this.lvIngredients.TabIndex = 9;
             this.lvIngredients.UseCompatibleStateImageBehavior = false;
             this.lvIngredients.View = System.Windows.Forms.View.Details;
             this.lvIngredients.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvIngredients_ColumnClick);
@@ -288,16 +291,48 @@
             this.btnSave.Location = new System.Drawing.Point(522, 569);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(161, 44);
-            this.btnSave.TabIndex = 42;
+            this.btnSave.TabIndex = 11;
             this.btnSave.Text = "Save && Close";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // nudHours
+            // 
+            this.nudHours.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.nudHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.nudHours.Location = new System.Drawing.Point(586, 114);
+            this.nudHours.Maximum = new decimal(new int[] {
+            -1593835521,
+            466537709,
+            54210,
+            0});
+            this.nudHours.Name = "nudHours";
+            this.nudHours.Size = new System.Drawing.Size(97, 44);
+            this.nudHours.TabIndex = 2;
+            this.nudHours.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // lblHours
+            // 
+            this.lblHours.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblHours.AutoSize = true;
+            this.lblHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblHours.Location = new System.Drawing.Point(477, 116);
+            this.lblHours.Name = "lblHours";
+            this.lblHours.Size = new System.Drawing.Size(103, 37);
+            this.lblHours.TabIndex = 43;
+            this.lblHours.Text = "Hours";
             // 
             // FrmRecipie
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(695, 619);
+            this.Controls.Add(this.nudHours);
+            this.Controls.Add(this.lblHours);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.lvIngredients);
             this.Controls.Add(this.lblCrafterLevel);
@@ -321,6 +356,7 @@
             this.Text = "Recipie #";
             ((System.ComponentModel.ISupportInitialize)(this.nudNumProduced)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddIngredient)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudHours)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -349,5 +385,7 @@
         private System.Windows.Forms.ColumnHeader ItemName;
         private System.Windows.Forms.ColumnHeader numUsed;
         private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.NumericUpDown nudHours;
+        private System.Windows.Forms.Label lblHours;
     }
 }

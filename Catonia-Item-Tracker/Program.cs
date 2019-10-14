@@ -151,8 +151,9 @@ namespace Catonia_Item_Tracker
                     r.resultQty = (int)row["resultQty"];
                     r.profession = (string)row["profession"];
                     r.crafterLevel = (string)row["crafterLevel"];
+                    r.hours = (byte)row["hours"];
 
-                    while(iLine < dsRecipieIngredients.Tables[0].Rows.Count)
+                    while (iLine < dsRecipieIngredients.Tables[0].Rows.Count)
                     {
                         if(((int)dsRecipieIngredients.Tables[0].Rows[iLine]["recipieID"]) == r.id)
                         {

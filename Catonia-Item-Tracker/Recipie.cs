@@ -14,6 +14,7 @@ namespace Catonia_Item_Tracker
         public int resultQty = 1;
         public string profession = null;
         public string crafterLevel = null;
+        public byte hours = 1;
 
         public override bool Equals(object a)
         {
