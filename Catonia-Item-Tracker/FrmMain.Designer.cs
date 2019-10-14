@@ -42,6 +42,7 @@
             this.cmsItemList = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createNewRecipieItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addOrRemoveModToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nudOwned = new System.Windows.Forms.NumericUpDown();
             this.lblNumOwned = new System.Windows.Forms.Label();
             this.lblGold = new System.Windows.Forms.Label();
@@ -50,6 +51,8 @@
             this.nudAddGold = new System.Windows.Forms.NumericUpDown();
             this.gbGold = new System.Windows.Forms.GroupBox();
             this.gbItemManagment = new System.Windows.Forms.GroupBox();
+            this.lblDeal = new System.Windows.Forms.Label();
+            this.nudDeal = new System.Windows.Forms.NumericUpDown();
             this.lvRecipiesUsingItem = new System.Windows.Forms.ListView();
             this.professionUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.crafterLevelUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -82,18 +85,15 @@
             this.ddlInventories = new System.Windows.Forms.ComboBox();
             this.btnCrafter = new System.Windows.Forms.Button();
             this.btnMods = new System.Windows.Forms.Button();
-            this.addOrRemoveModToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.nudDeal = new System.Windows.Forms.NumericUpDown();
-            this.lblDeal = new System.Windows.Forms.Label();
             this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddGold)).BeginInit();
             this.gbGold.SuspendLayout();
             this.gbItemManagment.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDeal)).BeginInit();
             this.cmsRecipieList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudAddItems)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudDeal)).BeginInit();
             this.SuspendLayout();
             // 
             // txtSearch
@@ -170,7 +170,7 @@
             // colUsable
             // 
             this.colUsable.Text = "Type";
-            this.colUsable.Width = 36;
+            this.colUsable.Width = 38;
             // 
             // colLastUpdated
             // 
@@ -185,7 +185,7 @@
             this.addOrRemoveModToolStripMenuItem});
             this.cmsItemList.Name = "cmsItemList";
             this.cmsItemList.ShowImageMargin = false;
-            this.cmsItemList.Size = new System.Drawing.Size(160, 92);
+            this.cmsItemList.Size = new System.Drawing.Size(160, 70);
             this.cmsItemList.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.CmsItemList_Closing);
             this.cmsItemList.Opening += new System.ComponentModel.CancelEventHandler(this.cmsItemList_Opening);
             // 
@@ -202,6 +202,13 @@
             this.createNewRecipieItemToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             this.createNewRecipieItemToolStripMenuItem.Text = "Create New Recipie";
             this.createNewRecipieItemToolStripMenuItem.Click += new System.EventHandler(this.createNewRecipieItemToolStripMenuItem_Click);
+            // 
+            // addOrRemoveModToolStripMenuItem
+            // 
+            this.addOrRemoveModToolStripMenuItem.Name = "addOrRemoveModToolStripMenuItem";
+            this.addOrRemoveModToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.addOrRemoveModToolStripMenuItem.Text = "Add or Remove Mod";
+            this.addOrRemoveModToolStripMenuItem.Click += new System.EventHandler(this.AddOrRemoveModToolStripMenuItem_Click);
             // 
             // nudOwned
             // 
@@ -324,6 +331,37 @@
             this.gbItemManagment.TabIndex = 11;
             this.gbItemManagment.TabStop = false;
             this.gbItemManagment.Text = "Item";
+            // 
+            // lblDeal
+            // 
+            this.lblDeal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblDeal.AutoSize = true;
+            this.lblDeal.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDeal.Location = new System.Drawing.Point(19, 150);
+            this.lblDeal.Name = "lblDeal";
+            this.lblDeal.Size = new System.Drawing.Size(134, 31);
+            this.lblDeal.TabIndex = 18;
+            this.lblDeal.Text = "% of price";
+            // 
+            // nudDeal
+            // 
+            this.nudDeal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.nudDeal.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.nudDeal.Location = new System.Drawing.Point(159, 137);
+            this.nudDeal.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+            this.nudDeal.Name = "nudDeal";
+            this.nudDeal.Size = new System.Drawing.Size(219, 53);
+            this.nudDeal.TabIndex = 17;
+            this.nudDeal.ThousandsSeparator = true;
+            this.nudDeal.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
             // 
             // lvRecipiesUsingItem
             // 
@@ -624,44 +662,6 @@
             this.btnMods.UseVisualStyleBackColor = true;
             this.btnMods.Click += new System.EventHandler(this.BtnMods_Click);
             // 
-            // addOrRemoveModToolStripMenuItem
-            // 
-            this.addOrRemoveModToolStripMenuItem.Name = "addOrRemoveModToolStripMenuItem";
-            this.addOrRemoveModToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
-            this.addOrRemoveModToolStripMenuItem.Text = "Add or Remove Mod";
-            this.addOrRemoveModToolStripMenuItem.Click += new System.EventHandler(this.AddOrRemoveModToolStripMenuItem_Click);
-            // 
-            // nudDeal
-            // 
-            this.nudDeal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.nudDeal.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudDeal.Location = new System.Drawing.Point(159, 137);
-            this.nudDeal.Maximum = new decimal(new int[] {
-            9999,
-            0,
-            0,
-            0});
-            this.nudDeal.Name = "nudDeal";
-            this.nudDeal.Size = new System.Drawing.Size(219, 53);
-            this.nudDeal.TabIndex = 17;
-            this.nudDeal.ThousandsSeparator = true;
-            this.nudDeal.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            // 
-            // lblDeal
-            // 
-            this.lblDeal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblDeal.AutoSize = true;
-            this.lblDeal.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDeal.Location = new System.Drawing.Point(19, 150);
-            this.lblDeal.Name = "lblDeal";
-            this.lblDeal.Size = new System.Drawing.Size(134, 31);
-            this.lblDeal.TabIndex = 18;
-            this.lblDeal.Text = "% of price";
-            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -692,9 +692,9 @@
             this.gbGold.PerformLayout();
             this.gbItemManagment.ResumeLayout(false);
             this.gbItemManagment.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudDeal)).EndInit();
             this.cmsRecipieList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudAddItems)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudDeal)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

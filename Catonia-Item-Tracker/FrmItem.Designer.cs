@@ -122,7 +122,6 @@
             "",
             "Raw Material",
             "Consumable",
-            "Garments",
             "Armor - Light",
             "Armor - Light - Mod",
             "Armor - Medium",
@@ -146,7 +145,16 @@
             "Weapon - 1H",
             "Weapon - 1H - Mod",
             "Weapon - 2H",
-            "Weapon - 2H - Mod"});
+            "Weapon - 2H - Mod",
+            "Trap",
+            "Headgear",
+            "Cloak/Robe/Shirt",
+            "Bracers",
+            "Gloves",
+            "Necklace",
+            "Ring",
+            "Belt",
+            "Boots"});
             this.cbType.Location = new System.Drawing.Point(53, 332);
             this.cbType.Name = "cbType";
             this.cbType.Size = new System.Drawing.Size(151, 21);
