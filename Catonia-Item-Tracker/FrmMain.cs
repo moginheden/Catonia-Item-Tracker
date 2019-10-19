@@ -472,7 +472,7 @@ namespace Catonia_Item_Tracker
             }
 
             //if selecting with the arrow keys, don't clear the other options
-            if ((e.KeyCode == Keys.Down) || (e.KeyCode == Keys.Up))
+            if ((e.KeyCode == Keys.Down) || (e.KeyCode == Keys.Up) || (e.KeyCode == Keys.Right) || (e.KeyCode == Keys.Left))
             {
                 return;
             }
