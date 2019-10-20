@@ -449,6 +449,8 @@ namespace Catonia_Item_Tracker
             ComboBox oBox = (ComboBox)sender;
             string search = oBox.Text;
 
+            int savedCursor = oBox.SelectionStart;
+
             //if hitting escape, close the drop
             if (e.KeyCode == Keys.Escape)
             {
@@ -516,9 +518,16 @@ namespace Catonia_Item_Tracker
 
             //4).binding data source erases text, so now we need to put the user's text back,
             oBox.Text = search;
-            
+
             //5). need to put the user's cursor back where it was.
-            oBox.SelectionStart = search.Length;
+            if (savedCursor > search.Length)
+            {
+                oBox.SelectionStart = search.Length;
+            }
+            else
+            {
+                oBox.SelectionStart = savedCursor;
+            }
 
 
         }
