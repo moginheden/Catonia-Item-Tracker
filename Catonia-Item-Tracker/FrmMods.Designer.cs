@@ -48,7 +48,7 @@
             this.chNewName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chNewQtyNeeded = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chNewQtyAvailable = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblMaterials = new System.Windows.Forms.Label();
             this.lblSkill = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -262,15 +262,15 @@
             this.chNewQtyAvailable.Text = "# Available";
             this.chNewQtyAvailable.Width = 71;
             // 
-            // label1
+            // lblMaterials
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(12, 137);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(205, 24);
-            this.label1.TabIndex = 17;
-            this.label1.Text = "Materials For New Mod";
+            this.lblMaterials.AutoSize = true;
+            this.lblMaterials.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMaterials.Location = new System.Drawing.Point(12, 137);
+            this.lblMaterials.Name = "lblMaterials";
+            this.lblMaterials.Size = new System.Drawing.Size(205, 24);
+            this.lblMaterials.TabIndex = 17;
+            this.lblMaterials.Text = "Materials For New Mod";
             // 
             // lblSkill
             // 
@@ -291,7 +291,7 @@
             this.ClientSize = new System.Drawing.Size(527, 559);
             this.Controls.Add(this.lblSkill);
             this.Controls.Add(this.lvMaterials);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lblMaterials);
             this.Controls.Add(this.btnRecover);
             this.Controls.Add(this.btnCraft);
             this.Controls.Add(this.lblType);
@@ -335,7 +335,7 @@
         private System.Windows.Forms.ListView lvMaterials;
         private System.Windows.Forms.ColumnHeader chNewName;
         private System.Windows.Forms.ColumnHeader chNewQtyNeeded;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblMaterials;
         private System.Windows.Forms.Label lblSkill;
         private System.Windows.Forms.ColumnHeader chNewQtyAvailable;
     }

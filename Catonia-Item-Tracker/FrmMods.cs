@@ -92,7 +92,18 @@ namespace Catonia_Item_Tracker
                 this.Close();
                 return false;
             }
-
+            else if (ii.item.type.StartsWith("Weapon"))
+            {
+                cbSubType.Items.Add("Masterwork Weapon");
+            }
+            else if (ii.item.type.StartsWith("Armor"))
+            {
+                cbSubType.Items.Add("Masterwork Armor/Shield");
+            }
+            else if (ii.item.type.StartsWith("Shield"))
+            {
+                cbSubType.Items.Add("Masterwork Armor/Shield");
+            }
             return true;
         }
 
@@ -131,6 +142,14 @@ namespace Catonia_Item_Tracker
                 {
                     cbMod.Items.Add(kvp.Value);
                 }
+                else if ((subType == "Masterwork Weapon") && (kvp.Value.name == "Masterwork Weapon"))
+                {
+                    cbMod.Items.Add(kvp.Value);
+                }
+                else if ((subType == "Masterwork Armor/Shield") && (kvp.Value.name == "Masterwork Armor/Shield"))
+                {
+                    cbMod.Items.Add(kvp.Value);
+                }
             }
 
             cbMod.EndUpdate();
@@ -150,31 +169,42 @@ namespace Catonia_Item_Tracker
             lvMaterials.BeginUpdate();
             lvMaterials.Items.Clear();
 
-            InventoryItem mod = Program.mainForm.inventory.findLoot(modItem);
-            foreach (Recipie r in Program.recipies)
+            if (modItem.name.StartsWith("Masterwork"))
             {
-                if (r.result.id == modItem.id)
+                btnCraft.Text = "Apply";
+                lblMaterials.Visible = false;
+                lblSkill.Text = "Requires a craft DC 30 higher than normal on every part";
+                lblSkill.Left = defaultSkillRight - lblSkill.Width;
+            }
+            else
+            {
+                lblMaterials.Visible = true;
+                InventoryItem mod = Program.mainForm.inventory.findLoot(modItem);
+                foreach (Recipie r in Program.recipies)
                 {
-                    if (mod.qty != 0)
+                    if (r.result.id == modItem.id)
                     {
-                        btnCraft.Text = "Apply";
-                        lvMaterials.Items.Add(new ListViewItem(new string[] { mod.item.name,
+                        if (mod.qty != 0)
+                        {
+                            btnCraft.Text = "Apply";
+                            lvMaterials.Items.Add(new ListViewItem(new string[] { mod.item.name,
                                                                               "1",
                                                                               mod.qty.ToString() }));
-                    }
-                    else
-                    {
-                        foreach(InventoryItem ingredient in r.ingredients)
+                        }
+                        else
                         {
-                            InventoryItem ingredientInInventory = Program.mainForm.inventory.findLoot(ingredient.item);
-                            lvMaterials.Items.Add(new ListViewItem(new string[] { ingredient.item.name,
+                            foreach (InventoryItem ingredient in r.ingredients)
+                            {
+                                InventoryItem ingredientInInventory = Program.mainForm.inventory.findLoot(ingredient.item);
+                                lvMaterials.Items.Add(new ListViewItem(new string[] { ingredient.item.name,
                                                                                   ingredient.qty.ToString(),
                                                                                   ingredientInInventory.qty.ToString() }));
+                            }
                         }
+                        lblSkill.Text = "Requires level " + r.crafterLevel.Substring(0, 2) + "(" + r.crafterLevel.Substring(2) + ") " + r.profession;
+                        lblSkill.Left = defaultSkillRight - lblSkill.Width;
+                        break;
                     }
-                    lblSkill.Text = "Requires level " + r.crafterLevel.Substring(0,2) + "(" + r.crafterLevel.Substring(2) + ") " + r.profession;
-                    lblSkill.Left = defaultSkillRight - lblSkill.Width;
-                    break;
                 }
             }
 
@@ -239,6 +269,12 @@ namespace Catonia_Item_Tracker
                     }
                 }
             }
+            //if it's masterwork create the mod item
+            else if (modItem.name.StartsWith("Masterwork"))
+            {
+                Program.mainForm.updateItemQtyWithHistory(Program.mainForm.inventory.findLoot(modItem), 1);
+            }
+
 
             using (new TriggerLock())
             {
@@ -250,9 +286,11 @@ namespace Catonia_Item_Tracker
                     //look for an exact match in existing items
                     foreach(KeyValuePair<int, InventoryItem> currII in Program.mainForm.inventory.loot)
                     {
+                        //if base item is the same, and the current set of mods on the item has as many mods as the item we are trying to apply a new one to including a new one
                         if((currII.Value.item.id == ii.item.id) && (currII.Value.modsAttached.Count == (ii.modsAttached.Count + 1)))
                         {
                             bool good = true;
+                            //loop through the existing mods on the current item to see if any don't match the item we are modding
                             foreach(int currMod in ii.modsAttached)
                             {
                                 if(!currII.Value.modsAttached.Contains(currMod))
@@ -260,9 +298,14 @@ namespace Catonia_Item_Tracker
                                     good = false;
                                 }
                             }
+                            //check for the mod we are trying to add on the current item
+                            if (!currII.Value.modsAttached.Contains(modItem.id))
+                            {
+                                good = false;
+                            }
 
                             //we found an exact match to what we are trying to produce, use it
-                            if(good)
+                            if (good)
                             {
                                 //add one of the fully modded version
                                 Program.mainForm.updateItemQtyWithHistory(currII.Value, 1);
