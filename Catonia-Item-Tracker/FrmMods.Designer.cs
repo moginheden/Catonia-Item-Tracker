@@ -58,7 +58,7 @@
             this.txtItemName.Location = new System.Drawing.Point(191, 9);
             this.txtItemName.Name = "txtItemName";
             this.txtItemName.ReadOnly = true;
-            this.txtItemName.Size = new System.Drawing.Size(332, 44);
+            this.txtItemName.Size = new System.Drawing.Size(354, 44);
             this.txtItemName.TabIndex = 0;
             // 
             // lblItemName
@@ -84,7 +84,7 @@
             // btnClose
             // 
             this.btnClose.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnClose.Location = new System.Drawing.Point(461, 521);
+            this.btnClose.Location = new System.Drawing.Point(483, 521);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(62, 26);
             this.btnClose.TabIndex = 7;
@@ -124,9 +124,9 @@
             "Weapon - 2H - Mod",
             "Consumable",
             "Garments"});
-            this.cbSubType.Location = new System.Drawing.Point(90, 110);
+            this.cbSubType.Location = new System.Drawing.Point(62, 110);
             this.cbSubType.Name = "cbSubType";
-            this.cbSubType.Size = new System.Drawing.Size(151, 24);
+            this.cbSubType.Size = new System.Drawing.Size(201, 24);
             this.cbSubType.TabIndex = 8;
             this.cbSubType.SelectedIndexChanged += new System.EventHandler(this.CbType_SelectedIndexChanged);
             // 
@@ -136,15 +136,15 @@
             this.lblSubType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F);
             this.lblSubType.Location = new System.Drawing.Point(16, 115);
             this.lblSubType.Name = "lblSubType";
-            this.lblSubType.Size = new System.Drawing.Size(67, 16);
+            this.lblSubType.Size = new System.Drawing.Size(40, 16);
             this.lblSubType.TabIndex = 9;
-            this.lblSubType.Text = "Sub Type";
+            this.lblSubType.Text = "Type";
             // 
             // lblMod
             // 
             this.lblMod.AutoSize = true;
             this.lblMod.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F);
-            this.lblMod.Location = new System.Drawing.Point(247, 115);
+            this.lblMod.Location = new System.Drawing.Point(269, 115);
             this.lblMod.Name = "lblMod";
             this.lblMod.Size = new System.Drawing.Size(35, 16);
             this.lblMod.TabIndex = 11;
@@ -155,7 +155,7 @@
             this.cbMod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbMod.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F);
             this.cbMod.FormattingEnabled = true;
-            this.cbMod.Location = new System.Drawing.Point(288, 109);
+            this.cbMod.Location = new System.Drawing.Point(310, 109);
             this.cbMod.Name = "cbMod";
             this.cbMod.Size = new System.Drawing.Size(173, 24);
             this.cbMod.TabIndex = 10;
@@ -168,10 +168,11 @@
             this.chType,
             this.chSubType});
             this.lvCurrentMods.FullRowSelect = true;
+            this.lvCurrentMods.HideSelection = false;
             this.lvCurrentMods.Location = new System.Drawing.Point(16, 357);
             this.lvCurrentMods.MultiSelect = false;
             this.lvCurrentMods.Name = "lvCurrentMods";
-            this.lvCurrentMods.Size = new System.Drawing.Size(504, 158);
+            this.lvCurrentMods.Size = new System.Drawing.Size(529, 158);
             this.lvCurrentMods.TabIndex = 12;
             this.lvCurrentMods.UseCompatibleStateImageBehavior = false;
             this.lvCurrentMods.View = System.Windows.Forms.View.Details;
@@ -207,13 +208,13 @@
             this.txtType.Location = new System.Drawing.Point(191, 59);
             this.txtType.Name = "txtType";
             this.txtType.ReadOnly = true;
-            this.txtType.Size = new System.Drawing.Size(332, 44);
+            this.txtType.Size = new System.Drawing.Size(354, 44);
             this.txtType.TabIndex = 13;
             // 
             // btnCraft
             // 
             this.btnCraft.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCraft.Location = new System.Drawing.Point(467, 109);
+            this.btnCraft.Location = new System.Drawing.Point(489, 109);
             this.btnCraft.Name = "btnCraft";
             this.btnCraft.Size = new System.Drawing.Size(56, 26);
             this.btnCraft.TabIndex = 15;
@@ -239,10 +240,11 @@
             this.chNewQtyNeeded,
             this.chNewQtyAvailable});
             this.lvMaterials.FullRowSelect = true;
+            this.lvMaterials.HideSelection = false;
             this.lvMaterials.Location = new System.Drawing.Point(16, 164);
             this.lvMaterials.MultiSelect = false;
             this.lvMaterials.Name = "lvMaterials";
-            this.lvMaterials.Size = new System.Drawing.Size(504, 158);
+            this.lvMaterials.Size = new System.Drawing.Size(529, 158);
             this.lvMaterials.TabIndex = 18;
             this.lvMaterials.UseCompatibleStateImageBehavior = false;
             this.lvMaterials.View = System.Windows.Forms.View.Details;
@@ -277,7 +279,7 @@
             this.lblSkill.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblSkill.AutoSize = true;
             this.lblSkill.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F);
-            this.lblSkill.Location = new System.Drawing.Point(292, 143);
+            this.lblSkill.Location = new System.Drawing.Point(322, 143);
             this.lblSkill.Name = "lblSkill";
             this.lblSkill.Size = new System.Drawing.Size(228, 16);
             this.lblSkill.TabIndex = 19;
@@ -288,7 +290,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(527, 559);
+            this.ClientSize = new System.Drawing.Size(557, 559);
             this.Controls.Add(this.lblSkill);
             this.Controls.Add(this.lvMaterials);
             this.Controls.Add(this.lblMaterials);
@@ -305,8 +307,8 @@
             this.Controls.Add(this.lblModList);
             this.Controls.Add(this.lblItemName);
             this.Controls.Add(this.txtItemName);
-            this.MaximumSize = new System.Drawing.Size(543, 598);
-            this.MinimumSize = new System.Drawing.Size(543, 598);
+            this.MaximumSize = new System.Drawing.Size(573, 598);
+            this.MinimumSize = new System.Drawing.Size(573, 598);
             this.Name = "FrmMods";
             this.Text = "Mods";
             this.ResumeLayout(false);

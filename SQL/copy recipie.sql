@@ -1,14 +1,14 @@
 insert into recipies
 select newResult.id, resultQty, profession, crafterLevel, [hours]
---, newResult.name, (select count(*) from recipies where result = newResult.id) as numRecipies
+, newResult.name, (select count(*) from recipies where result = newResult.id) as numRecipies
 from recipies oldRecipie
 	 inner join items oldResult on oldRecipie.result = oldResult.id
-	 inner join items newResult on newResult.id in (select id from items where type = 'Weapon - 2H')
+	 inner join items newResult on newResult.id in (select id from items where name = (select replace(name, 'Shard', 'Shard')
+																					   from items where id = oldResult.id))
 where newResult.id != oldResult.id
-  and oldResult.type = 'Weapon - 2H'
-  and newResult.name not like '%, small%'
-  and newResult.name not like 'Warhammer, redsteel'
-  and newResult.name not like 'Diamond-tiped heavy pick'
+  and oldResult.id in (select id from items where description like 'This sharp jew%')
+  and newResult.name not like '%ruby%'
+
 
 insert into recipieIngredients
 select newRecipie.id as recipieID, newIngredient.id as ingredient, recipieIngredients.qty

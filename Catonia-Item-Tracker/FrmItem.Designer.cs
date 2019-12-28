@@ -106,11 +106,11 @@
             // btnSave
             // 
             this.btnSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSave.Location = new System.Drawing.Point(396, 332);
+            this.btnSave.Location = new System.Drawing.Point(464, 332);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(127, 26);
+            this.btnSave.Size = new System.Drawing.Size(59, 26);
             this.btnSave.TabIndex = 7;
-            this.btnSave.Text = "Save && Close";
+            this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -186,7 +186,7 @@
             this.cbSubType.FormattingEnabled = true;
             this.cbSubType.Location = new System.Drawing.Point(269, 332);
             this.cbSubType.Name = "cbSubType";
-            this.cbSubType.Size = new System.Drawing.Size(121, 21);
+            this.cbSubType.Size = new System.Drawing.Size(189, 21);
             this.cbSubType.TabIndex = 10;
             // 
             // FrmItem

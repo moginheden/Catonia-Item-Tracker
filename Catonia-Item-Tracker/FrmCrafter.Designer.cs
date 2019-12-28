@@ -34,12 +34,13 @@
             this.cbProfession = new System.Windows.Forms.ComboBox();
             this.lvRecipies = new System.Windows.Forms.ListView();
             this.result = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.resultType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numMade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numCanMake = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.hours = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblRecipies = new System.Windows.Forms.Label();
             this.txtDescription = new System.Windows.Forms.TextBox();
             this.lblDescription = new System.Windows.Forms.Label();
-            this.hours = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // lblCrafterLevel
@@ -91,6 +92,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lvRecipies.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.result,
+            this.resultType,
             this.numMade,
             this.numCanMake,
             this.hours});
@@ -103,12 +105,17 @@
             this.lvRecipies.TabIndex = 45;
             this.lvRecipies.UseCompatibleStateImageBehavior = false;
             this.lvRecipies.View = System.Windows.Forms.View.Details;
+            this.lvRecipies.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvRecipies_ColumnClick);
             this.lvRecipies.SelectedIndexChanged += new System.EventHandler(this.LvRecipies_SelectedIndexChanged);
             this.lvRecipies.DoubleClick += new System.EventHandler(this.LvRecipies_DoubleClick);
             // 
             // result
             // 
             this.result.Text = "Result";
+            // 
+            // resultType
+            // 
+            this.resultType.Text = "Type";
             // 
             // numMade
             // 
@@ -118,6 +125,11 @@
             // 
             this.numCanMake.Text = "Can Do";
             this.numCanMake.Width = 48;
+            // 
+            // hours
+            // 
+            this.hours.Text = "Hours";
+            this.hours.Width = 40;
             // 
             // lblRecipies
             // 
@@ -148,11 +160,6 @@
             this.lblDescription.TabIndex = 48;
             this.lblDescription.Text = "Description of Result";
             // 
-            // hours
-            // 
-            this.hours.Text = "Hours";
-            this.hours.Width = 40;
-            // 
             // FrmCrafter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -181,6 +188,7 @@
         private System.Windows.Forms.ComboBox cbProfession;
         private System.Windows.Forms.ListView lvRecipies;
         private System.Windows.Forms.ColumnHeader result;
+        private System.Windows.Forms.ColumnHeader resultType;
         private System.Windows.Forms.ColumnHeader numMade;
         private System.Windows.Forms.ColumnHeader numCanMake;
         private System.Windows.Forms.Label lblRecipies;

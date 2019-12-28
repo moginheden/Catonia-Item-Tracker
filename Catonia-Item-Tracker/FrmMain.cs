@@ -21,15 +21,18 @@ namespace Catonia_Item_Tracker
         {
             private int col;
             private System.Windows.Forms.SortOrder order;
+            public bool sortItemsInInventoryToTop;
             public lvItemComparer()
             {
                 col = 0;
                 order = System.Windows.Forms.SortOrder.Ascending;
+                sortItemsInInventoryToTop = true;
             }
-            public lvItemComparer(int column, System.Windows.Forms.SortOrder order)
+            public lvItemComparer(int column, System.Windows.Forms.SortOrder order, bool sortItemsInInventoryToTop)
             {
                 col = column;
                 this.order = order;
+                this.sortItemsInInventoryToTop = sortItemsInInventoryToTop;
             }
             public int Compare(object x, object y)
             {
@@ -61,13 +64,17 @@ namespace Catonia_Item_Tracker
                     returnVal *= -1;
                 }
 
-                if ((((ListViewItem)x).SubItems[1].Text != "0") && (((ListViewItem)y).SubItems[1].Text == "0"))
+                //if we are forcing items with a qty greater than 0 to the top
+                if (sortItemsInInventoryToTop)
                 {
-                    return -1;
-                }
-                else if ((((ListViewItem)x).SubItems[1].Text == "0") && (((ListViewItem)y).SubItems[1].Text != "0"))
-                {
-                    return 1;
+                    if ((((ListViewItem)x).SubItems[1].Text != "0") && (((ListViewItem)y).SubItems[1].Text == "0"))
+                    {
+                        return -1;
+                    }
+                    else if ((((ListViewItem)x).SubItems[1].Text == "0") && (((ListViewItem)y).SubItems[1].Text != "0"))
+                    {
+                        return 1;
+                    }
                 }
 
                 return returnVal;
@@ -78,6 +85,11 @@ namespace Catonia_Item_Tracker
         /// the column # that was clicked last in the inventory list
         /// </summary>
         private int sortColumnInventory = 0;
+
+        /// <summary>
+        /// If the item list should always sort items we have at least one of above items we don't have any of
+        /// </summary>
+        private bool sortItemsInInventoryToTop = true;
 
         /// <summary>
         /// The list of item types that have been checked off in the filters
@@ -407,7 +419,7 @@ namespace Catonia_Item_Tracker
                 lvItemsToChange.Columns[0].Width = -2;
 
                 //sort itemList
-                lvItemsToChange.ListViewItemSorter = new lvItemComparer(sortColumnInventory, lvItemsToChange.Sorting);
+                lvItemsToChange.ListViewItemSorter = new lvItemComparer(sortColumnInventory, lvItemsToChange.Sorting, sortItemsInInventoryToTop);
                 lvItemsToChange.Sort();
             }
             finally
@@ -1188,12 +1200,33 @@ namespace Catonia_Item_Tracker
             cmsItemList.Items.Clear();
 
             Point clicked = lvItems.PointToClient(new Point(cmsItemList.Left, cmsItemList.Top));
+            int qtyHeaderLeft = lvItems.Columns[0].Width;
+            int qtyHeaderRight = qtyHeaderLeft + lvItems.Columns[1].Width;
             int craftHeaderLeft = lvItems.Columns[0].Width + lvItems.Columns[1].Width + lvItems.Columns[2].Width + lvItems.Columns[3].Width;
             int craftHeaderRight = craftHeaderLeft + lvItems.Columns[4].Width;
             int typeHeaderRight = craftHeaderRight + lvItems.Columns[5].Width;
 
-            //figure out if we are in the craft header
-            if ((clicked.Y < 24) 
+            //if we are in the qty header
+            if ((clicked.Y < 24)
+                && (clicked.X > qtyHeaderLeft) && (clicked.X < qtyHeaderRight))
+            {
+                cmsItemList.ShowCheckMargin = true;
+
+                List<ToolStripMenuItem> toolStripMenuItems = new List<ToolStripMenuItem>();
+
+                ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem();
+                toolStripMenuItem.CheckOnClick = true;
+                toolStripMenuItem.Name = "spiltSort";
+                toolStripMenuItem.Checked = sortItemsInInventoryToTop;
+                toolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+                toolStripMenuItem.Text = "Sort items in inventory to the top";
+                toolStripMenuItem.Click += new System.EventHandler(CmsItemListQty_Click);
+                toolStripMenuItems.Add(toolStripMenuItem);
+
+                cmsItemList.Items.AddRange(toolStripMenuItems.ToArray());
+            }
+            //if we are in the craft header
+            else if ((clicked.Y < 24) 
                 && (clicked.X > craftHeaderLeft) && (clicked.X < craftHeaderRight))
             {
                 cmsItemList.ShowCheckMargin = true;
@@ -1289,6 +1322,26 @@ namespace Catonia_Item_Tracker
         }
 
         /// <summary>
+        /// Event handler for the item context menu's qty options being selected or unselected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CmsItemListQty_Click(object sender, EventArgs e)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+
+            sortItemsInInventoryToTop = ((ToolStripMenuItem)cmsItemList.Items[0]).Checked;
+
+            // update the sort overide status
+            ((lvItemComparer)lvItems.ListViewItemSorter).sortItemsInInventoryToTop = sortItemsInInventoryToTop;
+
+            // Call the sort method to manually sort.
+            lvItems.Sort();
+
+            Cursor.Current = Cursors.Default;
+        }
+
+        /// <summary>
         /// Event handler for the item context menu's craft options being selected or unselected
         /// </summary>
         /// <param name="sender"></param>
@@ -1298,16 +1351,50 @@ namespace Catonia_Item_Tracker
             Cursor.Current = Cursors.WaitCursor;
 
             filterProfessions = new List<char>();
-            filterTypes = new List<string>();
             foreach (ToolStripMenuItem option in cmsItemList.Items)
             {
-                if(option.Checked)
+                if (option.Checked)
                 {
                     filterProfessions.Add(shortProfessionCode(option.Name));
                 }
             }
 
             updateLvItems(inventory.loot.Values, lvItems);
+
+            filterCrafts();
+            filterType();
+            Cursor.Current = Cursors.Default;
+        }
+
+        /// <summary>
+        /// Event handler for the item context menu's type options being selected or unselected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CmsItemListType_Click(object sender, EventArgs e)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+
+            filterTypes = new List<string>();
+            foreach (ToolStripMenuItem option in cmsItemList.Items)
+            {
+                if (option.Checked)
+                {
+                    filterTypes.Add(option.Name);
+                }
+            }
+
+            updateLvItems(inventory.loot.Values, lvItems);
+
+            filterCrafts();
+            filterType();
+            Cursor.Current = Cursors.Default;
+        }
+        /// <summary>
+        /// filters the lvItems to not show items that don't meet the list of crafts/professions chosen in filterProfessions
+        /// </summary>
+        private void filterCrafts()
+        { 
             if (filterProfessions.Count != 0)
             {
                 foreach(ListViewItem lvi in lvItems.Items)
@@ -1328,29 +1415,13 @@ namespace Catonia_Item_Tracker
                     }
                 }
             }
-            Cursor.Current = Cursors.Default;
         }
 
         /// <summary>
-        /// Event handler for the item context menu's type options being selected or unselected
+        /// filters the lvItems to not show items that don't meet the list of types chosen in filterTypes
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CmsItemListType_Click(object sender, EventArgs e)
-        {
-            Cursor.Current = Cursors.WaitCursor;
-
-            filterProfessions = new List<char>();
-            filterTypes = new List<string>();
-            foreach (ToolStripMenuItem option in cmsItemList.Items)
-            {
-                if (option.Checked)
-                {
-                    filterTypes.Add(option.Name);
-                }
-            }
-
-            updateLvItems(inventory.loot.Values, lvItems);
+        private void filterType()
+        { 
             if (filterTypes.Count != 0)
             {
                 foreach (ListViewItem lvi in lvItems.Items)
@@ -1361,8 +1432,8 @@ namespace Catonia_Item_Tracker
                     }
                 }
             }
-            Cursor.Current = Cursors.Default;
         }
+
         /// <summary>
         /// Event handler for the recipie context menu opening, sets if the edit option should show, (only if a single recipie is selected.)
         /// </summary>
@@ -1469,7 +1540,7 @@ namespace Catonia_Item_Tracker
             }
 
             // Set the ListViewItemSorter property to a new ListViewItemComparer object.
-            lvItems.ListViewItemSorter = new lvItemComparer(e.Column, lvItems.Sorting);
+            lvItems.ListViewItemSorter = new lvItemComparer(e.Column, lvItems.Sorting, sortItemsInInventoryToTop);
 
             // Call the sort method to manually sort.
             lvItems.Sort();

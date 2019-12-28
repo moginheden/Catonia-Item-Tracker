@@ -1,7 +1,9 @@
 
 
-select * from items
-where name like 'carnage%'
+select replace(name, 'Iron', 'Brass Ruby') as name, 'Adds 10lbs and grants Fire resist 5.  Once per day when hit with a fire spell you gain 10HP.' as description, '1350' as cost, type, 'Jewelcrafting' as subtype from items
+where name like 'iron - light armor'
+
+select distinct subtype from items
 
 select * 
 from recipies
