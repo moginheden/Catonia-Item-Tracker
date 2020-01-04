@@ -114,6 +114,10 @@ namespace Catonia_Item_Tracker
         /// <param name="e"></param>
         private void CbType_SelectedIndexChanged(object sender, EventArgs e)
         {
+            lvMaterials.BeginUpdate();
+            lvMaterials.Items.Clear();
+            lvMaterials.EndUpdate();
+
             cbMod.BeginUpdate();
             cbMod.Items.Clear();
 
