@@ -503,6 +503,16 @@ namespace Catonia_Item_Tracker
             for (int i = 0; results.Count < 20 && i < lvItems.Items.Count; i++)
             {
                 ListViewItem row = lvItems.Items[i];
+                if ((row.SubItems[0].Text.ToLower().StartsWith(search.ToLower()))
+                    || (cbSearchDescriptions.Checked && (((InventoryItem)row.Tag).item.description.ToLower().StartsWith(search.ToLower()))))
+                {
+                    results.Add(((InventoryItem)row.Tag));
+                }
+            }
+
+            for (int i = 0; results.Count < 20 && i < lvItems.Items.Count; i++)
+            {
+                ListViewItem row = lvItems.Items[i];
                 if ((row.SubItems[0].Text.ToLower().Contains(search.ToLower()))
                     || (cbSearchDescriptions.Checked && (((InventoryItem)row.Tag).item.description.ToLower().Contains(search.ToLower()))))
                 {
@@ -510,7 +520,7 @@ namespace Catonia_Item_Tracker
                 }
             }
 
-            if(results.Count == 0)
+            if (results.Count == 0)
             {
                 oBox.DroppedDown = false;
                 return;
