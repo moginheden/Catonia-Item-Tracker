@@ -516,7 +516,10 @@ namespace Catonia_Item_Tracker
                 if ((row.SubItems[0].Text.ToLower().Contains(search.ToLower()))
                     || (cbSearchDescriptions.Checked && (((InventoryItem)row.Tag).item.description.ToLower().Contains(search.ToLower()))))
                 {
-                    results.Add(((InventoryItem)row.Tag));
+                    if (!(results.Contains((InventoryItem)row.Tag)))
+                    {
+                        results.Add(((InventoryItem)row.Tag));
+                    }
                 }
             }
 
