@@ -70,7 +70,15 @@ namespace Catonia_Item_Tracker
             string[] typeParts = this.type.Split(new string[] { " - " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (string part in typeParts)
             {
-                returnVal += part[0];
+                if (part == "Raw Material")
+                {
+                    returnVal += 'M';
+                }
+                else
+                {
+                    returnVal += part[0];
+                }
+                
             }
 
             return returnVal;

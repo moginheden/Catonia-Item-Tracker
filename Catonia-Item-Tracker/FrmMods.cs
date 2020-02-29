@@ -121,6 +121,10 @@ namespace Catonia_Item_Tracker
             cbMod.BeginUpdate();
             cbMod.Items.Clear();
 
+            lblMod.Font = new Font(lblMod.Font, FontStyle.Regular);
+            lblMod.ForeColor = System.Drawing.SystemColors.ControlText;
+            lblMod.Cursor = System.Windows.Forms.Cursors.Default;
+
             lblSkill.Text = "";
 
             if (cbSubType.Items.Count == 0)
@@ -173,6 +177,10 @@ namespace Catonia_Item_Tracker
             lvMaterials.BeginUpdate();
             lvMaterials.Items.Clear();
 
+            lblMod.Font = new Font(lblMod.Font, FontStyle.Regular);
+            lblMod.ForeColor = System.Drawing.SystemColors.ControlText;
+            lblMod.Cursor = System.Windows.Forms.Cursors.Default;
+
             if (modItem.name.StartsWith("Masterwork"))
             {
                 btnCraft.Text = "Apply";
@@ -207,6 +215,10 @@ namespace Catonia_Item_Tracker
                         }
                         lblSkill.Text = "Requires level " + r.crafterLevel.Substring(0, 2) + "(" + r.crafterLevel.Substring(2) + ") " + r.profession;
                         lblSkill.Left = defaultSkillRight - lblSkill.Width;
+
+                        lblMod.Font = new Font(lblMod.Font, FontStyle.Underline);
+                        lblMod.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+                        lblMod.Cursor = System.Windows.Forms.Cursors.Hand;
                         break;
                     }
                 }
@@ -526,6 +538,15 @@ namespace Catonia_Item_Tracker
                     CbMod_SelectedIndexChanged(null, null);
                 }
             }
+        }
+
+        private void lblMod_Click(object sender, EventArgs e)
+        {
+            Item modItem = (Item)cbMod.SelectedItem;
+
+            InventoryItem mod = Program.mainForm.inventory.findLoot(modItem);
+
+            Program.mainForm.selectInventoryItem(mod);
         }
     }
 }

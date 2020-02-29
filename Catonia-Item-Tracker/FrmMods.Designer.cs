@@ -149,6 +149,7 @@
             this.lblMod.Size = new System.Drawing.Size(35, 16);
             this.lblMod.TabIndex = 11;
             this.lblMod.Text = "Mod";
+            this.lblMod.Click += new System.EventHandler(this.lblMod_Click);
             // 
             // cbMod
             // 

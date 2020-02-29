@@ -1213,15 +1213,13 @@ namespace Catonia_Item_Tracker
             cmsItemList.Items.Clear();
 
             Point clicked = lvItems.PointToClient(new Point(cmsItemList.Left, cmsItemList.Top));
-            int qtyHeaderLeft = lvItems.Columns[0].Width;
-            int qtyHeaderRight = qtyHeaderLeft + lvItems.Columns[1].Width;
-            int craftHeaderLeft = lvItems.Columns[0].Width + lvItems.Columns[1].Width + lvItems.Columns[2].Width + lvItems.Columns[3].Width;
-            int craftHeaderRight = craftHeaderLeft + lvItems.Columns[4].Width;
-            int typeHeaderRight = craftHeaderRight + lvItems.Columns[5].Width;
+            Point topItemClicked = lvItems.PointToClient(new Point(cmsItemList.Left, lvItems.Top + 43)); //43 gets just past the headder into the first item
+            ListViewHitTestInfo hit = lvItems.HitTest(topItemClicked);
+            int columnindex = hit.Item.SubItems.IndexOf(hit.SubItem);
 
             //if we are in the qty header
             if ((clicked.Y < 24)
-                && (clicked.X > qtyHeaderLeft) && (clicked.X < qtyHeaderRight))
+                && (columnindex == 1))
             {
                 cmsItemList.ShowCheckMargin = true;
 
@@ -1240,7 +1238,7 @@ namespace Catonia_Item_Tracker
             }
             //if we are in the craft header
             else if ((clicked.Y < 24) 
-                && (clicked.X > craftHeaderLeft) && (clicked.X < craftHeaderRight))
+                && (columnindex == 4))
             {
                 cmsItemList.ShowCheckMargin = true;
 
@@ -1275,7 +1273,7 @@ namespace Catonia_Item_Tracker
             }
             //if in type header
             else if ((clicked.Y < 24)
-                && (clicked.X > craftHeaderRight) && (clicked.X < typeHeaderRight))
+                && (columnindex == 5))
             {
                 cmsItemList.ShowCheckMargin = true;
 
