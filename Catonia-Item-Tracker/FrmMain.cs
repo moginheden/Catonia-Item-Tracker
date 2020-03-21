@@ -561,6 +561,7 @@ namespace Catonia_Item_Tracker
         {
             if (txtSearch.SelectedItem != null)
             {
+                oldSearch = txtSearch.SelectedItem.ToString();
                 foreach (ListViewItem row in lvItems.Items)
                 {
                     if (((InventoryItem)row.Tag).id == ((InventoryItem)txtSearch.SelectedItem).id)

@@ -109,7 +109,7 @@
             this.btnSave.Location = new System.Drawing.Point(464, 332);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(59, 26);
-            this.btnSave.TabIndex = 7;
+            this.btnSave.TabIndex = 9;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
@@ -160,7 +160,7 @@
             this.cbType.Location = new System.Drawing.Point(53, 332);
             this.cbType.Name = "cbType";
             this.cbType.Size = new System.Drawing.Size(151, 21);
-            this.cbType.TabIndex = 8;
+            this.cbType.TabIndex = 7;
             this.cbType.SelectedIndexChanged += new System.EventHandler(this.CbType_SelectedIndexChanged);
             // 
             // lblType
@@ -169,7 +169,7 @@
             this.lblType.Location = new System.Drawing.Point(16, 335);
             this.lblType.Name = "lblType";
             this.lblType.Size = new System.Drawing.Size(31, 13);
-            this.lblType.TabIndex = 9;
+            this.lblType.TabIndex = 10;
             this.lblType.Text = "Type";
             // 
             // lblSubType
@@ -187,7 +187,7 @@
             this.cbSubType.Location = new System.Drawing.Point(269, 332);
             this.cbSubType.Name = "cbSubType";
             this.cbSubType.Size = new System.Drawing.Size(189, 21);
-            this.cbSubType.TabIndex = 10;
+            this.cbSubType.TabIndex = 8;
             // 
             // FrmItem
             // 

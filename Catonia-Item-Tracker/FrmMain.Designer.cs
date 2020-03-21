@@ -59,6 +59,7 @@
             this.resultUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numMadeUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numCanMakeUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.hoursUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmsRecipieList = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editRecipieToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createNewRecipieToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,6 +73,7 @@
             this.crafterLevelMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numMadeMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.numCanMakeMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.hoursMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblItemHistory = new System.Windows.Forms.Label();
             this.lvItemHistory = new System.Windows.Forms.ListView();
             this.dateTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -85,8 +87,6 @@
             this.ddlInventories = new System.Windows.Forms.ComboBox();
             this.btnCrafter = new System.Windows.Forms.Button();
             this.btnMods = new System.Windows.Forms.Button();
-            this.hoursMaking = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.hoursUsing = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmsItemList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudOwned)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGold)).BeginInit();
@@ -106,7 +106,7 @@
             this.txtSearch.Location = new System.Drawing.Point(12, 28);
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(367, 45);
-            this.txtSearch.TabIndex = 1;
+            this.txtSearch.TabIndex = 0;
             this.txtSearch.SelectedIndexChanged += new System.EventHandler(this.TxtSearch_SelectedIndexChanged);
             this.txtSearch.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TxtSearch_KeyUp);
             // 
@@ -138,7 +138,7 @@
             this.lvItems.Location = new System.Drawing.Point(12, 79);
             this.lvItems.Name = "lvItems";
             this.lvItems.Size = new System.Drawing.Size(494, 776);
-            this.lvItems.TabIndex = 3;
+            this.lvItems.TabIndex = 2;
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
             this.lvItems.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvItems_ColumnClick);
@@ -224,7 +224,7 @@
             0});
             this.nudOwned.Name = "nudOwned";
             this.nudOwned.Size = new System.Drawing.Size(219, 53);
-            this.nudOwned.TabIndex = 4;
+            this.nudOwned.TabIndex = 0;
             this.nudOwned.ThousandsSeparator = true;
             this.nudOwned.ValueChanged += new System.EventHandler(this.nudOwned_ValueChanged);
             // 
@@ -261,7 +261,7 @@
             0});
             this.nudGold.Name = "nudGold";
             this.nudGold.Size = new System.Drawing.Size(219, 53);
-            this.nudGold.TabIndex = 6;
+            this.nudGold.TabIndex = 0;
             this.nudGold.ThousandsSeparator = true;
             this.nudGold.ValueChanged += new System.EventHandler(this.nudGold_ValueChanged);
             // 
@@ -271,7 +271,7 @@
             this.btnAddGold.Location = new System.Drawing.Point(9, 88);
             this.btnAddGold.Name = "btnAddGold";
             this.btnAddGold.Size = new System.Drawing.Size(144, 41);
-            this.btnAddGold.TabIndex = 8;
+            this.btnAddGold.TabIndex = 2;
             this.btnAddGold.Text = "Add Gold";
             this.btnAddGold.UseVisualStyleBackColor = true;
             this.btnAddGold.Click += new System.EventHandler(this.btnAddGold_Click);
@@ -292,7 +292,7 @@
             -2147483648});
             this.nudAddGold.Name = "nudAddGold";
             this.nudAddGold.Size = new System.Drawing.Size(219, 53);
-            this.nudAddGold.TabIndex = 9;
+            this.nudAddGold.TabIndex = 1;
             this.nudAddGold.ThousandsSeparator = true;
             // 
             // gbGold
@@ -305,7 +305,7 @@
             this.gbGold.Location = new System.Drawing.Point(512, 12);
             this.gbGold.Name = "gbGold";
             this.gbGold.Size = new System.Drawing.Size(384, 144);
-            this.gbGold.TabIndex = 10;
+            this.gbGold.TabIndex = 5;
             this.gbGold.TabStop = false;
             this.gbGold.Text = "Gold";
             // 
@@ -330,7 +330,7 @@
             this.gbItemManagment.Location = new System.Drawing.Point(512, 162);
             this.gbItemManagment.Name = "gbItemManagment";
             this.gbItemManagment.Size = new System.Drawing.Size(384, 802);
-            this.gbItemManagment.TabIndex = 11;
+            this.gbItemManagment.TabIndex = 4;
             this.gbItemManagment.TabStop = false;
             this.gbItemManagment.Text = "Item";
             // 
@@ -357,7 +357,7 @@
             0});
             this.nudDeal.Name = "nudDeal";
             this.nudDeal.Size = new System.Drawing.Size(219, 53);
-            this.nudDeal.TabIndex = 17;
+            this.nudDeal.TabIndex = 2;
             this.nudDeal.ThousandsSeparator = true;
             this.nudDeal.Value = new decimal(new int[] {
             100,
@@ -382,7 +382,7 @@
             this.lvRecipiesUsingItem.MultiSelect = false;
             this.lvRecipiesUsingItem.Name = "lvRecipiesUsingItem";
             this.lvRecipiesUsingItem.Size = new System.Drawing.Size(369, 237);
-            this.lvRecipiesUsingItem.TabIndex = 15;
+            this.lvRecipiesUsingItem.TabIndex = 7;
             this.lvRecipiesUsingItem.UseCompatibleStateImageBehavior = false;
             this.lvRecipiesUsingItem.View = System.Windows.Forms.View.Details;
             this.lvRecipiesUsingItem.SelectedIndexChanged += new System.EventHandler(this.lvRecipies_SelectedIndexChanged);
@@ -409,6 +409,11 @@
             // 
             this.numCanMakeUsing.Text = "Can Do";
             this.numCanMakeUsing.Width = 48;
+            // 
+            // hoursUsing
+            // 
+            this.hoursUsing.Text = "Hours";
+            this.hoursUsing.Width = 40;
             // 
             // cmsRecipieList
             // 
@@ -452,7 +457,7 @@
             this.btnBuy.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
             this.btnBuy.Name = "btnBuy";
             this.btnBuy.Size = new System.Drawing.Size(65, 53);
-            this.btnBuy.TabIndex = 12;
+            this.btnBuy.TabIndex = 4;
             this.btnBuy.Text = "Buy";
             this.btnBuy.UseVisualStyleBackColor = true;
             this.btnBuy.Click += new System.EventHandler(this.btnBuy_Click);
@@ -474,7 +479,7 @@
             -2147483648});
             this.nudAddItems.Name = "nudAddItems";
             this.nudAddItems.Size = new System.Drawing.Size(219, 53);
-            this.nudAddItems.TabIndex = 11;
+            this.nudAddItems.TabIndex = 1;
             this.nudAddItems.ThousandsSeparator = true;
             this.nudAddItems.ValueChanged += new System.EventHandler(this.NudAddItems_ValueChanged);
             // 
@@ -485,7 +490,7 @@
             this.btnAddItems.Location = new System.Drawing.Point(9, 78);
             this.btnAddItems.Name = "btnAddItems";
             this.btnAddItems.Size = new System.Drawing.Size(73, 53);
-            this.btnAddItems.TabIndex = 10;
+            this.btnAddItems.TabIndex = 3;
             this.btnAddItems.Text = "Add";
             this.btnAddItems.UseVisualStyleBackColor = true;
             this.btnAddItems.Click += new System.EventHandler(this.btnAddItems_Click);
@@ -498,7 +503,7 @@
             this.btnMake.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.btnMake.Name = "btnMake";
             this.btnMake.Size = new System.Drawing.Size(63, 28);
-            this.btnMake.TabIndex = 11;
+            this.btnMake.TabIndex = 6;
             this.btnMake.Text = "Make";
             this.btnMake.UseVisualStyleBackColor = true;
             this.btnMake.Click += new System.EventHandler(this.btnMake_Click);
@@ -520,7 +525,7 @@
             this.lvRecipiesMakingItem.MultiSelect = false;
             this.lvRecipiesMakingItem.Name = "lvRecipiesMakingItem";
             this.lvRecipiesMakingItem.Size = new System.Drawing.Size(369, 94);
-            this.lvRecipiesMakingItem.TabIndex = 6;
+            this.lvRecipiesMakingItem.TabIndex = 5;
             this.lvRecipiesMakingItem.UseCompatibleStateImageBehavior = false;
             this.lvRecipiesMakingItem.View = System.Windows.Forms.View.Details;
             this.lvRecipiesMakingItem.SelectedIndexChanged += new System.EventHandler(this.lvRecipies_SelectedIndexChanged);
@@ -544,6 +549,11 @@
             // 
             this.numCanMakeMaking.Text = "Can Do";
             this.numCanMakeMaking.Width = 49;
+            // 
+            // hoursMaking
+            // 
+            this.hoursMaking.Text = "Hours";
+            this.hoursMaking.Width = 40;
             // 
             // lblItemHistory
             // 
@@ -631,7 +641,7 @@
             this.btnCreateNew.Location = new System.Drawing.Point(385, 28);
             this.btnCreateNew.Name = "btnCreateNew";
             this.btnCreateNew.Size = new System.Drawing.Size(121, 24);
-            this.btnCreateNew.TabIndex = 17;
+            this.btnCreateNew.TabIndex = 1;
             this.btnCreateNew.Text = "Create New";
             this.btnCreateNew.UseVisualStyleBackColor = true;
             this.btnCreateNew.Click += new System.EventHandler(this.btnCreateNew_Click);
@@ -643,7 +653,7 @@
             this.ddlInventories.Location = new System.Drawing.Point(108, 4);
             this.ddlInventories.Name = "ddlInventories";
             this.ddlInventories.Size = new System.Drawing.Size(171, 21);
-            this.ddlInventories.TabIndex = 18;
+            this.ddlInventories.TabIndex = 7;
             this.ddlInventories.SelectedIndexChanged += new System.EventHandler(this.DdlInventories_SelectedIndexChanged);
             // 
             // btnCrafter
@@ -651,7 +661,7 @@
             this.btnCrafter.Location = new System.Drawing.Point(304, 4);
             this.btnCrafter.Name = "btnCrafter";
             this.btnCrafter.Size = new System.Drawing.Size(75, 21);
-            this.btnCrafter.TabIndex = 19;
+            this.btnCrafter.TabIndex = 6;
             this.btnCrafter.Text = "Crafter Guide";
             this.btnCrafter.UseVisualStyleBackColor = true;
             this.btnCrafter.Click += new System.EventHandler(this.BtnCrafter_Click);
@@ -661,20 +671,10 @@
             this.btnMods.Location = new System.Drawing.Point(385, 4);
             this.btnMods.Name = "btnMods";
             this.btnMods.Size = new System.Drawing.Size(121, 21);
-            this.btnMods.TabIndex = 20;
+            this.btnMods.TabIndex = 3;
             this.btnMods.Text = "Mods";
             this.btnMods.UseVisualStyleBackColor = true;
             this.btnMods.Click += new System.EventHandler(this.BtnMods_Click);
-            // 
-            // hoursMaking
-            // 
-            this.hoursMaking.Text = "Hours";
-            this.hoursMaking.Width = 40;
-            // 
-            // hoursUsing
-            // 
-            this.hoursUsing.Text = "Hours";
-            this.hoursUsing.Width = 40;
             // 
             // FrmMain
             // 
