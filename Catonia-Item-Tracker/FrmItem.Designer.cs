@@ -125,7 +125,7 @@
             "Backpack",
             "Headgear",
             "Mask",
-            "Earing",
+            "Earring",
             "Cloak",
             "Armor - Light",
             "Armor - Light - Mod",
