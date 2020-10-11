@@ -89,7 +89,8 @@ namespace Catonia_Item_Tracker
             {
                 dataConnection.Open();
                 string sql = @"SELECT DISTINCT profession
-                               FROM recipies";
+                               FROM recipies
+                               ORDER BY profession";
                 using (SqlCommand comm = new SqlCommand(sql, dataConnection))
                 {
                     using (SqlDataReader reader = comm.ExecuteReader())
@@ -103,7 +104,8 @@ namespace Catonia_Item_Tracker
                     }
                 }
                 sql = @"SELECT DISTINCT crafterLevel
-                        FROM recipies";
+                        FROM recipies
+                        ORDER BY crafterLevel";
                 using (SqlCommand comm = new SqlCommand(sql, dataConnection))
                 {
                     using (SqlDataReader reader = comm.ExecuteReader())

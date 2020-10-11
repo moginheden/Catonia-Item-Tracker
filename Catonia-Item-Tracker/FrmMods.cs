@@ -71,9 +71,19 @@ namespace Catonia_Item_Tracker
             {
                 dataConnection.Open();
 
+                string searchType = ii.item.type;
+                if ((searchType == "Robe") || (searchType == "Cloak"))
+                {
+                    searchType = "Robe/Cloak";
+                }
+                else if ((searchType == "Shirt") || (searchType == "Pants"))
+                {
+                    searchType = "Shirt/Pants";
+                }
+
                 string selectSql = @"SELECT DISTINCT subType
                                         FROM items
-                                        WHERE type = '" + ii.item.type.Replace("'", "") + @" - Mod'";
+                                        WHERE type = '" + searchType.Replace("'", "") + @" - Mod'";
                 using (SqlCommand comm = new SqlCommand(selectSql, dataConnection))
                 {
                     using (SqlDataReader reader = comm.ExecuteReader())
@@ -134,6 +144,15 @@ namespace Catonia_Item_Tracker
             }
 
             string modType = txtType.Text + " - Mod";
+            if ((modType == "Robe - Mod") || (modType == "Cloak - Mod"))
+            {
+                modType = "Robe/Cloak - Mod";
+            }
+            else if ((modType == "Shirt - Mod") || (modType == "Pants - Mod"))
+            {
+                modType = "Shirt/Pants - Mod";
+            }
+
             string subType = "";
             if (cbSubType.SelectedIndex == -1)
             {

@@ -1,33 +1,34 @@
 insert into items
-select replace(name, 'Ring', 'Crown/Tiara') as name, description, case when name like 'Brass%' then cost+100 when name like 'Silver%' then cost+700 when name like 'Gold%' then cost+1400 when name like 'Platinum%' then cost+4000 when name like 'Moonlight%' then cost+9000 end as cost, 'Headgear' as type,
-		'Jewelcrafting' as subtype
+select replace(name, 'Lesser', 'Epic') as name, replace(description, '2', '20') as description, 13800 as cost, 
+		type, subtype
 from items
-where type = 'Ring'
+where name like 'lesser necklace of % protection'
 
 insert into recipies
 select newResult.id, resultQty, profession, crafterLevel, [hours]
 --, newResult.name, (select count(*) from recipies where result = newResult.id) as numRecipies, oldRecipie.*
 from recipies oldRecipie
 	 inner join items oldResult on oldRecipie.result = oldResult.id
-	 inner join items newResult on newResult.name = replace(oldresult.name, 'Ring', 'Crown/Tiara')
+	 inner join items newResult on newResult.name = replace(oldResult.name, 'Lesser', 'Epic')
 where newResult.id != oldResult.id
-  and oldResult.type = 'Ring'
+  and oldResult.name like 'lesser necklace of % protection'
 
 
 
 insert into recipieIngredients
-select newRecipie.id as recipieID, newIngredient.id as ingredient, qty as qty
+select newRecipie.id as recipieID, newIngredient.id as ingredient, case when oldIngredient.name like '% pebbles' then 32 else qty end as qty
 --, oldResult.name as [old result], oldIngredient.name as [old ingredient], newResult.name as [new result], newIngredient.name as [new ingredient]
 from recipies oldRecipie
 	 inner join items oldResult on oldRecipie.result = oldResult.id
 	 inner join recipieIngredients on recipieIngredients.recipieID = oldRecipie.id
 	 inner join items oldIngredient on recipieIngredients.ingredient = oldIngredient.id
-	 inner join items newIngredient on newIngredient.name = case when oldIngredient.name like '% p44b%' then 'Brass Ingot' else oldIngredient.name end
-	 inner join items newResult on newResult.name = replace(oldresult.name, 'Ring', 'Crown/Tiara')
+	 inner join items newIngredient on newIngredient.name = case when oldIngredient.name like '%Ingot%' then 'Moonlight Ingot' else oldIngredient.name end
+	 inner join items newResult on newResult.name = replace(oldResult.name, 'Lesser', 'Epic')
 	 inner join recipies newRecipie on newRecipie.result = newResult.id
-where oldResult.type = 'Ring'
+where oldResult.subtype = 'Jewelcrafting'
   and newResult.id != oldResult.id
   and recipieIngredients.ingredient = oldIngredient.id
+
   and (((newRecipie.id % 3 = 0) and (oldIngredient.name like '%gem'))
        or ((newRecipie.id % 3 = 1) and (oldIngredient.name like '%shard'))
 	   or ((newRecipie.id % 3 = 2) and (oldIngredient.name like '%peb%')))
