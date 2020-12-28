@@ -1214,7 +1214,7 @@ namespace Catonia_Item_Tracker
             cmsItemList.Items.Clear();
 
             Point clicked = lvItems.PointToClient(new Point(cmsItemList.Left, cmsItemList.Top));
-            Point topItemClicked = lvItems.PointToClient(new Point(cmsItemList.Left, lvItems.Top + 43)); //43 gets just past the headder into the first item
+            Point topItemClicked = lvItems.PointToClient(new Point(cmsItemList.Left, lvItems.Top + 43)); //43 gets just past the header into the first item
             ListViewHitTestInfo hit = lvItems.HitTest(topItemClicked);
             int columnindex = hit.Item.SubItems.IndexOf(hit.SubItem);
 

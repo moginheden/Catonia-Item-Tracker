@@ -45,7 +45,7 @@ namespace Catonia_Item_Tracker
         public static FrmMain mainForm = null;
 
         /// <summary>
-        /// ID to diferentiate this instance from others in SQL's history table
+        /// ID to differentiate this instance from others in SQL's history table
         /// </summary>
         public static string clientID = Environment.MachineName;
 
